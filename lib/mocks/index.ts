@@ -1,4 +1,8 @@
 import { buildShoppingListFromPlan } from "@/lib/domain/shopping-list";
+import {
+  buildWeeklyPlanPreview,
+  getWeeklyPlanSummary,
+} from "@/lib/domain/weekly-plan-preview";
 import { household } from "@/lib/mocks/household";
 import { recipes, recipesById } from "@/lib/mocks/recipes";
 import { weekTemplate } from "@/lib/mocks/week-template";
@@ -14,41 +18,8 @@ export const householdSnapshot = {
   dietaryFocus: "Base comun con ajustes por persona",
 };
 
-export const weeklyPlanPreview = weeklyPlan.days.map((day) => ({
-  dayKey: day.dayKey,
-  label: day.label,
-  slots: ["lunch", "dinner"].map((mealType) => {
-    const slot = day.slots.find((item) => item.mealType === mealType);
-
-    if (!slot) {
-      return {
-        mealType,
-        status: "empty" as const,
-        title: "Sin plan todavia",
-        description: "Hueco libre para editar esta semana base.",
-      };
-    }
-
-    const recipe = recipesById[slot.recipeId];
-    const emphasis = slot.tags.includes("quick-dinner")
-      ? "Anti-delivery"
-      : slot.tags.includes("uses-leftovers")
-        ? "Aprovecha sobras"
-        : slot.tags.includes("batch-friendly")
-          ? "Batch cooking"
-          : "Base comun";
-
-    return {
-      mealType,
-      status: "planned" as const,
-      recipeId: recipe.id,
-      title: recipe.title,
-      minutes: recipe.durationMinutes,
-      description: emphasis,
-      tags: slot.tags,
-    };
-  }),
-}));
+export const weeklyPlanPreview = buildWeeklyPlanPreview(weeklyPlan, recipes);
+export const weeklyPlanSummary = getWeeklyPlanSummary(weeklyPlan);
 
 export const shoppingList = buildShoppingListFromPlan(weeklyPlan, recipes);
 

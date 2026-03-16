@@ -7,7 +7,7 @@ type InputCardProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function InputCard({ label, hint, className = "", ...props }: InputCardProps) {
   return (
-    <label className="block rounded-[1.5rem] border border-[var(--color-border)] bg-[rgba(255,255,255,0.05)] px-4 py-3">
+    <label className="block rounded-[1.5rem] border border-[var(--color-border)] bg-[rgba(255,255,255,0.05)] px-4 py-3 transition focus-within:border-[rgba(252,163,17,0.55)] focus-within:bg-[rgba(255,255,255,0.07)]">
       <span className="block text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
         {label}
       </span>

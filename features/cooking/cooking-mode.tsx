@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import type { Recipe } from "@/lib/domain/types";
+import { useEffect, useState } from "react";
+import type { Household, Recipe } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
 
 type CookingModeProps = {
   recipe: Recipe;
+  household: Household;
 };
 
-export function CookingMode({ recipe }: CookingModeProps) {
+export function CookingMode({ recipe, household }: CookingModeProps) {
   const [activeStep, setActiveStep] = useState(0);
   const initialSeconds = recipe.steps[0]?.timerSeconds ?? 0;
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
@@ -34,12 +35,31 @@ export function CookingMode({ recipe }: CookingModeProps) {
   const seconds = String(secondsLeft % 60).padStart(2, "0");
   const completionRatio = completedSteps.length / recipe.steps.length;
   const recipeCompleted = completedSteps.length === recipe.steps.length;
+  const servingReminders = household.members
+    .map((member) => {
+      const memberAdjustments = recipe.portionAdjustments.filter(
+        (adjustment) => adjustment.memberId === member.id,
+      );
 
-  const nextPendingStep = useMemo(
-    () =>
-      recipe.steps.findIndex((step) => !completedSteps.includes(step.id)),
-    [completedSteps, recipe.steps],
-  );
+      if (!memberAdjustments.length) {
+        return `${member.name}: misma base`;
+      }
+
+      const summary = memberAdjustments
+        .map((adjustment) => {
+          const ingredient = recipe.ingredients.find(
+            (item) => item.id === adjustment.ingredientId,
+          );
+          const ingredientName = ingredient?.name ?? "ajuste";
+          const sign = adjustment.deltaQuantity > 0 ? "+" : "";
+
+          return `${ingredientName} ${sign}${adjustment.deltaQuantity} ${adjustment.unit}`;
+        })
+        .join(", ");
+
+      return `${member.name}: ${summary}`;
+    })
+    .join(" · ");
 
   function selectStep(index: number) {
     const nextInitial = recipe.steps[index]?.timerSeconds ?? 0;
@@ -56,40 +76,44 @@ export function CookingMode({ recipe }: CookingModeProps) {
     );
   }
 
-  function goToNextStep() {
-    if (activeStep < recipe.steps.length - 1) {
-      selectStep(activeStep + 1);
-    }
-  }
+  function handleStepAction() {
+    const alreadyCompleted = completedSteps.includes(currentStep.id);
 
-  function focusNextPendingStep() {
-    if (nextPendingStep >= 0) {
-      selectStep(nextPendingStep);
+    if (alreadyCompleted) {
+      toggleStepCompleted(currentStep.id);
+      return;
+    }
+
+    toggleStepCompleted(currentStep.id);
+
+    if (activeStep < recipe.steps.length - 1) {
+      window.setTimeout(() => {
+        selectStep(activeStep + 1);
+      }, 120);
     }
   }
 
   return (
     <div className="space-y-4">
-      <SectionCard className="bg-[linear-gradient(135deg,rgba(252,163,17,0.2),rgba(255,255,255,0.08))]">
+      <SectionCard className="border-[rgba(252,163,17,0.4)] bg-[linear-gradient(135deg,rgba(252,163,17,0.24),rgba(255,255,255,0.1))] shadow-[0_0_0_1px_rgba(252,163,17,0.12)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
               Paso {activeStep + 1} de {recipe.steps.length}
             </p>
-            <h2 className="mt-2 font-display text-2xl font-semibold text-[var(--color-paper)]">
+            <h2 className="mt-2 font-display text-2xl font-semibold leading-tight text-[var(--color-paper)]">
               {currentStep.title}
             </h2>
           </div>
           <button
             type="button"
-            onClick={() => toggleStepCompleted(currentStep.id)}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               completedSteps.includes(currentStep.id)
                 ? "bg-[var(--color-success)] text-slate-950"
                 : "border border-[var(--color-border)] text-[var(--color-paper)]"
             }`}
           >
-            {completedSteps.includes(currentStep.id) ? "Completado" : "Marcar paso"}
+            {completedSteps.includes(currentStep.id) ? "Completado" : "En curso"}
           </button>
         </div>
 
@@ -121,22 +145,22 @@ export function CookingMode({ recipe }: CookingModeProps) {
         </p>
       </SectionCard>
 
-      <SectionCard>
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Timer opcional
-            </p>
-            <p className="mt-2 font-display text-4xl font-semibold text-[var(--color-paper)]">
-              {minutes}:{seconds}
-            </p>
-          </div>
-          {timerAvailable ? (
+      {timerAvailable ? (
+        <SectionCard>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                Timer
+              </p>
+              <p className="mt-2 font-display text-4xl font-semibold text-[var(--color-paper)]">
+                {minutes}:{seconds}
+              </p>
+            </div>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setRunning((current) => !current)}
-                className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
+                className="rounded-full bg-[var(--color-accent)] px-5 py-3.5 text-sm font-semibold text-slate-950"
               >
                 {running ? "Pausar" : "Iniciar"}
               </button>
@@ -146,36 +170,27 @@ export function CookingMode({ recipe }: CookingModeProps) {
                   setRunning(false);
                   setSecondsLeft(0);
                 }}
-                className="rounded-full border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)]"
+                className="rounded-full border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
               >
                 Omitir
               </button>
             </div>
-          ) : (
-            <span className="text-sm text-[var(--color-muted)]">Este paso no necesita timer</span>
-          )}
-        </div>
-      </SectionCard>
+          </div>
+        </SectionCard>
+      ) : null}
 
       <SectionCard>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => toggleStepCompleted(currentStep.id)}
-            className="flex-1 rounded-2xl border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)]"
-          >
-            {completedSteps.includes(currentStep.id)
-              ? "Desmarcar paso"
-              : "Completar este paso"}
-          </button>
-          <button
-            type="button"
-            onClick={goToNextStep}
-            className="flex-1 rounded-2xl bg-[rgba(255,255,255,0.08)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)]"
-          >
-            Siguiente paso
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleStepAction}
+          className={`w-full rounded-2xl px-4 py-4 text-base font-semibold transition ${
+            completedSteps.includes(currentStep.id)
+              ? "border border-[var(--color-border)] text-[var(--color-paper)] hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
+              : "bg-[var(--color-accent)] text-slate-950"
+          }`}
+        >
+          {completedSteps.includes(currentStep.id) ? "Deshacer" : "Hecho!"}
+        </button>
       </SectionCard>
 
       {recipeCompleted ? (
@@ -187,45 +202,32 @@ export function CookingMode({ recipe }: CookingModeProps) {
             Todo listo para servir
           </h3>
           <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-            Has completado todos los pasos. Puedes volver al menu semanal o
-            seguir con la compra del resto de la semana.
+            Has completado todos los pasos. Toca servir y usa estas notas finales para repartir mejor.
           </p>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 rounded-2xl bg-[rgba(255,255,255,0.06)] px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              Recuerda al servir
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[var(--color-paper)]">
+              {servingReminders}
+            </p>
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-3">
             <Link
               href="/dashboard"
               className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
             >
-              Volver al menu
+              A comer! 🍽️
             </Link>
             <Link
-              href="/shopping-list"
-              className="rounded-full border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)]"
+              href={`/recipes/${recipe.id}`}
+              className="text-sm font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-paper)]"
             >
-              Seguir con la compra
+              Deshacer
             </Link>
           </div>
         </SectionCard>
-      ) : (
-        <SectionCard>
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                Progreso
-              </p>
-              <p className="mt-1 text-sm text-[var(--color-paper)]">
-                Sigue aunque no uses timer. El progreso depende solo de los pasos completados.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={focusNextPendingStep}
-              className="rounded-full border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)]"
-            >
-              Ir al siguiente pendiente
-            </button>
-          </div>
-        </SectionCard>
-      )}
+      ) : null}
 
       <div className="grid gap-2">
         {recipe.steps.map((step, index) => {

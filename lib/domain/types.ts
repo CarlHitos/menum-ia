@@ -2,6 +2,8 @@ export type Goal = "gain" | "lose" | "maintain" | "eat-better";
 
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
+export type PlanningStartMode = "today" | "next-monday";
+
 export type IngredientCategory =
   | "protein"
   | "legumes"
@@ -134,16 +136,25 @@ export type WeekTemplate = {
   repeatable: boolean;
   days: PlannedDay[];
   batchBlocks: BatchCookingBlock[];
+  leftoverFlows: LeftoverFlow[];
 };
+
+export type WeeklyPlanStatus = "draft" | "confirmed";
 
 export type WeeklyPlan = {
   id: string;
   householdId: string;
   templateId?: string;
+  status: WeeklyPlanStatus;
+  planningStartMode: PlanningStartMode;
+  rangeStart: string;
+  rangeEnd: string;
   weekStart: string;
   days: PlannedDay[];
   batchBlocks: BatchCookingBlock[];
   leftoverFlows: LeftoverFlow[];
+  confirmedAt?: string;
+  updatedAt: string;
 };
 
 export type ShoppingItem = {
@@ -158,7 +169,7 @@ export type ShoppingItem = {
 };
 
 export type ShoppingCategory = {
-  key: IngredientCategory;
+  key: string;
   label: string;
   items: ShoppingItem[];
 };
@@ -166,4 +177,19 @@ export type ShoppingCategory = {
 export type ShoppingList = {
   planId: string;
   categories: ShoppingCategory[];
+};
+
+export type ShoppingListStateItem = {
+  itemKey: string;
+  checked: boolean;
+  status: "needed" | "removed";
+  name: string;
+  quantity: number;
+  unit: string;
+};
+
+export type ShoppingListState = {
+  planId: string;
+  items: ShoppingListStateItem[];
+  updatedAt: string;
 };

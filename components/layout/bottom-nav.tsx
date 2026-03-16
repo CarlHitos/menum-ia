@@ -1,10 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const items = [
-  { href: "/", label: "Inicio" },
-  { href: "/onboarding", label: "Hogar" },
-  { href: "/dashboard", label: "Menu" },
-  { href: "/shopping-list", label: "Compra" },
+  { href: "/", label: "Inicio", icon: "/branding/app-icon-main.svg" },
+  { href: "/onboarding", label: "Hogar", icon: "/branding/hogar.svg" },
+  { href: "/dashboard", label: "Menu", icon: "/branding/meal.svg" },
+  { href: "/shopping-list", label: "Compra", icon: "/branding/list.svg" },
 ];
 
 type BottomNavProps = {
@@ -24,12 +25,19 @@ export function BottomNav({ currentPath }: BottomNavProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex-1 rounded-full px-3 py-3 text-center text-sm transition ${
+            className={`flex flex-1 flex-col items-center justify-center gap-1.5 rounded-full px-3 py-2 text-center text-xs transition ${
               isActive
                 ? "bg-[var(--color-accent)] text-slate-950"
                 : "text-[var(--color-muted)]"
             }`}
           >
+            <Image
+              src={item.icon}
+              alt=""
+              width={24}
+              height={24}
+              className={`h-6 w-6 object-contain ${isActive ? "" : "opacity-85"}`}
+            />
             {item.label}
           </Link>
         );

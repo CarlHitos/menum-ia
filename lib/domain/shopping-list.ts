@@ -13,7 +13,7 @@ const categoryLabels: Record<IngredientCategory, string> = {
   carbs: "Cereales y carbohidratos",
   vegetables: "Verduras y hortalizas",
   fruit: "Fruta",
-  "fats-basics": "Grasas y basicos",
+  "fats-basics": "Condimentos y basicos",
   "dairy-drinks": "Lacteos / bebidas",
 };
 
@@ -104,7 +104,13 @@ export function buildShoppingListFromPlan(plan: WeeklyPlan, recipes: Recipe[]) {
       }))
       .sort(
         (left, right) =>
-          categoryOrder.indexOf(left.key) - categoryOrder.indexOf(right.key),
+          getCategoryOrderIndex(left.key as IngredientCategory) -
+          getCategoryOrderIndex(right.key as IngredientCategory),
       ),
   };
+}
+
+function getCategoryOrderIndex(key: IngredientCategory) {
+  const index = categoryOrder.indexOf(key);
+  return index === -1 ? categoryOrder.length : index;
 }

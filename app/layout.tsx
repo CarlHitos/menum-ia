@@ -13,8 +13,13 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Menumia",
+  title: "MenumIA",
   description: "Planificacion de comidas moderna para hogares.",
+  icons: {
+    icon: "/branding/favicon.png",
+    shortcut: "/branding/favicon.png",
+    apple: "/branding/favicon.png",
+  },
 };
 
 export default function RootLayout({

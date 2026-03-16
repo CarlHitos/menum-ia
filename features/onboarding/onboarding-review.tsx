@@ -1,24 +1,31 @@
 import Link from "next/link";
 import { SectionCard } from "@/components/ui/section-card";
 import type { OnboardingDraft } from "@/features/onboarding/types";
+import { formatGoalLabel } from "@/lib/domain/goal-labels";
 
 type OnboardingReviewProps = {
   draft: OnboardingDraft;
 };
 
 export function OnboardingReview({ draft }: OnboardingReviewProps) {
+  const householdName = draft.householdName || "tu hogar";
+
   return (
     <div className="space-y-4">
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
           Resumen final
         </p>
+        <span className="mt-3 inline-flex rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-soft)]">
+          Ahorro estimado: ~15% en delivery
+        </span>
         <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-          {draft.householdName || "Tu hogar"} ya tiene contexto suficiente
+          {`Todo listo, familia ${householdName}`}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          El menu semanal podra partir de una base comun para {draft.memberCount}{" "}
-          personas, con ajustes de racion por miembro.
+          MenumIA ya sabe que necesitais. Hemos disenado un plan inteligente
+          para vuestro hogar de {draft.memberCount} personas, optimizando la
+          compra para que no gasteis ni un euro de mas.
         </p>
       </SectionCard>
 
@@ -36,14 +43,28 @@ export function OnboardingReview({ draft }: OnboardingReviewProps) {
                 {member.name || "Sin nombre"}
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                {member.goal}
+                {formatGoalLabel(member.goal)}
               </p>
-              <p className="mt-2 text-sm text-[var(--color-muted)]">
-                Restricciones: {member.restrictions || "ninguna"}
-              </p>
-              <p className="mt-1 text-sm text-[var(--color-muted)]">
-                No le gusta: {member.dislikes || "sin notas"}
-              </p>
+              {member.allergies ? (
+                <p className="mt-2 text-sm text-[var(--color-muted)]">
+                  Alergias: {member.allergies}
+                </p>
+              ) : null}
+              {member.restrictions ? (
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
+                  Restricciones: {member.restrictions}
+                </p>
+              ) : null}
+              {member.dislikes ? (
+                <p className="mt-1 text-sm text-[var(--color-muted)]">
+                  No le gusta: {member.dislikes}
+                </p>
+              ) : null}
+              {!member.allergies && !member.restrictions && !member.dislikes ? (
+                <p className="mt-2 text-sm text-[var(--color-success)]">
+                  Sin restricciones importantes
+                </p>
+              ) : null}
             </div>
           ))}
         </div>
@@ -54,14 +75,15 @@ export function OnboardingReview({ draft }: OnboardingReviewProps) {
           Preferencias del hogar
         </p>
         <div className="mt-3 space-y-2 text-sm text-[var(--color-muted)]">
-          <p>Presupuesto semanal: {draft.weeklyBudget || "no definido"}</p>
-          <p>Tiempo de cocina: {draft.cookingLoad}</p>
-          <p>Supermercado habitual: {draft.preferredStore || "no definido"}</p>
+          <p>Comidas a planificar: {draft.mealsPerDay.map(formatMealType).join(", ")}</p>
+          <p>Presupuesto semanal: Objetivo {formatBudget(draft.weeklyBudget)}</p>
+          <p>Tiempo de cocina: {formatCookingLoad(draft.cookingLoad)}</p>
+          <p>Supermercado habitual: {draft.preferredStore || "sin definir"}</p>
           <p>
             Planificacion:{" "}
             {draft.repeatMode === "repeat-base-week"
-              ? "repetir semana base"
-              : "variar semana a semana"}
+              ? "Ahorro maximo"
+              : "Variedad y platos nuevos"}
           </p>
         </div>
       </SectionCard>
@@ -70,8 +92,44 @@ export function OnboardingReview({ draft }: OnboardingReviewProps) {
         href="/dashboard"
         className="inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-4 text-sm font-semibold text-slate-950"
       >
-        Entrar al menu semanal
+        Generar mi menu inteligente ✨
       </Link>
     </div>
   );
+}
+
+function formatMealType(mealType: string) {
+  switch (mealType) {
+    case "breakfast":
+      return "desayuno";
+    case "lunch":
+      return "comida";
+    case "snack":
+      return "snack o merienda";
+    case "dinner":
+      return "cena";
+    default:
+      return mealType;
+  }
+}
+
+function formatBudget(value: string) {
+  if (!value.trim()) {
+    return "sin definir";
+  }
+
+  return value.includes("€") ? value : `${value}€`;
+}
+
+function formatCookingLoad(cookingLoad: OnboardingDraft["cookingLoad"]) {
+  switch (cookingLoad) {
+    case "low":
+      return "Express y entre semana";
+    case "medium":
+      return "Ritmo equilibrado";
+    case "high":
+      return "Cocinando a tope";
+    default:
+      return cookingLoad;
+  }
 }

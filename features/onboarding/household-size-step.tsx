@@ -18,8 +18,8 @@ export function HouseholdSizeStep({
     <div className="space-y-4">
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
         <p className="text-sm leading-6 text-[var(--color-paper)]">
-          Define primero la estructura basica del hogar para adaptar el menu a una
-          sola cocina compartida.
+          Para daros la mejor planificacion, primero necesitamos saber como es
+          vuestro dia a dia. Cuentanos quienes sois en este hogar compartido.
         </p>
       </SectionCard>
 
@@ -34,7 +34,7 @@ export function HouseholdSizeStep({
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
           Cuantas personas cocinan y comen aqui
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
           {memberOptions.map((count) => (
             <ChoiceChip
               key={count}

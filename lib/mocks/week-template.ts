@@ -11,12 +11,28 @@ export const weekTemplate: WeekTemplate = {
       label: "Lun",
       slots: [
         {
+          id: "mon-breakfast",
+          mealType: "breakfast",
+          recipeId: "avena-yogur-fruta",
+          dayKey: "monday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "mon-lunch",
           mealType: "lunch",
           recipeId: "arroz-pollo-verduras",
           dayKey: "monday",
           servings: 3,
           tags: ["batch-friendly", "generates-leftovers"],
+        },
+        {
+          id: "mon-snack",
+          mealType: "snack",
+          recipeId: "yogur-fruta-semillas",
+          dayKey: "monday",
+          servings: 3,
+          tags: [],
         },
         {
           id: "mon-dinner",
@@ -33,9 +49,25 @@ export const weekTemplate: WeekTemplate = {
       label: "Mar",
       slots: [
         {
+          id: "tue-breakfast",
+          mealType: "breakfast",
+          recipeId: "tostadas-huevo-aguacate",
+          dayKey: "tuesday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "tue-lunch",
           mealType: "lunch",
           recipeId: "lentejas-verduras-arroz",
+          dayKey: "tuesday",
+          servings: 3,
+          tags: [],
+        },
+        {
+          id: "tue-snack",
+          mealType: "snack",
+          recipeId: "hummus-zanahoria-tortitas",
           dayKey: "tuesday",
           servings: 3,
           tags: [],
@@ -55,12 +87,28 @@ export const weekTemplate: WeekTemplate = {
       label: "Mie",
       slots: [
         {
+          id: "wed-breakfast",
+          mealType: "breakfast",
+          recipeId: "avena-yogur-fruta",
+          dayKey: "wednesday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "wed-lunch",
           mealType: "lunch",
           recipeId: "pasta-carne-tomate",
           dayKey: "wednesday",
           servings: 3,
           tags: ["batch-friendly", "generates-leftovers"],
+        },
+        {
+          id: "wed-snack",
+          mealType: "snack",
+          recipeId: "yogur-fruta-semillas",
+          dayKey: "wednesday",
+          servings: 3,
+          tags: [],
         },
         {
           id: "wed-dinner",
@@ -77,9 +125,25 @@ export const weekTemplate: WeekTemplate = {
       label: "Jue",
       slots: [
         {
+          id: "thu-breakfast",
+          mealType: "breakfast",
+          recipeId: "tostadas-huevo-aguacate",
+          dayKey: "thursday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "thu-lunch",
           mealType: "lunch",
           recipeId: "merluza-patata-brocoli",
+          dayKey: "thursday",
+          servings: 3,
+          tags: [],
+        },
+        {
+          id: "thu-snack",
+          mealType: "snack",
+          recipeId: "hummus-zanahoria-tortitas",
           dayKey: "thursday",
           servings: 3,
           tags: [],
@@ -99,12 +163,28 @@ export const weekTemplate: WeekTemplate = {
       label: "Vie",
       slots: [
         {
+          id: "fri-breakfast",
+          mealType: "breakfast",
+          recipeId: "avena-yogur-fruta",
+          dayKey: "friday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "fri-lunch",
           mealType: "lunch",
           recipeId: "salteado-arroz-pavo",
           dayKey: "friday",
           servings: 3,
           tags: ["uses-leftovers"],
+        },
+        {
+          id: "fri-snack",
+          mealType: "snack",
+          recipeId: "yogur-fruta-semillas",
+          dayKey: "friday",
+          servings: 3,
+          tags: [],
         },
         {
           id: "fri-dinner",
@@ -121,9 +201,25 @@ export const weekTemplate: WeekTemplate = {
       label: "Sab",
       slots: [
         {
+          id: "sat-breakfast",
+          mealType: "breakfast",
+          recipeId: "tostadas-huevo-aguacate",
+          dayKey: "saturday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "sat-lunch",
           mealType: "lunch",
           recipeId: "albondigas-pure",
+          dayKey: "saturday",
+          servings: 3,
+          tags: [],
+        },
+        {
+          id: "sat-snack",
+          mealType: "snack",
+          recipeId: "hummus-zanahoria-tortitas",
           dayKey: "saturday",
           servings: 3,
           tags: [],
@@ -143,12 +239,28 @@ export const weekTemplate: WeekTemplate = {
       label: "Dom",
       slots: [
         {
+          id: "sun-breakfast",
+          mealType: "breakfast",
+          recipeId: "avena-yogur-fruta",
+          dayKey: "sunday",
+          servings: 3,
+          tags: [],
+        },
+        {
           id: "sun-lunch",
           mealType: "lunch",
           recipeId: "pollo-boniato-ensalada",
           dayKey: "sunday",
           servings: 3,
           tags: ["batch-friendly", "generates-leftovers"],
+        },
+        {
+          id: "sun-snack",
+          mealType: "snack",
+          recipeId: "yogur-fruta-semillas",
+          dayKey: "sunday",
+          servings: 3,
+          tags: [],
         },
         {
           id: "sun-dinner",
@@ -164,7 +276,7 @@ export const weekTemplate: WeekTemplate = {
   batchBlocks: [
     {
       id: "batch-sunday",
-      label: "Batch del domingo",
+      label: "Cocina base del domingo",
       plannedDay: "sunday",
       produces: [
         { id: "batch-rice", name: "Arroz cocido", quantity: 700, unit: "g", expiresInDays: 3 },
@@ -175,12 +287,44 @@ export const weekTemplate: WeekTemplate = {
     },
     {
       id: "batch-wednesday",
-      label: "Batch del miercoles",
+      label: "Cocina base del miercoles",
       plannedDay: "wednesday",
       produces: [
         { id: "batch-meat-sauce", name: "Salsa de carne", quantity: 500, unit: "g", expiresInDays: 3 },
       ],
       feedsMealSlotIds: ["wed-lunch", "fri-dinner"],
+    },
+  ],
+  leftoverFlows: [
+    {
+      sourceMealSlotId: "mon-lunch",
+      producedComponentId: "batch-chicken",
+      targetMealSlotId: "tue-dinner",
+      note: "El pollo del lunes alimenta los wraps del martes.",
+    },
+    {
+      sourceMealSlotId: "mon-lunch",
+      producedComponentId: "batch-rice",
+      targetMealSlotId: "fri-lunch",
+      note: "Parte del arroz cocido se reutiliza en el salteado.",
+    },
+    {
+      sourceMealSlotId: "mon-lunch",
+      producedComponentId: "batch-veg",
+      targetMealSlotId: "fri-lunch",
+      note: "Las verduras asadas reducen tiempo el viernes.",
+    },
+    {
+      sourceMealSlotId: "wed-lunch",
+      producedComponentId: "batch-meat-sauce",
+      targetMealSlotId: "fri-dinner",
+      note: "La salsa de carne acelera la pizza rapida del viernes.",
+    },
+    {
+      sourceMealSlotId: "sun-lunch",
+      producedComponentId: "batch-sunday-chicken",
+      targetMealSlotId: "sun-dinner",
+      note: "El pollo del domingo ayuda a resolver la cena de aprovechamiento.",
     },
   ],
 };

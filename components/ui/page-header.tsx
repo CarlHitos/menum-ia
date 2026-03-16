@@ -16,9 +16,11 @@ export function PageHeader({
   return (
     <header className="mb-6 flex items-start justify-between gap-4">
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent-soft)]">
-          {eyebrow}
-        </p>
+        {eyebrow ? (
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent-soft)]">
+            {eyebrow}
+          </p>
+        ) : null}
         <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--color-paper)]">
           {title}
         </h1>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PageHeader } from "@/components/ui/page-header";
 import { StepActions } from "@/components/ui/step-actions";
 import { OnboardingProgress } from "@/features/onboarding/onboarding-progress";
 import { HouseholdSizeStep } from "@/features/onboarding/household-size-step";
@@ -36,6 +37,7 @@ function buildMembersForCount(
         id: `member-${index + 1}`,
         name: "",
         goal: "maintain",
+        allergies: "",
         restrictions: "",
         dislikes: "",
       }
@@ -45,6 +47,7 @@ function buildMembersForCount(
 
 export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
   const [draft, setDraft] = useState<OnboardingDraft>(() =>
     loadOnboardingDraft() ?? buildInitialOnboardingDraft(initialHousehold),
   );
@@ -81,17 +84,40 @@ export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
   }
 
   function goNext() {
+    if (currentStep === 1 && safeCurrentMemberIndex < draft.memberCount - 1) {
+      setCurrentMemberIndex((index) => index + 1);
+      return;
+    }
+
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
   }
 
   function goBack() {
+    if (currentStep === 1 && safeCurrentMemberIndex > 0) {
+      setCurrentMemberIndex((index) => index - 1);
+      return;
+    }
+
     setCurrentStep((step) => Math.max(step - 1, 0));
   }
 
-  const canContinueFromMembers = draft.members.every((member) => member.name.trim());
+  const safeCurrentMemberIndex = Math.min(
+    currentMemberIndex,
+    Math.max(draft.memberCount - 1, 0),
+  );
+  const canContinueFromMembers =
+    draft.members[safeCurrentMemberIndex]?.name.trim();
 
   return (
     <div>
+      {currentStep === 0 ? (
+        <PageHeader
+          eyebrow=""
+          title="Conozcamos vuestra mesa"
+          description="Dinos quiénes sois y MenumIA creará un plan de comidas que se adapte perfectamente a todos, ahorrando tiempo y dinero."
+        />
+      ) : null}
+
       <OnboardingProgress
         currentStep={currentStep}
         totalSteps={steps.length}
@@ -103,7 +129,11 @@ export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
       ) : null}
 
       {currentStep === 1 ? (
-        <MembersStep draft={draft} onMemberChange={updateMember} />
+        <MembersStep
+          draft={draft}
+          currentMemberIndex={safeCurrentMemberIndex}
+          onMemberChange={updateMember}
+        />
       ) : null}
 
       {currentStep === 2 ? (
@@ -116,7 +146,12 @@ export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
         <StepActions
           canGoBack={currentStep > 0}
           onBack={goBack}
-          primaryLabel={currentStep === steps.length - 2 ? "Ver resumen" : "Continuar"}
+          primaryLabel={
+            currentStep === steps.length - 2
+              ? "✨ Finalizar configuracion"
+              : "Continuar →"
+          }
+          primaryTone={currentStep === steps.length - 2 ? "subtle" : "solid"}
           onPrimary={goNext}
           primaryDisabled={currentStep === 1 ? !canContinueFromMembers : false}
         />

@@ -7,9 +7,9 @@ export default function DashboardPage() {
   return (
     <AppShell currentPath="/dashboard">
       <PageHeader
-        eyebrow="Dashboard"
-        title="Menu semanal"
-        description="Semana base visible de lunes a domingo con comidas y cenas clickables."
+        eyebrow=""
+        title="Vuestra semana, lista"
+        description="El plan de hoy ya esta preparado para que solo tengais que ajustar, comprar y cocinar."
       />
       <DashboardClient household={household} />
     </AppShell>

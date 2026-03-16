@@ -1,4 +1,5 @@
 import type { OnboardingDraft } from "@/features/onboarding/types";
+import { formatGoalLabel } from "@/lib/domain/goal-labels";
 import type { Household } from "@/lib/domain/types";
 
 export function buildInitialOnboardingDraft(household: Household): OnboardingDraft {
@@ -9,9 +10,11 @@ export function buildInitialOnboardingDraft(household: Household): OnboardingDra
       id: member.id,
       name: member.name,
       goal: member.goal,
+      allergies: member.allergies.join(", "),
       restrictions: member.restrictions.join(", "),
       dislikes: member.dislikes.join(", "),
     })),
+    mealsPerDay: household.planningPreferences.mealsPerDay,
     weeklyBudget: `${household.planningPreferences.weeklyBudget ?? ""} EUR`,
     cookingLoad: household.planningPreferences.cookingLoad,
     preferredStore: household.planningPreferences.preferredStores[0] ?? "",
@@ -31,8 +34,8 @@ export function buildDashboardContext(
 
   const goalSummary =
     goals.length === 1
-      ? `Objetivo compartido: ${formatGoal(goals[0])}`
-      : `Objetivos mixtos: ${goals.map(formatGoal).join(", ")}`;
+      ? `Objetivo compartido: ${formatGoalLabel(goals[0])}`
+      : `Objetivos mixtos: ${goals.map(formatGoalLabel).join(", ")}`;
 
   return {
     householdName: source.householdName || fallbackHousehold.name,
@@ -40,6 +43,7 @@ export function buildDashboardContext(
     memberSummary:
       memberNames.length > 0 ? memberNames.join(", ") : "Hogar en configuracion",
     goalSummary,
+    mealsPerDay: source.mealsPerDay,
     cookingLoadLabel: formatCookingLoad(source.cookingLoad),
     repeatLabel:
       source.repeatMode === "repeat-base-week"
@@ -47,23 +51,8 @@ export function buildDashboardContext(
         : "Semana variable",
     preferredStore: source.preferredStore || fallbackHousehold.planningPreferences.preferredStores[0] || "No definido",
     contextualTitle: `Menu semanal para ${source.householdName || fallbackHousehold.name}`,
-    contextualDescription: `Base comun para ${source.memberCount} personas, ajustada a ${goalSummary.toLowerCase()}.`,
+    contextualDescription: `Base comun para ${source.memberCount} personas. ${goalSummary}.`,
   };
-}
-
-function formatGoal(goal: string) {
-  switch (goal) {
-    case "gain":
-      return "ganar masa";
-    case "lose":
-      return "perder grasa";
-    case "maintain":
-      return "mantener";
-    case "eat-better":
-      return "comer mejor";
-    default:
-      return goal;
-  }
 }
 
 function formatCookingLoad(value: string) {
