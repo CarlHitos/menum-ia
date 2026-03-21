@@ -23,6 +23,7 @@ import {
 } from "@/lib/domain/weekly-plan-runtime";
 import { buildDashboardContext } from "@/lib/local-storage/onboarding-mappers";
 import {
+  clearActiveWeeklyPlan,
   loadActiveWeeklyPlan,
   saveActiveWeeklyPlan,
 } from "@/lib/local-storage/weekly-plan-storage";
@@ -134,6 +135,12 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
     setPlan(nextPlan);
   }
 
+  function handleResetPlanningStart() {
+    setSelectedSlotId(null);
+    setPlan(null);
+    clearActiveWeeklyPlan(userId);
+  }
+
   return (
     <>
       <div className="mb-4 grid grid-cols-2 gap-3">
@@ -185,7 +192,7 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
         <>
 
       <SectionCard className="mb-4 bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
@@ -202,7 +209,7 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
                     : "bg-[rgba(252,163,17,0.16)] text-[var(--color-accent-soft)]"
                 }`}
               >
-                {plan.status === "confirmed" ? "Confirmada" : "Draft"}
+                {plan.status === "confirmed" ? "Confirmada" : "Borrador"}
               </span>
             </div>
             <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
@@ -215,19 +222,18 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
                   ? "Has cambiado recetas de una semana ya cerrada. Si sigues, la compra usara esta version actual."
                   : "Ajusta recetas antes de cerrar la semana y pasar a compra."}
             </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
+            <p className="mt-2 text-xs italic text-[var(--color-muted)]/80">
               {plan.status === "confirmed"
-                ? "La compra usara esta semana activa"
-                : "La compra se generara con esta version"}
+                ? "La compra usara esta semana activa."
+                : "La compra se generara con esta version."}
             </p>
           </div>
-
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col gap-2">
             {plan.status === "confirmed" ? (
               <button
                 type="button"
                 onClick={handleGoToShoppingList}
-                className="rounded-full border border-[rgba(252,163,17,0.26)] bg-[rgba(252,163,17,0.08)] px-3 py-2 text-sm font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.5)] hover:bg-[rgba(252,163,17,0.18)] active:bg-[var(--color-accent)] active:text-slate-950"
+                className="inline-flex w-full items-center justify-center rounded-full border border-[rgba(252,163,17,0.26)] bg-[rgba(252,163,17,0.08)] px-3 py-2.5 text-sm font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.5)] hover:bg-[rgba(252,163,17,0.18)] active:bg-[var(--color-accent)] active:text-slate-950"
               >
                 Hacer la compra
               </button>
@@ -235,57 +241,31 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
               <button
                 type="button"
                 onClick={handleConfirmWeek}
-                className="rounded-full bg-[var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-slate-950"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-slate-950"
               >
                 Confirmar semana
               </button>
             )}
 
             {plan.status === "draft" ? (
-              <button
-                type="button"
-                onClick={handleGoToShoppingList}
-                className="text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-paper)]"
-              >
-                Ver compra provisional
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={handleGoToShoppingList}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-3 py-2.5 text-sm font-medium text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
+                >
+                  Compra provisional
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetPlanningStart}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-3 py-2.5 text-sm font-medium text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
+                >
+                  Cambiar inicio
+                </button>
+              </div>
             ) : null}
           </div>
-        </div>
-      </SectionCard>
-
-      <SectionCard className="mb-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          Resumen del hogar
-        </p>
-        <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-          Menu optimizado para {household.members.length} personas en{" "}
-          {context.preferredStore}. Objetivo:{" "}
-          {formatBudget(household.planningPreferences.weeklyBudget)}
-        </h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {context.memberNames.map((name) => (
-            <span
-              key={name}
-              className="inline-flex items-center gap-2 rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-sm text-[var(--color-paper)]"
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(252,163,17,0.16)] text-xs font-semibold text-[var(--color-accent)]">
-                {getInitials(name)}
-              </span>
-              {name}
-            </span>
-          ))}
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
-          <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
-            {context.cookingLoadLabel}
-          </span>
-          <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
-            {context.repeatLabel}
-          </span>
-          <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
-            {context.goalSummary}
-          </span>
         </div>
       </SectionCard>
 
@@ -365,19 +345,6 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
       ) : null}
     </>
   );
-}
-
-function formatBudget(value?: number) {
-  if (!value) {
-    return "sin definir";
-  }
-
-  return `${value}€`;
-}
-
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
 }
 
 function findSlotById(plan: WeeklyPlan | null, slotId: string | null): MealSlot | null {

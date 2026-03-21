@@ -32,7 +32,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         title="Entrad en vuestro hogar"
         action={
           <Image
-            src="/branding/Iconosintransparency.png"
+            src="/branding/IconosintransparencyIA.png"
             alt="Logo de MenumIA"
             width={52}
             height={52}

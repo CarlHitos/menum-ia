@@ -33,7 +33,7 @@ export default async function HomePage() {
         }
         action={
           <Image
-            src="/branding/Iconosintransparency.png"
+            src="/branding/IconosintransparencyIA.png"
             alt="Logo de MenumIA"
             width={52}
             height={52}
@@ -57,17 +57,51 @@ export default async function HomePage() {
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
           {household ? "Resumen del hogar" : "Bienvenida"}
         </p>
-        <p className="mt-3 text-sm leading-6 text-[var(--color-muted)]">
-          {household
-            ? `Supermercado habitual: ${
-                household.planningPreferences.preferredStores[0] ?? "sin definir"
-              }. Presupuesto semanal: ${
-                household.planningPreferences.weeklyBudget
-                  ? `${household.planningPreferences.weeklyBudget}€`
-                  : "sin definir"
-              }.`
-            : "MenumIA es el corazon de vuestra cocina. Organiza quien cocina, que toca hoy y genera la lista de la compra exacta para que nunca falte un ingrediente. Olvida la improvisacion y los gastos de ultima hora en delivery"}
-        </p>
+        {household ? (
+          <>
+            <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
+              Menu optimizado para {household.members.length} personas en{" "}
+              {household.planningPreferences.preferredStores[0] ?? "sin definir"}
+              . Objetivo:{" "}
+              {household.planningPreferences.weeklyBudget
+                ? `${household.planningPreferences.weeklyBudget}€`
+                : "sin definir"}
+            </h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {household.members.map((member) => (
+                <span
+                  key={member.id}
+                  className="inline-flex items-center gap-2 rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-sm text-[var(--color-paper)]"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(252,163,17,0.16)] text-xs font-semibold text-[var(--color-accent)]">
+                    {getInitials(member.name)}
+                  </span>
+                  {member.name}
+                </span>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
+              <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
+                {formatCookingLoad(household.planningPreferences.cookingLoad)}
+              </span>
+              <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
+                {household.planningPreferences.repeatMode === "repeat-base-week"
+                  ? "Semana base repetible"
+                  : "Semana variable"}
+              </span>
+              <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
+                {formatGoalSummary(household.members.map((member) => member.goal))}
+              </span>
+            </div>
+          </>
+        ) : (
+          <p className="mt-3 text-sm leading-6 text-[var(--color-muted)]">
+            MenumIA es el corazon de vuestra cocina. Organiza quien cocina, que
+            toca hoy y genera la lista de la compra exacta para que nunca falte
+            un ingrediente. Olvida la improvisacion y los gastos de ultima hora
+            en delivery
+          </p>
+        )}
       </SectionCard>
 
       <SectionCard className="mt-4 mb-4 bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
@@ -150,4 +184,45 @@ export default async function HomePage() {
       ) : null}
     </AppShell>
   );
+}
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
+
+function formatCookingLoad(value: "low" | "medium" | "high") {
+  switch (value) {
+    case "low":
+      return "Muy poco tiempo";
+    case "medium":
+      return "30 min aprox.";
+    case "high":
+      return "Mas margen para cocinar";
+  }
+}
+
+function formatGoalSummary(goals: string[]) {
+  const uniqueGoals = Array.from(new Set(goals));
+
+  if (uniqueGoals.length === 1) {
+    return `Objetivo compartido: ${formatGoalLabel(uniqueGoals[0])}`;
+  }
+
+  return `Objetivos mixtos: ${uniqueGoals.map(formatGoalLabel).join(", ")}`;
+}
+
+function formatGoalLabel(goal: string) {
+  switch (goal) {
+    case "gain":
+      return "💪 Ganar fuerza";
+    case "lose":
+      return "🔥 Perder peso";
+    case "maintain":
+      return "⚖️ Mantenerse";
+    case "eat-better":
+      return "🥗 Comer mejor";
+    default:
+      return goal;
+  }
 }
