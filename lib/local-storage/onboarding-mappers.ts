@@ -1,6 +1,6 @@
 import type { OnboardingDraft } from "@/features/onboarding/types";
 import { formatGoalLabel } from "@/lib/domain/goal-labels";
-import type { Household } from "@/lib/domain/types";
+import type { Goal, Household } from "@/lib/domain/types";
 import { buildDefaultOnboardingDraft } from "@/lib/domain/household-mappers";
 
 export function buildInitialOnboardingDraft(household?: Household | null): OnboardingDraft {
@@ -36,11 +36,14 @@ export function buildDashboardContext(
     .map((member) => member.name.trim())
     .filter(Boolean);
   const goals = Array.from(new Set(source.members.map((member) => member.goal)));
+  const selectedGoals = goals.filter((goal): goal is Goal => goal !== "");
 
   const goalSummary =
-    goals.length === 1
-      ? `Objetivo compartido: ${formatGoalLabel(goals[0])}`
-      : `Objetivos mixtos: ${goals.map(formatGoalLabel).join(", ")}`;
+    selectedGoals.length === 0
+      ? "Objetivos pendientes"
+      : selectedGoals.length === 1
+        ? `Objetivo compartido: ${formatGoalLabel(selectedGoals[0])}`
+        : `Objetivos mixtos: ${selectedGoals.map(formatGoalLabel).join(", ")}`;
 
   return {
     householdName: source.householdName || fallbackHousehold.name,

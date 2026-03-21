@@ -27,12 +27,12 @@ export function OnboardingReview({
           Ahorro estimado: ~15% en delivery
         </span>
         <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-          {`Todo listo, familia ${householdName}`}
+          {`Todo listo, ${householdName}`}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          MenumIA ya sabe que necesitais. Hemos disenado un plan inteligente
-          para vuestro hogar de {draft.memberCount} personas, optimizando la
-          compra para que no gasteis ni un euro de mas.
+          MenumIA ya sabe lo que necesitas. Hemos disenado un plan inteligente
+          para tu hogar de {formatMemberCount(draft.memberCount)}, con una
+          compra mas afinada para que aproveches mejor cada euro.
         </p>
       </SectionCard>
 
@@ -50,7 +50,7 @@ export function OnboardingReview({
                 {member.name || "Sin nombre"}
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                {formatGoalLabel(member.goal)}
+                {member.goal ? formatGoalLabel(member.goal) : "Objetivo pendiente"}
               </p>
               {member.allergies ? (
                 <p className="mt-2 text-sm text-[var(--color-muted)]">
@@ -113,6 +113,10 @@ export function OnboardingReview({
       </button>
     </div>
   );
+}
+
+function formatMemberCount(count: number) {
+  return `${count} ${count === 1 ? "persona" : "personas"}`;
 }
 
 function formatMealType(mealType: string) {

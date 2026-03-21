@@ -61,12 +61,28 @@ function isValidOnboardingDraftPayload(value: unknown): value is OnboardingDraft
 
   return (
     typeof draft.householdName === "string" &&
+    draft.householdName.trim().length > 0 &&
     typeof draft.memberCount === "number" &&
     Array.isArray(draft.members) &&
+    draft.members.every(
+      (member) =>
+        member &&
+        typeof member === "object" &&
+        typeof member.name === "string" &&
+        member.name.trim().length > 0 &&
+        (member.goal === "gain" ||
+          member.goal === "lose" ||
+          member.goal === "maintain" ||
+          member.goal === "eat-better"),
+    ) &&
     Array.isArray(draft.mealsPerDay) &&
+    draft.mealsPerDay.length > 0 &&
     typeof draft.weeklyBudget === "string" &&
-    typeof draft.cookingLoad === "string" &&
+    (draft.cookingLoad === "low" ||
+      draft.cookingLoad === "medium" ||
+      draft.cookingLoad === "high") &&
     typeof draft.preferredStore === "string" &&
-    typeof draft.repeatMode === "string"
+    (draft.repeatMode === "repeat-base-week" ||
+      draft.repeatMode === "vary-week")
   );
 }

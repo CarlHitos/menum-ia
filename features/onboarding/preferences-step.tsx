@@ -7,6 +7,9 @@ import type { MealType } from "@/lib/domain/types";
 type PreferencesStepProps = {
   draft: OnboardingDraft;
   onChange: (updates: Partial<OnboardingDraft>) => void;
+  showMealsError?: boolean;
+  showCookingLoadError?: boolean;
+  showRepeatModeError?: boolean;
 };
 
 const cookingOptions = [
@@ -30,16 +33,15 @@ const mealOptions: Array<{ value: MealType; label: string }> = [
 export function PreferencesStep({
   draft,
   onChange,
+  showMealsError = false,
+  showCookingLoadError = false,
+  showRepeatModeError = false,
 }: PreferencesStepProps) {
   function toggleMealType(mealType: MealType) {
     const exists = draft.mealsPerDay.includes(mealType);
     const nextMeals = exists
       ? draft.mealsPerDay.filter((entry) => entry !== mealType)
       : [...draft.mealsPerDay, mealType];
-
-    if (nextMeals.length === 0) {
-      return;
-    }
 
     onChange({ mealsPerDay: nextMeals });
   }
@@ -48,19 +50,24 @@ export function PreferencesStep({
     <div className="space-y-4">
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-          Disenemos vuestra semana
+          Disenemos tu semana
         </p>
         <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
           Ajustemos los detalles finales
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          Ajusta estos detalles para que MenumIA cree un plan que cuide vuestro bolsillo y vuestro tiempo.
+          Ajusta estos detalles para que MenumIA cree un plan que cuide tu bolsillo y tu tiempo.
         </p>
       </SectionCard>
 
-      <SectionCard>
+      <SectionCard
+        className={
+          showMealsError ? "border-red-400/70 bg-red-500/5" : undefined
+        }
+      >
+        <div id="preferences-meals">
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          ¿Que comidas quereis organizar?
+          ¿Que comidas quieres organizar?
         </p>
         <div className="flex flex-wrap gap-2">
           {mealOptions.map((option) => (
@@ -73,23 +80,34 @@ export function PreferencesStep({
           ))}
         </div>
         <p className="mt-3 text-sm leading-6 text-[var(--color-muted)]">
-          Marcad solo las que haceis en casa para que la lista de la compra sea exacta.
+          Marca solo las que haces en casa para que la lista de la compra sea exacta.
         </p>
+        {showMealsError ? (
+          <p className="mt-2 text-xs text-red-200">
+            Selecciona al menos una comida antes de continuar.
+          </p>
+        ) : null}
+        </div>
       </SectionCard>
 
       <SectionCard>
         <InputCard
-          label="Vuestro presupuesto objetivo"
+          label="Presupuesto objetivo"
           value={draft.weeklyBudget}
           onChange={(event) => onChange({ weeklyBudget: event.target.value })}
           placeholder="Ej: 135€"
-          hint="Intentaremos que vuestra lista de la compra no supere esta cifra."
+          hint="Intentaremos que tu lista de la compra no supere esta cifra."
         />
       </SectionCard>
 
-      <SectionCard>
+      <SectionCard
+        className={
+          showCookingLoadError ? "border-red-400/70 bg-red-500/5" : undefined
+        }
+      >
+        <div id="preferences-cooking-load">
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          ¿De cuanto tiempo disponeis?
+          ¿De cuanto tiempo dispones?
         </p>
         <div className="flex flex-wrap gap-2">
           {cookingOptions.map((option) => (
@@ -101,18 +119,29 @@ export function PreferencesStep({
             />
           ))}
         </div>
+        {showCookingLoadError ? (
+          <p className="mt-2 text-xs text-red-200">
+            Elige cuanto tiempo sueles tener para cocinar.
+          </p>
+        ) : null}
+        </div>
       </SectionCard>
 
       <InputCard
-        label="Vuestra tienda de confianza"
+        label="Tu tienda de confianza"
         value={draft.preferredStore}
         onChange={(event) => onChange({ preferredStore: event.target.value })}
         placeholder="Ej: Mercadona, Lidl, Carrefour..."
       />
 
-      <SectionCard>
+      <SectionCard
+        className={
+          showRepeatModeError ? "border-red-400/70 bg-red-500/5" : undefined
+        }
+      >
+        <div id="preferences-repeat-mode">
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          ¿Como preferis vuestro menu?
+          ¿Como prefieres tu menu?
         </p>
         <div className="flex flex-wrap gap-2">
           {repeatOptions.map((option) => (
@@ -133,6 +162,12 @@ export function PreferencesStep({
             <span className="font-semibold text-[var(--color-paper)]">Variedad total:</span>{" "}
             platos distintos cada dia.
           </p>
+        </div>
+        {showRepeatModeError ? (
+          <p className="mt-2 text-xs text-red-200">
+            Elige como prefieres organizar tu menu antes de continuar.
+          </p>
+        ) : null}
         </div>
       </SectionCard>
     </div>

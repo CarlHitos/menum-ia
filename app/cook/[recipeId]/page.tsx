@@ -51,7 +51,7 @@ export default async function CookPage({ params }: CookPageProps) {
               Raciones
             </p>
             <p className="mt-1 text-base font-semibold text-[var(--color-paper)]">
-              {recipe.baseServings} personas
+              {recipe.baseServings} {recipe.baseServings === 1 ? "persona" : "personas"}
             </p>
           </div>
         </div>

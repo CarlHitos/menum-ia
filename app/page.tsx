@@ -5,9 +5,9 @@ import { authOptions } from "@/auth";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { SectionCard } from "@/components/ui/section-card";
-import { StatPill } from "@/components/ui/stat-pill";
 import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
 import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
+import type { Household } from "@/lib/domain/types";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -28,9 +28,7 @@ export default async function HomePage() {
     <AppShell currentPath="/" hideBottomNav={!household}>
       <PageHeader
         eyebrow="MenumIA"
-        title={
-          household ? `Vuestro hogar: ${household.name}` : "Tu hogar en armonIA"
-        }
+        title={household ? "Planificacion activa" : "Tu hogar en armonIA"}
         action={
           <Image
             src="/branding/IconosintransparencyIA.png"
@@ -42,30 +40,14 @@ export default async function HomePage() {
           />
         }
       />
-
-      {household ? (
-        <div className="mb-4 grid grid-cols-2 gap-3">
-          <StatPill label="Hogar" value={household.name} />
-          <StatPill
-            label="Miembros"
-            value={`${household.members.length} personas`}
-          />
-        </div>
-      ) : null}
-
       <SectionCard>
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          {household ? "Resumen del hogar" : "Bienvenida"}
+          {household ? `Resumen del hogar: ${household.name}` : "Bienvenida"}
         </p>
         {household ? (
           <>
             <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-              Menu optimizado para {household.members.length} personas en{" "}
-              {household.planningPreferences.preferredStores[0] ?? "sin definir"}
-              . Objetivo:{" "}
-              {household.planningPreferences.weeklyBudget
-                ? `${household.planningPreferences.weeklyBudget}€`
-                : "sin definir"}
+              {buildHouseholdSummary(household)}
             </h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {household.members.map((member) => (
@@ -90,13 +72,16 @@ export default async function HomePage() {
                   : "Semana variable"}
               </span>
               <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2">
-                {formatGoalSummary(household.members.map((member) => member.goal))}
+                {formatGoalSummary(
+                  household.members.map((member) => member.goal),
+                  household.members.length,
+                )}
               </span>
             </div>
           </>
         ) : (
           <p className="mt-3 text-sm leading-6 text-[var(--color-muted)]">
-            MenumIA es el corazon de vuestra cocina. Organiza quien cocina, que
+            MenumIA es el corazon de tu cocina. Organiza quien cocina, que
             toca hoy y genera la lista de la compra exacta para que nunca falte
             un ingrediente. Olvida la improvisacion y los gastos de ultima hora
             en delivery
@@ -108,7 +93,7 @@ export default async function HomePage() {
         {household ? (
           <>
             <p className="text-base leading-7 text-[var(--color-paper)]">
-              Ya teneis el hogar configurado. Desde aqui podeis entrar al menu
+              Ya tienes el hogar configurado. Desde aqui puedes entrar al menu
               semanal y, mas adelante, editar miembros, presupuesto y
               preferencias sin rehacer el onboarding. 
             </p>
@@ -131,8 +116,8 @@ export default async function HomePage() {
         ) : (
           <>
             <p className="text-base leading-7 text-[var(--color-paper)]">
-              Primero configurad vuestro hogar para que MenumIA pueda preparar
-              un menu y una compra que de verdad encajen con vosotros.
+              Primero configura tu hogar para que MenumIA pueda preparar un
+              menu y una compra que de verdad encajen contigo.
             </p>
             <div className="mt-4 flex justify-center">
               <Link
@@ -157,7 +142,7 @@ export default async function HomePage() {
                 Menu semanal accionable
               </h2>
               <p className="mt-1 text-sm text-[var(--color-muted)]">
-                Entrad al menu para materializar vuestra semana activa y ajustar
+                Entra al menu para materializar tu semana activa y ajustar
                 recetas antes de pasar a la compra.
               </p>
             </div>
@@ -167,7 +152,7 @@ export default async function HomePage() {
               </h2>
               <p className="mt-1 text-sm text-[var(--color-muted)]">
                 Cuando la semana este lista, la lista de compra se generara
-                desde vuestro plan real, no desde una demo.
+                desde tu plan real, no desde una demo.
               </p>
             </div>
             <div>
@@ -175,7 +160,7 @@ export default async function HomePage() {
                 Edicion del hogar
               </h2>
               <p className="mt-1 text-sm text-[var(--color-muted)]">
-                En una siguiente fase podreis editar miembros, presupuesto y
+                En una siguiente fase podras editar miembros, presupuesto y
                 preferencias del hogar desde esta misma seccion.
               </p>
             </div>
@@ -191,6 +176,22 @@ function getInitials(name: string) {
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
 }
 
+function buildHouseholdSummary(household: Household) {
+  const parts = ["Menu optimizado y listo para ajustar"];
+  const preferredStore = household.planningPreferences.preferredStores[0];
+  const weeklyBudget = household.planningPreferences.weeklyBudget;
+
+  if (preferredStore) {
+    parts.push(`compra pensada para ${preferredStore}`);
+  }
+
+  if (weeklyBudget) {
+    parts.push(`presupuesto objetivo ${weeklyBudget}€`);
+  }
+
+  return `${parts.join(". ")}.`;
+}
+
 function formatCookingLoad(value: "low" | "medium" | "high") {
   switch (value) {
     case "low":
@@ -202,11 +203,13 @@ function formatCookingLoad(value: "low" | "medium" | "high") {
   }
 }
 
-function formatGoalSummary(goals: string[]) {
+function formatGoalSummary(goals: string[], memberCount: number) {
   const uniqueGoals = Array.from(new Set(goals));
 
   if (uniqueGoals.length === 1) {
-    return `Objetivo compartido: ${formatGoalLabel(uniqueGoals[0])}`;
+    return memberCount === 1
+      ? `Objetivo principal: ${formatGoalLabel(uniqueGoals[0])}`
+      : `Objetivo compartido: ${formatGoalLabel(uniqueGoals[0])}`;
   }
 
   return `Objetivos mixtos: ${uniqueGoals.map(formatGoalLabel).join(", ")}`;

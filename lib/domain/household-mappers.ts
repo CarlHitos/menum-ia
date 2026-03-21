@@ -32,11 +32,11 @@ export function buildDefaultOnboardingDraft(
       buildEmptyOnboardingMember("member-1"),
       buildEmptyOnboardingMember("member-2"),
     ],
-    mealsPerDay: ["breakfast", "lunch", "snack", "dinner"],
+    mealsPerDay: [],
     weeklyBudget: "",
-    cookingLoad: "medium",
+    cookingLoad: "",
     preferredStore: "",
-    repeatMode: "repeat-base-week",
+    repeatMode: "",
   };
 }
 
@@ -76,8 +76,8 @@ export function buildHouseholdPersistenceInput(
     name: draft.householdName.trim() || "Mi hogar",
     preferredStore: normalizeNullableText(draft.preferredStore),
     weeklyBudget: parseWeeklyBudget(draft.weeklyBudget),
-    cookingLoad: draft.cookingLoad,
-    repeatMode: draft.repeatMode,
+    cookingLoad: resolveCookingLoad(draft.cookingLoad),
+    repeatMode: resolveRepeatMode(draft.repeatMode),
     mealsPerDay: draft.mealsPerDay,
   };
 }
@@ -85,12 +85,12 @@ export function buildHouseholdPersistenceInput(
 export function buildHouseholdMemberPersistenceInput(draft: OnboardingDraft) {
   return draft.members.map((member, index) => ({
     name: member.name.trim() || `Miembro ${index + 1}`,
-    goal: member.goal,
+    goal: resolveGoal(member.goal),
     allergies: splitListField(member.allergies),
     restrictions: splitListField(member.restrictions),
     dislikes: splitListField(member.dislikes),
-    portionProfile: derivePortionProfile(member.goal),
-    snackProfile: deriveSnackProfile(member.goal),
+    portionProfile: derivePortionProfile(resolveGoal(member.goal)),
+    snackProfile: deriveSnackProfile(resolveGoal(member.goal)),
     sortOrder: index,
   }));
 }
@@ -99,7 +99,7 @@ function buildEmptyOnboardingMember(id: string) {
   return {
     id,
     name: "",
-    goal: "maintain" as Goal,
+    goal: "" as const,
     allergies: "",
     restrictions: "",
     dislikes: "",
@@ -121,6 +121,18 @@ function splitListField(value: string) {
 function parseWeeklyBudget(value: string) {
   const digits = value.replace(/[^\d]/g, "");
   return digits ? Number.parseInt(digits, 10) : null;
+}
+
+function resolveGoal(value: Goal | ""): Goal {
+  return value === "" ? "maintain" : value;
+}
+
+function resolveCookingLoad(value: OnboardingDraft["cookingLoad"]) {
+  return value === "" ? "medium" : value;
+}
+
+function resolveRepeatMode(value: OnboardingDraft["repeatMode"]) {
+  return value === "" ? "repeat-base-week" : value;
 }
 
 function normalizeGoal(value: string): Goal {
