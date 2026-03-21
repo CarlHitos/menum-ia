@@ -3,7 +3,7 @@ import type { Goal, MealType } from "@/lib/domain/types";
 export type OnboardingMemberDraft = {
   id: string;
   name: string;
-  goal: Goal;
+  goal: Goal | "";
   allergies: string;
   restrictions: string;
   dislikes: string;
@@ -15,7 +15,7 @@ export type OnboardingDraft = {
   members: OnboardingMemberDraft[];
   mealsPerDay: MealType[];
   weeklyBudget: string;
-  cookingLoad: "low" | "medium" | "high";
+  cookingLoad: "low" | "medium" | "high" | "";
   preferredStore: string;
-  repeatMode: "repeat-base-week" | "vary-week";
+  repeatMode: "repeat-base-week" | "vary-week" | "";
 };

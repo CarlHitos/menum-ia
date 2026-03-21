@@ -130,7 +130,7 @@ export function ShoppingListPageClient({
         <PageHeader
           eyebrow=""
           title="Lista inteligente"
-          description="Primero elige cuando empieza vuestra planificacion para generar la compra."
+          description="Primero elige cuando empieza tu planificacion para generar la compra."
         />
 
         <SectionCard>
@@ -156,7 +156,7 @@ export function ShoppingListPageClient({
       <PageHeader
         eyebrow=""
         title="Lista inteligente"
-        description={`${recipeCount} recetas optimizadas para vuestro presupuesto.`}
+        description={`${recipeCount} recetas optimizadas para tu presupuesto.`}
       />
 
       <SectionCard className="mb-4">
@@ -169,7 +169,7 @@ export function ShoppingListPageClient({
         </p>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
           {plan.status === "confirmed"
-            ? "Esta lista refleja la semana que habeis dejado lista para comprar y cocinar."
+            ? "Esta lista refleja la semana que ya has dejado lista para comprar y cocinar."
             : hasChangesAfterConfirmation
               ? "Has cambiado una semana que ya estaba cerrada. Esta compra ya usa la version actual del menu."
               : "Esta lista se ira ajustando mientras cambies recetas antes de cerrar la semana."}

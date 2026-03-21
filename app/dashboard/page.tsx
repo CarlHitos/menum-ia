@@ -26,7 +26,7 @@ export default async function DashboardPage() {
       <PageHeader
         eyebrow=""
         title="Plan semanal"
-        description="Preparad vuestra semana activa, ajustad recetas y pasad a la compra cuando este lista."
+        description="Prepara tu semana activa, ajusta recetas y pasa a la compra cuando este lista."
       />
       <DashboardClient household={household} userId={session.user.id} />
     </AppShell>

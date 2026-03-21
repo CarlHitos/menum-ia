@@ -38,7 +38,7 @@ function buildMembersForCount(
       existing ?? {
         id: `member-${index + 1}`,
         name: "",
-        goal: "maintain",
+        goal: "",
         allergies: "",
         restrictions: "",
         dislikes: "",
@@ -54,6 +54,12 @@ export function OnboardingFlow({
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
+  const [showHouseholdNameError, setShowHouseholdNameError] = useState(false);
+  const [showMemberNameError, setShowMemberNameError] = useState(false);
+  const [showMemberGoalError, setShowMemberGoalError] = useState(false);
+  const [showMealsError, setShowMealsError] = useState(false);
+  const [showCookingLoadError, setShowCookingLoadError] = useState(false);
+  const [showRepeatModeError, setShowRepeatModeError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [draft, setDraft] = useState<OnboardingDraft>(() =>
@@ -77,6 +83,22 @@ export function OnboardingFlow({
             : current.members,
       };
     });
+
+    if (updates.householdName !== undefined && updates.householdName.trim()) {
+      setShowHouseholdNameError(false);
+    }
+
+    if (updates.mealsPerDay !== undefined && updates.mealsPerDay.length > 0) {
+      setShowMealsError(false);
+    }
+
+    if (updates.cookingLoad !== undefined && updates.cookingLoad !== "") {
+      setShowCookingLoadError(false);
+    }
+
+    if (updates.repeatMode !== undefined && updates.repeatMode !== "") {
+      setShowRepeatModeError(false);
+    }
   }
 
   function updateMember(
@@ -89,12 +111,86 @@ export function OnboardingFlow({
         member.id === memberId ? { ...member, ...updates } : member,
       ),
     }));
+
+    if (updates.name !== undefined && updates.name.trim()) {
+      setShowMemberNameError(false);
+    }
+
+    if (updates.goal !== undefined && updates.goal !== "") {
+      setShowMemberGoalError(false);
+    }
   }
 
   function goNext() {
+    if (currentStep === 0 && !canContinueFromHousehold) {
+      setShowHouseholdNameError(true);
+      document.getElementById("household-name")?.focus();
+      return;
+    }
+
+    if (currentStep === 1 && !canContinueFromMembers) {
+      setShowMemberNameError(true);
+      document
+        .getElementById(`member-name-${draft.members[safeCurrentMemberIndex]?.id}`)
+        ?.focus();
+      return;
+    }
+
+    if (currentStep === 1 && !canContinueFromMemberGoal) {
+      setShowMemberGoalError(true);
+      document
+        .getElementById(`member-goal-${draft.members[safeCurrentMemberIndex]?.id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (currentStep === 2 && !canContinueFromMeals) {
+      setShowMealsError(true);
+      document.getElementById("preferences-meals")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+
+    if (currentStep === 2 && !canContinueFromCookingLoad) {
+      setShowCookingLoadError(true);
+      document.getElementById("preferences-cooking-load")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+
+    if (currentStep === 2 && !canContinueFromRepeatMode) {
+      setShowRepeatModeError(true);
+      document.getElementById("preferences-repeat-mode")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+
     if (currentStep === 1 && safeCurrentMemberIndex < draft.memberCount - 1) {
+      setShowMemberNameError(false);
+      setShowMemberGoalError(false);
       setCurrentMemberIndex((index) => index + 1);
       return;
+    }
+
+    if (currentStep === 0) {
+      setShowHouseholdNameError(false);
+    }
+
+    if (currentStep === 1) {
+      setShowMemberNameError(false);
+      setShowMemberGoalError(false);
+    }
+
+    if (currentStep === 2) {
+      setShowMealsError(false);
+      setShowCookingLoadError(false);
+      setShowRepeatModeError(false);
     }
 
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
@@ -115,6 +211,12 @@ export function OnboardingFlow({
   );
   const canContinueFromMembers =
     draft.members[safeCurrentMemberIndex]?.name.trim();
+  const canContinueFromMemberGoal =
+    draft.members[safeCurrentMemberIndex]?.goal !== "";
+  const canContinueFromHousehold = draft.householdName.trim().length > 0;
+  const canContinueFromMeals = draft.mealsPerDay.length > 0;
+  const canContinueFromCookingLoad = draft.cookingLoad !== "";
+  const canContinueFromRepeatMode = draft.repeatMode !== "";
 
   async function handleComplete() {
     setIsSaving(true);
@@ -137,7 +239,7 @@ export function OnboardingFlow({
       router.refresh();
     } catch {
       setSubmitError(
-        "No se ha podido guardar vuestro hogar. Revisad la conexion e intentadlo de nuevo.",
+        "No se ha podido guardar tu hogar. Revisa la conexion e intentalo de nuevo.",
       );
     } finally {
       setIsSaving(false);
@@ -149,8 +251,8 @@ export function OnboardingFlow({
       {currentStep === 0 ? (
         <PageHeader
           eyebrow=""
-          title="Conozcamos vuestra mesa"
-          description="Dinos quiénes sois y MenumIA creará un plan de comidas que se adapte perfectamente a todos, ahorrando tiempo y dinero."
+          title="Conozcamos tu hogar"
+          description="Cuentanos quienes sois y MenumIA preparara un plan de comidas que encaje con tu ritmo, ahorrando tiempo y dinero."
         />
       ) : null}
 
@@ -161,19 +263,31 @@ export function OnboardingFlow({
       />
 
       {currentStep === 0 ? (
-        <HouseholdSizeStep draft={draft} onChange={updateDraft} />
+        <HouseholdSizeStep
+          draft={draft}
+          onChange={updateDraft}
+          showNameError={showHouseholdNameError}
+        />
       ) : null}
 
       {currentStep === 1 ? (
         <MembersStep
           draft={draft}
           currentMemberIndex={safeCurrentMemberIndex}
+          showNameError={showMemberNameError}
+          showGoalError={showMemberGoalError}
           onMemberChange={updateMember}
         />
       ) : null}
 
       {currentStep === 2 ? (
-        <PreferencesStep draft={draft} onChange={updateDraft} />
+        <PreferencesStep
+          draft={draft}
+          onChange={updateDraft}
+          showMealsError={showMealsError}
+          showCookingLoadError={showCookingLoadError}
+          showRepeatModeError={showRepeatModeError}
+        />
       ) : null}
 
       {currentStep === 3 ? (
@@ -196,7 +310,7 @@ export function OnboardingFlow({
           }
           primaryTone={currentStep === steps.length - 2 ? "subtle" : "solid"}
           onPrimary={goNext}
-          primaryDisabled={currentStep === 1 ? !canContinueFromMembers : false}
+          primaryDisabled={false}
         />
       ) : null}
     </div>

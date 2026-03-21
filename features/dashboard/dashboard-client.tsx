@@ -217,7 +217,7 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
               {plan.status === "confirmed"
-                ? "Esta es vuestra semana activa para comprar y cocinar."
+                ? "Esta es tu semana activa para comprar y cocinar."
                 : hasChangesAfterConfirmation
                   ? "Has cambiado recetas de una semana ya cerrada. Si sigues, la compra usara esta version actual."
                   : "Ajusta recetas antes de cerrar la semana y pasar a compra."}
@@ -322,7 +322,7 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                      {recipe.baseServings} personas
+                      {formatServings(recipe.baseServings)}
                     </span>
                     <span
                       className={`text-xs font-semibold uppercase tracking-[0.16em] ${
@@ -345,6 +345,10 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
       ) : null}
     </>
   );
+}
+
+function formatServings(count: number) {
+  return `${count} ${count === 1 ? "persona" : "personas"}`;
 }
 
 function findSlotById(plan: WeeklyPlan | null, slotId: string | null): MealSlot | null {
