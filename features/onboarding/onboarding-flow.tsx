@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { StepActions } from "@/components/ui/step-actions";
 import { OnboardingProgress } from "@/features/onboarding/onboarding-progress";
@@ -20,7 +21,8 @@ import {
 } from "@/lib/local-storage/onboarding-storage";
 
 type OnboardingFlowProps = {
-  initialHousehold: Household;
+  initialHousehold?: Household | null;
+  userId: string;
 };
 
 const steps = ["Hogar", "Miembros", "Preferencias", "Resumen"];
@@ -45,16 +47,22 @@ function buildMembersForCount(
   });
 }
 
-export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
+export function OnboardingFlow({
+  initialHousehold,
+  userId,
+}: OnboardingFlowProps) {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [draft, setDraft] = useState<OnboardingDraft>(() =>
-    loadOnboardingDraft() ?? buildInitialOnboardingDraft(initialHousehold),
+    loadOnboardingDraft(userId) ?? buildInitialOnboardingDraft(initialHousehold),
   );
 
   useEffect(() => {
-    saveOnboardingDraft(draft);
-  }, [draft]);
+    saveOnboardingDraft(draft, userId);
+  }, [draft, userId]);
 
   function updateDraft(updates: Partial<OnboardingDraft>) {
     setDraft((current) => {
@@ -108,6 +116,34 @@ export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
   const canContinueFromMembers =
     draft.members[safeCurrentMemberIndex]?.name.trim();
 
+  async function handleComplete() {
+    setIsSaving(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/household", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draft),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save household");
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setSubmitError(
+        "No se ha podido guardar vuestro hogar. Revisad la conexion e intentadlo de nuevo.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
     <div>
       {currentStep === 0 ? (
@@ -140,7 +176,14 @@ export function OnboardingFlow({ initialHousehold }: OnboardingFlowProps) {
         <PreferencesStep draft={draft} onChange={updateDraft} />
       ) : null}
 
-      {currentStep === 3 ? <OnboardingReview draft={draft} /> : null}
+      {currentStep === 3 ? (
+        <OnboardingReview
+          draft={draft}
+          onComplete={handleComplete}
+          isSubmitting={isSaving}
+          submitError={submitError}
+        />
+      ) : null}
 
       {currentStep < steps.length - 1 ? (
         <StepActions

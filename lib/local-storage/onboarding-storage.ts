@@ -3,12 +3,17 @@ import type { OnboardingDraft } from "@/features/onboarding/types";
 const STORAGE_KEY_V3 = "menumia:onboarding:v3";
 const STORAGE_KEY_V2 = "menumia:onboarding:v2";
 const STORAGE_KEY_V1 = "menumia:onboarding:v1";
+const COMPLETION_KEY_V1 = "menumia:onboarding-complete:v1";
 const DEFAULT_MEALS_PER_DAY: OnboardingDraft["mealsPerDay"] = [
   "breakfast",
   "lunch",
   "snack",
   "dinner",
 ];
+
+function getStorageKey(baseKey: string, userId?: string) {
+  return userId ? `${baseKey}:${userId}` : baseKey;
+}
 
 type V2OnboardingDraft = Omit<OnboardingDraft, "mealsPerDay">;
 
@@ -144,20 +149,24 @@ function normalizeLegacyDraft(draft: LegacyOnboardingDraft): OnboardingDraft {
   };
 }
 
-export function loadOnboardingDraft() {
+export function loadOnboardingDraft(userId?: string) {
   if (typeof window === "undefined") {
     return null;
   }
 
   try {
-    const currentRaw = window.localStorage.getItem(STORAGE_KEY_V3);
+    const currentRaw = window.localStorage.getItem(
+      getStorageKey(STORAGE_KEY_V3, userId),
+    );
 
     if (currentRaw) {
       const parsed = JSON.parse(currentRaw);
       return isValidOnboardingDraft(parsed) ? parsed : null;
     }
 
-    const v2Raw = window.localStorage.getItem(STORAGE_KEY_V2);
+    const v2Raw = window.localStorage.getItem(
+      getStorageKey(STORAGE_KEY_V2, userId),
+    );
 
     if (v2Raw) {
       const parsed = JSON.parse(v2Raw);
@@ -170,11 +179,13 @@ export function loadOnboardingDraft() {
         ...parsed,
         mealsPerDay: DEFAULT_MEALS_PER_DAY,
       };
-      saveOnboardingDraft(normalizedDraft);
+      saveOnboardingDraft(normalizedDraft, userId);
       return normalizedDraft;
     }
 
-    const legacyRaw = window.localStorage.getItem(STORAGE_KEY_V1);
+    const legacyRaw = window.localStorage.getItem(
+      getStorageKey(STORAGE_KEY_V1, userId),
+    );
 
     if (!legacyRaw) {
       return null;
@@ -187,34 +198,70 @@ export function loadOnboardingDraft() {
     }
 
     const normalizedDraft = normalizeLegacyDraft(parsed);
-    saveOnboardingDraft(normalizedDraft);
+    saveOnboardingDraft(normalizedDraft, userId);
     return normalizedDraft;
   } catch {
     return null;
   }
 }
 
-export function saveOnboardingDraft(draft: OnboardingDraft) {
+export function saveOnboardingDraft(draft: OnboardingDraft, userId?: string) {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage.setItem(STORAGE_KEY_V3, JSON.stringify(draft));
+    window.localStorage.setItem(
+      getStorageKey(STORAGE_KEY_V3, userId),
+      JSON.stringify(draft),
+    );
   } catch {
     // Ignore storage failures and keep local state working.
   }
 }
 
-export function clearOnboardingDraft() {
+export function clearOnboardingDraft(userId?: string) {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage.removeItem(STORAGE_KEY_V3);
-    window.localStorage.removeItem(STORAGE_KEY_V2);
-    window.localStorage.removeItem(STORAGE_KEY_V1);
+    window.localStorage.removeItem(getStorageKey(STORAGE_KEY_V3, userId));
+    window.localStorage.removeItem(getStorageKey(STORAGE_KEY_V2, userId));
+    window.localStorage.removeItem(getStorageKey(STORAGE_KEY_V1, userId));
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+export function isOnboardingComplete(userId?: string) {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return (
+      window.localStorage.getItem(getStorageKey(COMPLETION_KEY_V1, userId)) ===
+      "true"
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function setOnboardingComplete(
+  completed: boolean,
+  userId?: string,
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      getStorageKey(COMPLETION_KEY_V1, userId),
+      completed ? "true" : "false",
+    );
   } catch {
     // Ignore storage failures.
   }

@@ -20,8 +20,14 @@ import {
 import { loadActiveWeeklyPlan } from "@/lib/local-storage/weekly-plan-storage";
 import { recipes } from "@/lib/mocks";
 
-export function ShoppingListPageClient() {
-  const plan = useMemo(() => loadActiveWeeklyPlan(), []);
+type ShoppingListPageClientProps = {
+  userId: string;
+};
+
+export function ShoppingListPageClient({
+  userId,
+}: ShoppingListPageClientProps) {
+  const plan = useMemo(() => loadActiveWeeklyPlan(userId), [userId]);
   const shoppingList = useMemo(
     () => (plan ? buildShoppingListFromPlan(plan, recipes) : null),
     [plan],
@@ -35,9 +41,9 @@ export function ShoppingListPageClient() {
       };
     }
 
-    const stored = loadShoppingListState(plan.id);
+    const stored = loadShoppingListState(plan.id, userId);
     const nextState = buildNextShoppingListState(stored, shoppingList);
-    saveShoppingListState(nextState);
+    saveShoppingListState(nextState, userId);
     return nextState;
   });
   const merged = useMemo(
@@ -101,7 +107,7 @@ export function ShoppingListPageClient() {
         ),
         updatedAt: new Date().toISOString(),
       };
-      saveShoppingListState(nextState);
+      saveShoppingListState(nextState, userId);
       return nextState;
     });
   }
@@ -113,7 +119,7 @@ export function ShoppingListPageClient() {
         items: current.items.map((item) => ({ ...item, checked: false })),
         updatedAt: new Date().toISOString(),
       };
-      saveShoppingListState(nextState);
+      saveShoppingListState(nextState, userId);
       return nextState;
     });
   }

@@ -60,3 +60,28 @@ No implementar todavía:
 ## Antes de hacer cambios grandes
 
 Si una tarea implica reorganizar rutas, modelo de datos o arquitectura, primero proponer un plan breve antes de implementar.
+
+## Reglas de workflow
+
+- Leer también `WORKFLOW.md` antes de cambios grandes.
+- No trabajar directamente sobre `main` en cambios relevantes.
+- Para nuevas funcionalidades, auth, DB, persistencia o refactorizaciones importantes, trabajar en rama separada.
+- Antes de tocar arquitectura, dominio o infraestructura, proponer un plan breve.
+- Mantener los cambios dentro del scope pedido.
+- Al cerrar una fase, resumir:
+  - archivos tocados
+  - decisiones tomadas
+  - validaciones realizadas
+  - riesgos o límites detectados
+- Favorecer commits pequeños y coherentes por intención.
+- No asumir merge directo a `main` en cambios relevantes; trabajar pensando en integración por Pull Request.
+
+## Reglas de seguridad y secretos
+
+- No leer, abrir, citar ni modificar archivos de entorno o secretos locales.
+- Ignorar explícitamente:
+  - `.env.local`
+  - `.env.*`
+  - archivos con claves, tokens o credenciales
+- Si una tarea parece requerir acceso a secretos, pedir confirmación explícita antes de continuar.
+- Nunca copiar valores de secretos en el chat, commits, documentación o logs.

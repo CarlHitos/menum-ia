@@ -1,8 +1,13 @@
 import type { OnboardingDraft } from "@/features/onboarding/types";
 import { formatGoalLabel } from "@/lib/domain/goal-labels";
 import type { Household } from "@/lib/domain/types";
+import { buildDefaultOnboardingDraft } from "@/lib/domain/household-mappers";
 
-export function buildInitialOnboardingDraft(household: Household): OnboardingDraft {
+export function buildInitialOnboardingDraft(household?: Household | null): OnboardingDraft {
+  if (!household) {
+    return buildDefaultOnboardingDraft();
+  }
+
   return {
     householdName: household.name,
     memberCount: household.members.length,

@@ -2,6 +2,12 @@ import type { ShoppingListState } from "@/lib/domain/types";
 
 const STORAGE_PREFIX = "menumia:shopping-list-state:v1:";
 
+function getStorageKey(planId: string, userId?: string) {
+  return userId
+    ? `${STORAGE_PREFIX}${userId}:${planId}`
+    : `${STORAGE_PREFIX}${planId}`;
+}
+
 function isValidShoppingListState(value: unknown): value is ShoppingListState {
   if (!value || typeof value !== "object") {
     return false;
@@ -16,13 +22,13 @@ function isValidShoppingListState(value: unknown): value is ShoppingListState {
   );
 }
 
-export function loadShoppingListState(planId: string) {
+export function loadShoppingListState(planId: string, userId?: string) {
   if (typeof window === "undefined") {
     return null;
   }
 
   try {
-    const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${planId}`);
+    const raw = window.localStorage.getItem(getStorageKey(planId, userId));
 
     if (!raw) {
       return null;
@@ -35,14 +41,14 @@ export function loadShoppingListState(planId: string) {
   }
 }
 
-export function saveShoppingListState(state: ShoppingListState) {
+export function saveShoppingListState(state: ShoppingListState, userId?: string) {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
     window.localStorage.setItem(
-      `${STORAGE_PREFIX}${state.planId}`,
+      getStorageKey(state.planId, userId),
       JSON.stringify(state),
     );
   } catch {
