@@ -2,8 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const items = [
-  { href: "/", label: "Inicio", icon: "/branding/app-icon-main.svg" },
-  { href: "/onboarding", label: "Hogar", icon: "/branding/hogar.svg" },
+  { href: "/", label: "Hogar", icon: "/branding/hogar.svg" },
   { href: "/dashboard", label: "Menu", icon: "/branding/meal.svg" },
   { href: "/shopping-list", label: "Compra", icon: "/branding/list.svg" },
 ];
