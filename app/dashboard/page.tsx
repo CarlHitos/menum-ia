@@ -25,7 +25,7 @@ export default async function DashboardPage() {
     <AppShell currentPath="/dashboard">
       <PageHeader
         eyebrow=""
-        title="Vuestra semana, lista"
+        title="Plan semanal"
         description="Preparad vuestra semana activa, ajustad recetas y pasad a la compra cuando este lista."
       />
       <DashboardClient household={household} userId={session.user.id} />

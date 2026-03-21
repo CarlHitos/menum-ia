@@ -17,10 +17,34 @@ export function ShoppingListClient({
   onToggleItem,
   onClearMarked,
 }: ShoppingListClientProps) {
+  const categoriesWithProgress = useMemo(
+    () =>
+      categories.map((category) => {
+        const checkedCount = category.items.filter((item) => item.checked).length;
+        const pendingItems = category.items.filter((item) => !item.checked);
+        const isComplete =
+          category.items.length > 0 && checkedCount === category.items.length;
+
+        return {
+          ...category,
+          checkedCount,
+          pendingItems,
+          isComplete,
+        };
+      }),
+    [categories],
+  );
+  const pendingCategories = categoriesWithProgress.filter(
+    (category) => !category.isComplete,
+  );
+  const completedCategories = categoriesWithProgress.filter(
+    (category) => category.isComplete,
+  );
   const [openCategoryKeys, setOpenCategoryKeys] = useState<string[]>(
     categories[0] ? [categories[0].key] : [],
   );
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);
+  const [openCompletedCategoryKeys, setOpenCompletedCategoryKeys] = useState<string[]>([]);
   const completedItems = useMemo(
     () =>
       categories.flatMap((category) =>
@@ -31,7 +55,16 @@ export function ShoppingListClient({
     [categories],
   );
 
-  function toggleCategory(categoryKey: string) {
+  function toggleCategory(categoryKey: string, isComplete: boolean) {
+    if (isComplete) {
+      setOpenCompletedCategoryKeys((current) =>
+        current.includes(categoryKey)
+          ? current.filter((key) => key !== categoryKey)
+          : [...current, categoryKey],
+      );
+      return;
+    }
+
     setOpenCategoryKeys((current) =>
       current.includes(categoryKey)
         ? current.filter((key) => key !== categoryKey)
@@ -41,24 +74,23 @@ export function ShoppingListClient({
 
   return (
     <div className="space-y-3">
-      {categories.map((category) => {
-        const categoryChecked = category.items.filter((item) => item.checked).length;
-        const pendingItems = category.items.filter((item) => !item.checked);
-        const isOpen = openCategoryKeys.includes(category.key);
-        const isComplete = category.items.length > 0 && categoryChecked === category.items.length;
+      {[...pendingCategories, ...completedCategories].map((category) => {
+        const isOpen = category.isComplete
+          ? openCompletedCategoryKeys.includes(category.key)
+          : openCategoryKeys.includes(category.key);
 
         return (
           <SectionCard
             key={category.key}
             className={
-              isComplete
+              category.isComplete
                 ? "border-[rgba(135,214,141,0.22)] bg-[rgba(255,255,255,0.04)]"
                 : undefined
             }
           >
             <button
               type="button"
-              onClick={() => toggleCategory(category.key)}
+              onClick={() => toggleCategory(category.key, category.isComplete)}
               className="flex w-full items-center justify-between gap-4 text-left"
             >
               <div className="flex items-center gap-3">
@@ -71,10 +103,12 @@ export function ShoppingListClient({
                   </h2>
                   <p
                     className={`mt-1 text-xs uppercase tracking-[0.18em] ${
-                      isComplete ? "text-[var(--color-success)]" : "text-[var(--color-muted)]"
+                      category.isComplete
+                        ? "text-[var(--color-success)]"
+                        : "text-[var(--color-muted)]"
                     }`}
                   >
-                    {categoryChecked}/{category.items.length} marcados
+                    {category.checkedCount}/{category.items.length} marcados
                   </p>
                 </div>
               </div>
@@ -85,7 +119,7 @@ export function ShoppingListClient({
 
             {isOpen ? (
               <div className="mt-4 space-y-2">
-                {pendingItems.map((item) => {
+                {category.pendingItems.map((item) => {
                   const isChecked = item.checked;
 
                   return (
@@ -116,6 +150,11 @@ export function ShoppingListClient({
                     </label>
                   );
                 })}
+                {category.isComplete ? (
+                  <p className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-3 text-sm text-[var(--color-success)]">
+                    Categoria completada. Todo este grupo ya esta marcado.
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </SectionCard>

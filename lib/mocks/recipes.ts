@@ -393,7 +393,7 @@ export const recipes: Recipe[] = [
   {
     id: "chia-mango-coco",
     title: "Pudding de chia con mango y coco",
-    description: "Desayuno frio que puede dejarse listo la noche anterior para reducir friccion por la manana.",
+    description: "Desayuno frio que puede dejarse listo la noche anterior para ir mas descansados por la manana.",
     category: "breakfast",
     durationMinutes: 10,
     difficulty: "easy",
@@ -736,7 +736,7 @@ export const recipes: Recipe[] = [
   {
     id: "lentejas-verduras-arroz",
     title: "Lentejas guisadas con verduras y arroz",
-    description: "Plato completo de cuchara con base sencilla para el hogar.",
+    description: "Un plato de cuchara de los de siempre, facil y para todos.",
     category: "lunch",
     durationMinutes: 40,
     difficulty: "easy",
@@ -945,7 +945,7 @@ export const recipes: Recipe[] = [
   {
     id: "merluza-patata-brocoli",
     title: "Merluza al horno con patata y brocoli",
-    description: "Comida de horno sencilla con base comun adaptable.",
+    description: "Todo al horno, sin complicaciones y con raciones a medida.",
     category: "lunch",
     durationMinutes: 32,
     difficulty: "easy",
@@ -1145,7 +1145,7 @@ export const recipes: Recipe[] = [
       { id: "carlos-wrap-pizza-plus", memberId: "carlos", ingredientId: "wrap-base-pizza", deltaQuantity: 1, unit: "ud" },
     ],
     quickDinner: true,
-    leftoverNotes: "Usa salsa de carne del miercoles para reducir friccion.",
+    leftoverNotes: "Usa salsa de carne del miercoles para ahorrar tiempo y simplificar la cena.",
   },
   {
     id: "frittata-espinacas-feta",

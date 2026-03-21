@@ -71,6 +71,7 @@ export function WeeklyMenu({
         <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-7">
           {plan.map((day) => {
             const isSelected = day.dayKey === selectedDay.dayKey;
+            const [dayNumber, dayMonth] = splitDateLabel(day.dateLabel);
 
             return (
               <button
@@ -91,7 +92,10 @@ export function WeeklyMenu({
                     {day.shortLabel}
                   </span>
                   <span className="mt-1 block text-[10px] leading-none opacity-80">
-                    {day.dateLabel}
+                    {dayNumber}
+                  </span>
+                  <span className="mt-1 block text-[10px] leading-none opacity-80">
+                    {dayMonth}
                   </span>
                 </span>
               </button>
@@ -229,4 +233,9 @@ export function WeeklyMenu({
       </div>
     </div>
   );
+}
+
+function splitDateLabel(dateLabel: string) {
+  const [dayNumber = dateLabel, dayMonth = ""] = dateLabel.split(/\s+/, 2);
+  return [dayNumber, dayMonth];
 }

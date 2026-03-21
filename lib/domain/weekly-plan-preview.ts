@@ -43,7 +43,7 @@ const tagLabels: Record<MealTag, string> = {
 
 const tagDescriptions: Record<MealTag, string> = {
   "quick-dinner":
-    "Bloque pensado para resolverse con poca friccion cuando llegas con poco tiempo o energia.",
+    "Pensada para esos dias en los que llegas a casa con el tiempo justo o la energia al minimo.",
   "batch-friendly":
     "Esta comida merece cocinar un poco mas porque deja trabajo adelantado para otros dias.",
   "uses-leftovers":
@@ -165,15 +165,15 @@ export function getTagGuide() {
 
 function buildSlotDescription(tags: MealTag[], fallbackDescription: string) {
   if (tags.includes("batch-friendly")) {
-    return "Comida base que adelanta parte de la semana.";
+    return "Ideal para cocinar de mas y dejar otra comida medio resuelta.";
   }
 
   if (tags.includes("uses-leftovers")) {
-    return "Bloque montado para reaprovechar lo ya cocinado.";
+    return "Perfecta para aprovechar lo que ya teneis preparado.";
   }
 
   if (tags.includes("quick-dinner")) {
-    return "Opcion ligera de friccion baja para resolver el dia.";
+    return "Opcion ligera y sin complicaciones para resolver el dia.";
   }
 
   return fallbackDescription;
