@@ -1,13 +1,20 @@
-import Link from "next/link";
 import { SectionCard } from "@/components/ui/section-card";
 import type { OnboardingDraft } from "@/features/onboarding/types";
 import { formatGoalLabel } from "@/lib/domain/goal-labels";
 
 type OnboardingReviewProps = {
   draft: OnboardingDraft;
+  onComplete: () => void | Promise<void>;
+  isSubmitting?: boolean;
+  submitError?: string | null;
 };
 
-export function OnboardingReview({ draft }: OnboardingReviewProps) {
+export function OnboardingReview({
+  draft,
+  onComplete,
+  isSubmitting = false,
+  submitError = null,
+}: OnboardingReviewProps) {
   const householdName = draft.householdName || "tu hogar";
 
   return (
@@ -88,12 +95,22 @@ export function OnboardingReview({ draft }: OnboardingReviewProps) {
         </div>
       </SectionCard>
 
-      <Link
-        href="/dashboard"
+      {submitError ? (
+        <SectionCard className="border-red-400/30 bg-red-500/10">
+          <p className="text-sm leading-6 text-red-100">{submitError}</p>
+        </SectionCard>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={() => {
+          void onComplete();
+        }}
+        disabled={isSubmitting}
         className="inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-4 text-sm font-semibold text-slate-950"
       >
-        Generar mi menu inteligente ✨
-      </Link>
+        {isSubmitting ? "Guardando hogar..." : "Generar mi menu inteligente ✨"}
+      </button>
     </div>
   );
 }

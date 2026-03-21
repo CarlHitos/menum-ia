@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatPill } from "@/components/ui/stat-pill";
 import { WeeklyMenu } from "@/features/week-menu/weekly-menu";
-import type { OnboardingDraft } from "@/features/onboarding/types";
 import type {
   Household,
   MealSlot,
@@ -22,7 +21,6 @@ import {
   getPlanRangeLabel,
   updateWeeklyPlanStatus,
 } from "@/lib/domain/weekly-plan-runtime";
-import { loadOnboardingDraft } from "@/lib/local-storage/onboarding-storage";
 import { buildDashboardContext } from "@/lib/local-storage/onboarding-mappers";
 import {
   loadActiveWeeklyPlan,
@@ -32,16 +30,18 @@ import { recipes, weekTemplate } from "@/lib/mocks";
 
 type DashboardClientProps = {
   household: Household;
+  userId: string;
 };
 
-export function DashboardClient({ household }: DashboardClientProps) {
+export function DashboardClient({ household, userId }: DashboardClientProps) {
   const router = useRouter();
-  const storedDraft: OnboardingDraft | null = loadOnboardingDraft();
-  const [plan, setPlan] = useState<WeeklyPlan | null>(() => loadActiveWeeklyPlan());
+  const [plan, setPlan] = useState<WeeklyPlan | null>(() =>
+    loadActiveWeeklyPlan(userId),
+  );
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
 
-  const context = buildDashboardContext(storedDraft, household);
+  const context = buildDashboardContext(null, household);
   const visibleMeals =
     context.mealsPerDay.length > 0
       ? context.mealsPerDay
@@ -51,8 +51,6 @@ export function DashboardClient({ household }: DashboardClientProps) {
     : [];
   const visibleMealsLabel = visibleMeals.map(formatMealTypeLabel).join(", ");
   const rangeLabel = plan ? getPlanRangeLabel(plan) : "";
-  const memberCount =
-    context.memberNames.length || storedDraft?.memberCount || household.members.length;
   const hasChangesAfterConfirmation =
     plan?.status === "draft" && Boolean(plan.confirmedAt);
   const selectedSlot = findSlotById(plan, selectedSlotId);
@@ -72,8 +70,8 @@ export function DashboardClient({ household }: DashboardClientProps) {
       return;
     }
 
-    saveActiveWeeklyPlan(plan);
-  }, [plan]);
+    saveActiveWeeklyPlan(plan, userId);
+  }, [plan, userId]);
 
   useEffect(() => {
     if (!selectedSlotId || !editorRef.current) {
@@ -125,7 +123,7 @@ export function DashboardClient({ household }: DashboardClientProps) {
 
     const confirmedPlan = updateWeeklyPlanStatus(plan, "confirmed");
     setPlan(confirmedPlan);
-    saveActiveWeeklyPlan(confirmedPlan);
+    saveActiveWeeklyPlan(confirmedPlan, userId);
   }
 
   function handleStartPlanning(mode: PlanningStartMode) {
@@ -261,8 +259,9 @@ export function DashboardClient({ household }: DashboardClientProps) {
           Resumen del hogar
         </p>
         <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-          Menu optimizado para {memberCount} personas en {context.preferredStore}. Objetivo:{" "}
-          {formatBudget(storedDraft?.weeklyBudget)}
+          Menu optimizado para {household.members.length} personas en{" "}
+          {context.preferredStore}. Objetivo:{" "}
+          {formatBudget(household.planningPreferences.weeklyBudget)}
         </h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {context.memberNames.map((name) => (
@@ -368,12 +367,12 @@ export function DashboardClient({ household }: DashboardClientProps) {
   );
 }
 
-function formatBudget(value?: string) {
-  if (!value?.trim()) {
+function formatBudget(value?: number) {
+  if (!value) {
     return "sin definir";
   }
 
-  return value.includes("€") ? value : value.replace("EUR", "€").trim();
+  return `${value}€`;
 }
 
 function getInitials(name: string) {
