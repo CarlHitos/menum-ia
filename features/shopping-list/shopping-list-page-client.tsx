@@ -12,25 +12,23 @@ import {
   getRemovedShoppingItems,
   mergeShoppingListWithState,
 } from "@/lib/domain/shopping-list-state";
-import type { ShoppingListState } from "@/lib/domain/types";
-import {
-  loadShoppingListState,
-  saveShoppingListState,
-} from "@/lib/local-storage/shopping-list-state-storage";
-import { loadActiveWeeklyPlan } from "@/lib/local-storage/weekly-plan-storage";
-import { recipes } from "@/lib/mocks";
+import type { Recipe, ShoppingListState, WeeklyPlan } from "@/lib/domain/types";
 
 type ShoppingListPageClientProps = {
-  userId: string;
+  initialPlan: WeeklyPlan | null;
+  initialShoppingState: ShoppingListState | null;
+  recipes: Recipe[];
 };
 
 export function ShoppingListPageClient({
-  userId,
+  initialPlan,
+  initialShoppingState,
+  recipes,
 }: ShoppingListPageClientProps) {
-  const plan = useMemo(() => loadActiveWeeklyPlan(userId), [userId]);
+  const plan = initialPlan;
   const shoppingList = useMemo(
     () => (plan ? buildShoppingListFromPlan(plan, recipes) : null),
-    [plan],
+    [plan, recipes],
   );
   const [shoppingState, setShoppingState] = useState<ShoppingListState>(() => {
     if (!plan || !shoppingList) {
@@ -41,10 +39,7 @@ export function ShoppingListPageClient({
       };
     }
 
-    const stored = loadShoppingListState(plan.id, userId);
-    const nextState = buildNextShoppingListState(stored, shoppingList);
-    saveShoppingListState(nextState, userId);
-    return nextState;
+    return buildNextShoppingListState(initialShoppingState, shoppingList);
   });
   const merged = useMemo(
     () =>
@@ -107,7 +102,7 @@ export function ShoppingListPageClient({
         ),
         updatedAt: new Date().toISOString(),
       };
-      saveShoppingListState(nextState, userId);
+      void persistShoppingListState(nextState);
       return nextState;
     });
   }
@@ -119,7 +114,7 @@ export function ShoppingListPageClient({
         items: current.items.map((item) => ({ ...item, checked: false })),
         updatedAt: new Date().toISOString(),
       };
-      saveShoppingListState(nextState, userId);
+      void persistShoppingListState(nextState);
       return nextState;
     });
   }
@@ -262,4 +257,14 @@ export function ShoppingListPageClient({
       />
     </>
   );
+}
+
+async function persistShoppingListState(state: ShoppingListState) {
+  await fetch("/api/shopping-list-state", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(state),
+  });
 }
