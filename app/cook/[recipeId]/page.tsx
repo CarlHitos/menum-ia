@@ -3,19 +3,31 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/ui/section-card";
 import { CookingMode } from "@/features/cooking/cooking-mode";
-import { household, recipesById } from "@/lib/mocks";
+import { requireAuth } from "@/lib/auth/require-auth";
+import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
+import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
+import { getCatalogRecipeById } from "@/lib/server/recipes-catalog";
 
 type CookPageProps = {
   params: Promise<{ recipeId: string }>;
 };
 
 export default async function CookPage({ params }: CookPageProps) {
+  const session = await requireAuth("/dashboard");
+  const persistedHousehold = await getHouseholdWithMembersByOwnerUserId(
+    session.user.id,
+  );
   const { recipeId } = await params;
-  const recipe = recipesById[recipeId];
+  const recipe = await getCatalogRecipeById(recipeId);
 
-  if (!recipe) {
+  if (!recipe || !persistedHousehold) {
     notFound();
   }
+
+  const household = buildHouseholdFromPersistence(
+    persistedHousehold.household,
+    persistedHousehold.members,
+  );
 
   return (
     <AppShell currentPath="/dashboard">

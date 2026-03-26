@@ -134,3 +134,86 @@ export const householdMembers = pgTable("household_members", {
     .defaultNow()
     .notNull(),
 });
+
+export const weekTemplates = pgTable("week_templates", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  householdId: text("household_id")
+    .notNull()
+    .references(() => households.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  repeatable: boolean("repeatable").default(true).notNull(),
+  days: jsonb("days").notNull(),
+  batchBlocks: jsonb("batch_blocks").notNull(),
+  leftoverFlows: jsonb("leftover_flows").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const weeklyPlans = pgTable("weekly_plans", {
+  id: text("id").primaryKey(),
+  householdId: text("household_id")
+    .notNull()
+    .references(() => households.id, { onDelete: "cascade" }),
+  templateId: text("template_id").references(() => weekTemplates.id, {
+    onDelete: "set null",
+  }),
+  status: text("status").notNull(),
+  planningStartMode: text("planning_start_mode").notNull(),
+  rangeStart: text("range_start").notNull(),
+  rangeEnd: text("range_end").notNull(),
+  weekStart: text("week_start").notNull(),
+  days: jsonb("days").notNull(),
+  batchBlocks: jsonb("batch_blocks").notNull(),
+  leftoverFlows: jsonb("leftover_flows").notNull(),
+  confirmedAt: text("confirmed_at"),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const shoppingListStates = pgTable("shopping_list_states", {
+  planId: text("plan_id")
+    .primaryKey()
+    .references(() => weeklyPlans.id, { onDelete: "cascade" }),
+  items: jsonb("items").notNull(),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+export const recipes = pgTable("recipes", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  durationMinutes: integer("duration_minutes").notNull(),
+  difficulty: text("difficulty").notNull(),
+  baseServings: integer("base_servings").notNull(),
+  utensils: jsonb("utensils").notNull().$type<string[]>(),
+  ingredients: jsonb("ingredients").notNull(),
+  steps: jsonb("steps").notNull(),
+  substitutions: jsonb("substitutions").notNull().$type<string[]>(),
+  portionAdjustments: jsonb("portion_adjustments").notNull(),
+  batchCookingNotes: text("batch_cooking_notes"),
+  leftoverNotes: text("leftover_notes"),
+  quickDinner: boolean("quick_dinner"),
+  baseYield: jsonb("base_yield"),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+});

@@ -560,7 +560,7 @@ No como sustituto de `Household` persistido remotamente.
 Antes de introducir backend o auth, conviene mantener esta separación:
 
 - dominio persistible en `lib/domain`
-- mocks y fixtures en `lib/mocks`
+- datos estáticos temporales en `lib/data`
 - proyecciones y mapeos en selectores y mappers
 - estado local de cliente fuera del modelo canónico
 

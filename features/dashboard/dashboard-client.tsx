@@ -10,6 +10,7 @@ import type {
   MealSlot,
   PlanningStartMode,
   Recipe,
+  WeekTemplate,
   WeeklyPlan,
 } from "@/lib/domain/types";
 import {
@@ -22,25 +23,25 @@ import {
   updateWeeklyPlanStatus,
 } from "@/lib/domain/weekly-plan-runtime";
 import { buildDashboardContext } from "@/lib/local-storage/onboarding-mappers";
-import {
-  clearActiveWeeklyPlan,
-  loadActiveWeeklyPlan,
-  saveActiveWeeklyPlan,
-} from "@/lib/local-storage/weekly-plan-storage";
-import { recipes, weekTemplate } from "@/lib/mocks";
 
 type DashboardClientProps = {
   household: Household;
-  userId: string;
+  weekTemplate: WeekTemplate;
+  initialPlan: WeeklyPlan | null;
+  recipes: Recipe[];
 };
 
-export function DashboardClient({ household, userId }: DashboardClientProps) {
+export function DashboardClient({
+  household,
+  weekTemplate,
+  initialPlan,
+  recipes,
+}: DashboardClientProps) {
   const router = useRouter();
-  const [plan, setPlan] = useState<WeeklyPlan | null>(() =>
-    loadActiveWeeklyPlan(userId),
-  );
+  const [plan, setPlan] = useState<WeeklyPlan | null>(initialPlan);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
+  const hasHydratedPlan = useRef(false);
 
   const context = buildDashboardContext(null, household);
   const visibleMeals =
@@ -60,19 +61,24 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
       selectedSlot
         ? recipes.filter((recipe) => recipe.category === selectedSlot.mealType)
         : [],
-    [selectedSlot],
+    [recipes, selectedSlot],
   );
   const selectedRecipe = selectedSlot
     ? recipes.find((recipe) => recipe.id === selectedSlot.recipeId) ?? null
     : null;
 
   useEffect(() => {
+    if (!hasHydratedPlan.current) {
+      hasHydratedPlan.current = true;
+      return;
+    }
+
     if (!plan) {
       return;
     }
 
-    saveActiveWeeklyPlan(plan, userId);
-  }, [plan, userId]);
+    void persistWeeklyPlan(plan);
+  }, [plan]);
 
   useEffect(() => {
     if (!selectedSlotId || !editorRef.current) {
@@ -124,7 +130,6 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
 
     const confirmedPlan = updateWeeklyPlanStatus(plan, "confirmed");
     setPlan(confirmedPlan);
-    saveActiveWeeklyPlan(confirmedPlan, userId);
   }
 
   function handleStartPlanning(mode: PlanningStartMode) {
@@ -136,9 +141,13 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
   }
 
   function handleResetPlanningStart() {
+    const currentPlanId = plan?.id;
     setSelectedSlotId(null);
     setPlan(null);
-    clearActiveWeeklyPlan(userId);
+
+    if (currentPlanId) {
+      void deleteWeeklyPlan(currentPlanId);
+    }
   }
 
   return (
@@ -345,6 +354,22 @@ export function DashboardClient({ household, userId }: DashboardClientProps) {
       ) : null}
     </>
   );
+}
+
+async function persistWeeklyPlan(plan: WeeklyPlan) {
+  await fetch("/api/weekly-plan", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(plan),
+  });
+}
+
+async function deleteWeeklyPlan(planId: string) {
+  await fetch(`/api/weekly-plan?planId=${encodeURIComponent(planId)}`, {
+    method: "DELETE",
+  });
 }
 
 function formatServings(count: number) {
