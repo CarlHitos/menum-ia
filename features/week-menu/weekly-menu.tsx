@@ -10,6 +10,7 @@ type WeeklyMenuProps = {
   selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
   initialDayKey?: string | null;
+  onOpenRecipe?: (href: string) => void;
 };
 
 const weekdayOrder = [
@@ -27,6 +28,7 @@ export function WeeklyMenu({
   selectedSlotId = null,
   onSelectSlot,
   initialDayKey = null,
+  onOpenRecipe,
 }: WeeklyMenuProps) {
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
@@ -155,9 +157,14 @@ export function WeeklyMenu({
                 ) : null}
 
                 <div className="flex flex-wrap items-center gap-2">
+                  {slot.servings ? <span className="text-xs text-[var(--color-muted)]">{slot.servings} comensales</span> : null}
                   {slot.status === "planned" && slot.recipeId ? (
                     <Link
-                      href={`/recipes/${slot.recipeId}`}
+                      href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
+                      onClick={onOpenRecipe ? (event) => {
+                        event.preventDefault();
+                        onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
+                      } : undefined}
                       className="inline-flex items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
                     >
                       Ver receta

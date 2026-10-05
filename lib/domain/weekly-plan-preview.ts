@@ -1,4 +1,5 @@
 import type { MealTag, MealType, Recipe, WeeklyPlan } from "@/lib/domain/types";
+import { recipeContextQuery } from "@/lib/domain/plan-servings";
 
 export type WeeklyPlanPreviewSlot = {
   id: string;
@@ -8,6 +9,8 @@ export type WeeklyPlanPreviewSlot = {
   title: string;
   description: string;
   recipeId?: string;
+  recipeHref?: string;
+  servings?: number;
   minutes?: number;
   badges: Array<{
     tag: MealTag;
@@ -89,6 +92,8 @@ export function buildWeeklyPlanPreview(
         mealLabel: mealTypeLabels[slot.mealType],
         status: "planned" as const,
         recipeId: recipe.id,
+        recipeHref: `/recipes/${recipe.id}${recipeContextQuery(plan.id, slot.id)}`,
+        servings: slot.servings,
         title: recipe.title,
         minutes: recipe.durationMinutes,
         description: buildSlotDescription(slot.tags, recipe.description),

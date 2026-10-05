@@ -12,6 +12,7 @@ import {
 import { buildDefaultWeekTemplate } from "@/lib/domain/default-week-template";
 import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
 import { getCatalogRecipes } from "@/lib/server/recipes-catalog";
+import { resolvePlanServings } from "@/lib/domain/plan-servings";
 
 export default async function DashboardPage() {
   const session = await requireAuth("/dashboard");
@@ -46,7 +47,7 @@ export default async function DashboardPage() {
       <DashboardClient
         household={household}
         weekTemplate={weekTemplate}
-        initialPlan={initialPlan}
+        initialPlan={initialPlan ? resolvePlanServings(initialPlan, household) : null}
         recipes={recipes}
       />
     </AppShell>

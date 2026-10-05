@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { resolvePlanServings, updateSlotServings } from "@/lib/domain/plan-servings";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatPill } from "@/components/ui/stat-pill";
@@ -41,7 +42,9 @@ export function DashboardClient({
   const [plan, setPlan] = useState<WeeklyPlan | null>(initialPlan);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
-  const hasHydratedPlan = useRef(false);
+  const saveQueue = useRef<Promise<void>>(Promise.resolve());
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const context = buildDashboardContext(null, household);
   const visibleMeals =
@@ -68,19 +71,6 @@ export function DashboardClient({
     : null;
 
   useEffect(() => {
-    if (!hasHydratedPlan.current) {
-      hasHydratedPlan.current = true;
-      return;
-    }
-
-    if (!plan) {
-      return;
-    }
-
-    void persistWeeklyPlan(plan);
-  }, [plan]);
-
-  useEffect(() => {
     if (!selectedSlotId || !editorRef.current) {
       return;
     }
@@ -92,44 +82,61 @@ export function DashboardClient({
     setSelectedSlotId(slotId);
   }
 
+  function enqueueSave(action: () => Promise<void>) {
+    setSaving(true);
+    setSaveError(null);
+    const pending = saveQueue.current.catch(() => {}).then(action);
+    saveQueue.current = pending;
+    void pending.then(() => {
+      if (saveQueue.current === pending) setSaving(false);
+    }, () => {
+      if (saveQueue.current === pending) {
+        setSaving(false);
+        setSaveError("No se han podido guardar los cambios. Reintenta antes de continuar.");
+      }
+    });
+  }
+
+  function savePlan(next: WeeklyPlan) {
+    setPlan(next);
+    enqueueSave(() => persistWeeklyPlan(next));
+  }
+
   function replaceSlotRecipe(slotId: string, nextRecipe: Recipe) {
-    setPlan((current) => {
-      if (!current) {
-        return current;
-      }
-
-      const currentSlot = findSlotById(current, slotId);
-
-      if (!currentSlot || currentSlot.recipeId === nextRecipe.id) {
-        return current;
-      }
-
-      return {
-        ...current,
-        status: current.status === "confirmed" ? "draft" : current.status,
-        updatedAt: new Date().toISOString(),
-        days: current.days.map((day) => ({
-          ...day,
-          slots: day.slots.map((slot) =>
-            slot.id === slotId ? { ...slot, recipeId: nextRecipe.id } : slot,
-          ),
-        })),
-      };
+    if (!plan) return;
+    const currentSlot = findSlotById(plan, slotId);
+    if (!currentSlot || currentSlot.recipeId === nextRecipe.id) return;
+    savePlan({
+      ...plan,
+      status: "draft",
+      updatedAt: new Date().toISOString(),
+      days: plan.days.map((day) => ({
+        ...day,
+        slots: day.slots.map((slot) => slot.id === slotId ? { ...slot, recipeId: nextRecipe.id } : slot),
+      })),
     });
     setSelectedSlotId(null);
   }
 
+  async function navigateAfterSave(href: string) {
+    try {
+      let pending: Promise<void>;
+      do {
+        pending = saveQueue.current;
+        await pending;
+      } while (pending !== saveQueue.current);
+      router.push(href);
+    } catch {
+      // Keep the current plan and display the retry action.
+    }
+  }
+
   function handleGoToShoppingList() {
-    router.push("/shopping-list");
+    void navigateAfterSave("/shopping-list");
   }
 
   function handleConfirmWeek() {
-    if (!plan) {
-      return;
-    }
-
-    const confirmedPlan = updateWeeklyPlanStatus(plan, "confirmed");
-    setPlan(confirmedPlan);
+    if (plan) savePlan(updateWeeklyPlanStatus(plan, "confirmed"));
   }
 
   function handleStartPlanning(mode: PlanningStartMode) {
@@ -137,21 +144,30 @@ export function DashboardClient({
       householdId: household.id,
       planningStartMode: mode,
     });
-    setPlan(nextPlan);
+    savePlan(resolvePlanServings(nextPlan, household));
   }
 
   function handleResetPlanningStart() {
-    const currentPlanId = plan?.id;
-    setSelectedSlotId(null);
-    setPlan(null);
+    if (!plan) return;
+    const planId = plan.id;
+    enqueueSave(async () => {
+      await deleteWeeklyPlan(planId);
+      setSelectedSlotId(null);
+      setPlan(null);
+    });
+  }
 
-    if (currentPlanId) {
-      void deleteWeeklyPlan(currentPlanId);
-    }
+  function changeServings(servings: number, override = true) {
+    if (plan && selectedSlot) savePlan(updateSlotServings(plan, selectedSlot.id, servings, override));
   }
 
   return (
     <>
+      {saving ? <p role="status" className="mb-3 text-sm text-[var(--color-muted)]">Guardando cambios…</p> : null}
+      {saveError ? <div role="alert" className="mb-3 rounded-2xl border border-[var(--color-accent)] p-3 text-sm">
+        {saveError}
+        {plan ? <button type="button" className="ml-2 underline" onClick={() => savePlan(plan)}>Reintentar</button> : null}
+      </div> : null}
       <div className="mb-4 grid grid-cols-2 gap-3">
         <StatPill label="Hogar" value={context.householdName} />
         <StatPill label="Comidas" value={visibleMealsLabel} />
@@ -268,6 +284,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={handleResetPlanningStart}
+                  disabled={saving}
                   className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-3 py-2.5 text-sm font-medium text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
                 >
                   Cambiar inicio
@@ -283,6 +300,7 @@ export function DashboardClient({
         initialDayKey={plan.days[0]?.dayKey ?? null}
         selectedSlotId={selectedSlotId}
         onSelectSlot={handleSelectSlot}
+        onOpenRecipe={(href) => void navigateAfterSave(href)}
       />
 
       {selectedSlot ? (
@@ -300,6 +318,16 @@ export function DashboardClient({
               : "Selecciona una receta para este bloque."}
           </p>
 
+          <div className="mt-4 rounded-2xl bg-[rgba(255,255,255,0.06)] p-4">
+            <p className="text-sm font-semibold">Comensales para esta comida</p>
+            <div className="mt-3 flex items-center gap-4">
+              <button type="button" aria-label="Un comensal menos" disabled={selectedSlot.servings <= 1} onClick={() => changeServings(selectedSlot.servings - 1)} className="h-11 w-11 rounded-full border border-[var(--color-border)] disabled:opacity-30">−</button>
+              <output aria-live="polite" className="text-xl font-semibold">{selectedSlot.servings}</output>
+              <button type="button" aria-label="Un comensal más" onClick={() => changeServings(selectedSlot.servings + 1)} className="h-11 w-11 rounded-full border border-[var(--color-border)]">+</button>
+            </div>
+            <p className="mt-2 text-xs text-[var(--color-muted)]">Actualiza los ingredientes y la compra de esta comida.</p>
+            {selectedSlot.servingsOverride ? <button type="button" onClick={() => changeServings(Math.max(1, household.members.length), false)} className="mt-3 min-h-11 text-sm underline">Usar tamaño del hogar ({household.members.length})</button> : null}
+          </div>
           <div className="mt-4 grid gap-3">
             {availableRecipes.map((recipe) => {
               const active = selectedSlot.recipeId === recipe.id;
@@ -331,7 +359,7 @@ export function DashboardClient({
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                      {formatServings(recipe.baseServings)}
+                      {formatServings(selectedSlot.servings)}
                     </span>
                     <span
                       className={`text-xs font-semibold uppercase tracking-[0.16em] ${
@@ -357,19 +385,21 @@ export function DashboardClient({
 }
 
 async function persistWeeklyPlan(plan: WeeklyPlan) {
-  await fetch("/api/weekly-plan", {
+  const response = await fetch("/api/weekly-plan", {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(plan),
   });
+  if (!response.ok) throw new Error("Unable to save plan");
 }
 
 async function deleteWeeklyPlan(planId: string) {
-  await fetch(`/api/weekly-plan?planId=${encodeURIComponent(planId)}`, {
+  const response = await fetch(`/api/weekly-plan?planId=${encodeURIComponent(planId)}`, {
     method: "DELETE",
   });
+  if (!response.ok) throw new Error("Unable to delete plan");
 }
 
 function formatServings(count: number) {

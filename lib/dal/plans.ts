@@ -93,6 +93,7 @@ export async function saveWeeklyPlan(plan: WeeklyPlan) {
     })
     .onConflictDoUpdate({
       target: weeklyPlans.id,
+      setWhere: eq(weeklyPlans.householdId, plan.householdId),
       set: {
         householdId: plan.householdId,
         templateId: plan.templateId ?? null,
@@ -110,7 +111,7 @@ export async function saveWeeklyPlan(plan: WeeklyPlan) {
     })
     .returning();
 
-  return mapWeeklyPlan(saved);
+  return saved ? mapWeeklyPlan(saved) : null;
 }
 
 export async function deleteWeeklyPlan(planId: string, householdId: string) {

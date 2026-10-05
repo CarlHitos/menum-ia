@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { scaleRecipeIngredients, formatIngredientAmount } from "@/lib/domain/portioning";
 import { useEffect, useState } from "react";
-import type { Household, Recipe } from "@/lib/domain/types";
+import type { Recipe } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
 
 type CookingModeProps = {
   recipe: Recipe;
-  household: Household;
+  requestedServings: number;
+  contextQuery?: string;
 };
 
-export function CookingMode({ recipe, household }: CookingModeProps) {
+export function CookingMode({ recipe, requestedServings, contextQuery = "" }: CookingModeProps) {
+  const ingredients = scaleRecipeIngredients(recipe, requestedServings);
   const [activeStep, setActiveStep] = useState(0);
   const initialSeconds = recipe.steps[0]?.timerSeconds ?? 0;
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
@@ -35,31 +38,6 @@ export function CookingMode({ recipe, household }: CookingModeProps) {
   const seconds = String(secondsLeft % 60).padStart(2, "0");
   const completionRatio = completedSteps.length / recipe.steps.length;
   const recipeCompleted = completedSteps.length === recipe.steps.length;
-  const servingReminders = household.members
-    .map((member) => {
-      const memberAdjustments = recipe.portionAdjustments.filter(
-        (adjustment) => adjustment.memberId === member.id,
-      );
-
-      if (!memberAdjustments.length) {
-        return `${member.name}: misma base`;
-      }
-
-      const summary = memberAdjustments
-        .map((adjustment) => {
-          const ingredient = recipe.ingredients.find(
-            (item) => item.id === adjustment.ingredientId,
-          );
-          const ingredientName = ingredient?.name ?? "ajuste";
-          const sign = adjustment.deltaQuantity > 0 ? "+" : "";
-
-          return `${ingredientName} ${sign}${adjustment.deltaQuantity} ${adjustment.unit}`;
-        })
-        .join(", ");
-
-      return `${member.name}: ${summary}`;
-    })
-    .join(" · ");
 
   function selectStep(index: number) {
     const nextInitial = recipe.steps[index]?.timerSeconds ?? 0;
@@ -95,6 +73,19 @@ export function CookingMode({ recipe, household }: CookingModeProps) {
 
   return (
     <div className="space-y-4">
+      <SectionCard>
+        <details>
+          <summary className="cursor-pointer py-2 font-semibold">Ingredientes para {requestedServings} comensales</summary>
+          <ul className="mt-3 space-y-2 text-sm">
+            {ingredients.map((ingredient) => (
+              <li key={ingredient.id} className="flex justify-between gap-3">
+                <span>{ingredient.name}</span>
+                <span>{formatIngredientAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      </SectionCard>
       <SectionCard className="border-[rgba(252,163,17,0.4)] bg-[linear-gradient(135deg,rgba(252,163,17,0.24),rgba(255,255,255,0.1))] shadow-[0_0_0_1px_rgba(252,163,17,0.12)]">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -209,7 +200,7 @@ export function CookingMode({ recipe, household }: CookingModeProps) {
               Recuerda al servir
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--color-paper)]">
-              {servingReminders}
+              Reparte la preparación entre {requestedServings} {requestedServings === 1 ? "comensal" : "comensales"}.
             </p>
           </div>
           <div className="mt-4 flex items-center justify-between gap-3">
@@ -220,7 +211,7 @@ export function CookingMode({ recipe, household }: CookingModeProps) {
               A comer! 🍽️
             </Link>
             <Link
-              href={`/recipes/${recipe.id}`}
+              href={`/recipes/${recipe.id}${contextQuery}`}
               className="text-sm font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-paper)]"
             >
               Deshacer

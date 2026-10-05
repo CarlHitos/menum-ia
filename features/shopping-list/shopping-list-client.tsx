@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { formatIngredientAmount, formatQuantity } from "@/lib/domain/portioning";
 import type { ShoppingCategory, ShoppingItem } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -144,7 +145,9 @@ export function ShoppingListClient({
                           {item.name}
                         </span>
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                          {item.quantity} {item.unit} · {item.sourceRecipeIds.length} recetas
+                          {formatIngredientAmount(item.purchaseAmount ?? item.quantity, item.unit, item.amountType)} · {item.sourceRecipeIds.length} recetas
+                          {item.totalNeeded !== undefined && item.purchaseAmount !== item.totalNeeded ? ` · Necesario: ${formatQuantity(item.totalNeeded)} ${item.unit}` : ""}
+                          {item.hasUnquantifiedAmount && item.amountType === "exact" ? " + según necesidad" : ""}
                         </span>
                       </span>
                     </label>
@@ -204,7 +207,7 @@ export function ShoppingListClient({
                       {item.name}
                     </span>
                     <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                      {item.quantity} {item.unit} · {item.categoryLabel}
+                      {formatIngredientAmount(item.purchaseAmount ?? item.quantity, item.unit, item.amountType)} · {item.categoryLabel}
                     </span>
                   </span>
                 </label>
@@ -240,7 +243,7 @@ export function ShoppingListClient({
                   {item.name}
                 </span>
                 <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                  {item.quantity} {item.unit}
+                  {formatIngredientAmount(item.purchaseAmount ?? item.quantity, item.unit, item.amountType)}
                 </span>
               </div>
             ))}
