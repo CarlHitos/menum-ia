@@ -1,3 +1,4 @@
+import { ingredientKey, normalizeUnit } from "@/lib/domain/ingredient-identity";
 import type {
   ShoppingCategory,
   ShoppingItem,
@@ -9,37 +10,40 @@ export function buildNextShoppingListState(
   previousState: ShoppingListState | null,
   derivedList: ShoppingList,
 ): ShoppingListState {
-  const previousMap = new Map(previousState?.items.map((item) => [item.itemKey, item]) ?? []);
-  const nextKeys = new Set(
-    derivedList.categories.flatMap((category) => category.items.map((item) => item.id)),
-  );
-
+  const previousItems = previousState?.planId === derivedList.planId ? previousState.items : [];
+  const matchedKeys = new Set<string>();
   const flattenedItems = flattenShoppingItems(derivedList.categories);
-
-  const neededItems = Array.from(nextKeys).map((itemKey) => {
-    const item = flattenedItems.find((entry) => entry.id === itemKey);
-
-    if (!item) {
-      throw new Error(`Missing shopping item for key ${itemKey}`);
-    }
-
+  const neededItems = flattenedItems.map((item) => {
+    const matches = previousItems.filter((previous) =>
+      previous.itemKey === item.id || item.legacyKeys?.includes(previous.itemKey) ||
+      ingredientKey(previous.name, previous.unit) === item.id,
+    );
+    matches.forEach((previous) => matchedKeys.add(previous.itemKey));
+    const previousQuantity = matches.reduce((sum, previous) =>
+      sum + previous.quantity * normalizeUnit(previous.unit).factor, 0);
+    // Preserve checks across aliases/unit upgrades, but ask the user to check
+    // again when the planned purchase has increased or a product returns.
+    const checked = matches.length > 0 && matches.every((previous) => previous.checked && previous.status === "needed") &&
+      item.quantity <= previousQuantity + Number.EPSILON * Math.max(1, previousQuantity) * 16;
     return {
-      itemKey,
-      checked: previousMap.get(itemKey)?.checked ?? false,
+      itemKey: item.id,
+      checked,
       status: "needed" as const,
       name: item.name,
       quantity: item.quantity,
       unit: item.unit,
+      amountType: item.amountType,
+      hasUnquantifiedAmount: item.hasUnquantifiedAmount,
     };
   });
 
   const removedItems =
-    previousState?.items
-      .filter((item) => !nextKeys.has(item.itemKey))
+    previousItems
+      .filter((item) => !matchedKeys.has(item.itemKey))
       .map((item) => ({
         ...item,
         status: "removed" as const,
-      })) ?? [];
+      }));
 
   return {
     planId: derivedList.planId,
@@ -85,6 +89,8 @@ export function getRemovedShoppingItems(
         name: previousItemsMap.get(item.itemKey)?.name ?? item.name,
         quantity: previousItemsMap.get(item.itemKey)?.quantity ?? item.quantity,
         unit: previousItemsMap.get(item.itemKey)?.unit ?? item.unit,
+        amountType: item.amountType,
+        hasUnquantifiedAmount: item.hasUnquantifiedAmount,
         checked: item.checked,
         sourceRecipeIds: [],
         sourceMealSlotIds: [],

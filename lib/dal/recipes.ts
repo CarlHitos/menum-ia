@@ -1,6 +1,7 @@
 import { asc, count, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { recipes as recipesTable } from "@/db/schema";
+import { normalizeRecipeForServings } from "@/lib/domain/recipe-compatibility";
 import type { Recipe } from "@/lib/domain/types";
 
 type PersistedRecipeRecord = typeof recipesTable.$inferSelect;
@@ -80,7 +81,7 @@ export async function upsertRecipes(recipes: Recipe[]) {
 }
 
 function mapRecipe(record: PersistedRecipeRecord): Recipe {
-  return {
+  return normalizeRecipeForServings({
     id: record.id,
     title: record.title,
     description: record.description,
@@ -97,7 +98,7 @@ function mapRecipe(record: PersistedRecipeRecord): Recipe {
     leftoverNotes: record.leftoverNotes ?? undefined,
     quickDinner: record.quickDinner ?? undefined,
     baseYield: (record.baseYield as Recipe["baseYield"]) ?? undefined,
-  };
+  });
 }
 
 function dbExcluded(column: string) {

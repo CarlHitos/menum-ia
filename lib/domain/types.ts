@@ -46,11 +46,13 @@ export type HouseholdMember = {
 
 export type RecipeIngredient = {
   id: string;
+  productId?: string;
   name: string;
   quantity: number;
   unit: string;
   category: IngredientCategory;
   scalable: boolean;
+  amountType?: "exact" | "to_taste" | "as_needed";
   componentRef?: string;
 };
 
@@ -104,6 +106,7 @@ export type MealSlot = {
   recipeId: string;
   dayKey: string;
   servings: number;
+  servingsOverride?: boolean;
   tags: MealTag[];
   notes?: string;
 };
@@ -161,6 +164,11 @@ export type ShoppingItem = {
   id: string;
   name: string;
   quantity: number;
+  totalNeeded?: number;
+  purchaseAmount?: number;
+  amountType?: RecipeIngredient["amountType"];
+  hasUnquantifiedAmount?: boolean;
+  legacyKeys?: string[];
   unit: string;
   checked: boolean;
   sourceRecipeIds: string[];
@@ -186,6 +194,8 @@ export type ShoppingListStateItem = {
   name: string;
   quantity: number;
   unit: string;
+  amountType?: RecipeIngredient["amountType"];
+  hasUnquantifiedAmount?: boolean;
 };
 
 export type ShoppingListState = {

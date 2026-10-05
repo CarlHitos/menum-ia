@@ -1,4 +1,5 @@
-import { getIngredientAdjustmentTotal } from "@/lib/domain/portioning";
+import { scaleRecipeIngredients } from "@/lib/domain/portioning";
+import { calculatePurchaseAmount, ingredientKey, normalizeUnit } from "@/lib/domain/ingredient-identity";
 import type {
   IngredientCategory,
   Recipe,
@@ -36,38 +37,38 @@ export function buildShoppingListFromPlan(plan: WeeklyPlan, recipes: Recipe[]) {
       const recipe = recipeMap.get(slot.recipeId);
 
       if (!recipe) {
-        continue;
+        throw new Error(`Missing recipe in weekly plan: ${slot.recipeId}`);
       }
 
-      const servingsFactor = slot.servings / recipe.baseServings;
-
-      for (const ingredient of recipe.ingredients) {
-        const baseQuantity = ingredient.quantity * servingsFactor;
-        const adjustmentTotal = getIngredientAdjustmentTotal(
-          ingredient,
-          recipe.portionAdjustments,
-        );
-        const quantity = Number((baseQuantity + adjustmentTotal).toFixed(2));
-        const key = `${ingredient.category}:${ingredient.name}:${ingredient.unit}`;
+      for (const ingredient of scaleRecipeIngredients(recipe, slot.servings)) {
+        const { unit, factor } = normalizeUnit(ingredient.unit);
+        const quantity = (ingredient.recipeAmount ?? 0) * factor;
+        const key = ingredientKey(ingredient.name, unit, ingredient.productId);
+        const legacyKey = `${ingredient.category}:${ingredient.name}:${ingredient.unit}`;
         const existing = bucket.get(key);
 
         if (existing) {
-          existing.quantity = Number((existing.quantity + quantity).toFixed(2));
+          existing.totalNeeded = (existing.totalNeeded ?? 0) + quantity;
+          existing.hasUnquantifiedAmount ||= ingredient.recipeAmount === null;
+          if (ingredient.amountType === "exact") existing.amountType = "exact";
           existing.sourceRecipeIds = [...new Set([...existing.sourceRecipeIds, recipe.id])];
-          existing.sourceMealSlotIds = [
-            ...new Set([...existing.sourceMealSlotIds, slot.id]),
-          ];
+          existing.sourceMealSlotIds = [...new Set([...existing.sourceMealSlotIds, slot.id])];
+          existing.legacyKeys = [...new Set([...(existing.legacyKeys ?? []), legacyKey])];
           continue;
         }
 
         bucket.set(key, {
           id: key,
           name: ingredient.name,
-          quantity,
-          unit: ingredient.unit,
+          quantity: 0,
+          totalNeeded: quantity,
+          amountType: ingredient.amountType,
+          hasUnquantifiedAmount: ingredient.recipeAmount === null,
+          unit,
           checked: false,
           sourceRecipeIds: [recipe.id],
           sourceMealSlotIds: [slot.id],
+          legacyKeys: [legacyKey],
           category: ingredient.category,
         });
       }
@@ -83,14 +84,11 @@ export function buildShoppingListFromPlan(plan: WeeklyPlan, recipes: Recipe[]) {
       items: [],
     };
 
+    const purchaseAmount = calculatePurchaseAmount(item.totalNeeded ?? 0, item.unit);
     category.items.push({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unit: item.unit,
-      checked: item.checked,
-      sourceRecipeIds: item.sourceRecipeIds,
-      sourceMealSlotIds: item.sourceMealSlotIds,
+      ...item,
+      quantity: purchaseAmount,
+      purchaseAmount,
     });
     grouped.set(item.category, category);
   }
