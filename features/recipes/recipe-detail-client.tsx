@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SectionCard } from "@/components/ui/section-card";
 import { scaleRecipeIngredients, formatIngredientAmount } from "@/lib/domain/portioning";
+import { getRecipeMetadata, recipeKindLabels, recipeSeasonLabels } from "@/lib/domain/recipe-library";
 import type { Recipe } from "@/lib/domain/types";
 
 type RecipeDetailClientProps = {
@@ -40,7 +41,8 @@ export function RecipeDetailClient({
 
         <div className="mt-4 flex flex-wrap gap-2">
           <RecipeChip label={`${requestedServings} comensales`} />
-          <RecipeChip label={formatMealType(recipe.category)} />
+          <RecipeChip label={recipeKindLabels[getRecipeMetadata(recipe).kind]} />
+          <RecipeChip label={recipeSeasonLabels[getRecipeMetadata(recipe).season]} />
           <RecipeChip label={`${recipe.durationMinutes} min`} />
           <RecipeChip label={formatDifficulty(recipe.difficulty)} />
         </div>
@@ -168,21 +170,6 @@ function RecipeChip({
       {label}
     </span>
   );
-}
-
-function formatMealType(mealType: string) {
-  switch (mealType) {
-    case "breakfast":
-      return "Desayuno";
-    case "lunch":
-      return "Comida";
-    case "snack":
-      return "Snack / merienda";
-    case "dinner":
-      return "Cena";
-    default:
-      return mealType;
-  }
 }
 
 function formatDifficulty(value: string) {

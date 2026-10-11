@@ -194,6 +194,7 @@ export const shoppingListStates = pgTable("shopping_list_states", {
 });
 
 export const recipes = pgTable("recipes", {
+  catalogMetadata: jsonb("catalog_metadata").$type<import("@/lib/domain/types").RecipeCatalogMetadata>(),
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),

@@ -1,12 +1,17 @@
-import { getAllRecipes, getRecipeById, getRecipeCount, upsertRecipes } from "@/lib/dal/recipes";
+import { getAllRecipes, getRecipeById, insertMissingRecipes, prepareRecipeCatalogSchema } from "@/lib/dal/recipes";
 import { recipes as seedRecipes } from "@/lib/data/recipe-catalog";
+import { expandedRecipes } from "@/lib/data/expanded-recipes";
 
-export async function ensureRecipesCatalog() {
-  const total = await getRecipeCount();
-
-  if (total === 0) {
-    await upsertRecipes(seedRecipes);
-  }
+let initialization: Promise<void> | undefined;
+export function ensureRecipesCatalog() {
+  initialization ??= (async () => {
+    await prepareRecipeCatalogSchema();
+    await insertMissingRecipes([...seedRecipes, ...expandedRecipes]);
+  })().catch((error) => {
+    initialization = undefined;
+    throw error;
+  });
+  return initialization;
 }
 
 export async function getCatalogRecipes() {

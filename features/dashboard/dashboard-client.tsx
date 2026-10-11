@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { resolvePlanServings, updateSlotServings } from "@/lib/domain/plan-servings";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RecipeBrowser } from "@/features/recipes/recipe-browser";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatPill } from "@/components/ui/stat-pill";
 import { WeeklyMenu } from "@/features/week-menu/weekly-menu";
@@ -59,13 +60,6 @@ export function DashboardClient({
   const hasChangesAfterConfirmation =
     plan?.status === "draft" && Boolean(plan.confirmedAt);
   const selectedSlot = findSlotById(plan, selectedSlotId);
-  const availableRecipes = useMemo(
-    () =>
-      selectedSlot
-        ? recipes.filter((recipe) => recipe.category === selectedSlot.mealType)
-        : [],
-    [recipes, selectedSlot],
-  );
   const selectedRecipe = selectedSlot
     ? recipes.find((recipe) => recipe.id === selectedSlot.recipeId) ?? null
     : null;
@@ -328,53 +322,7 @@ export function DashboardClient({
             <p className="mt-2 text-xs text-[var(--color-muted)]">Actualiza los ingredientes y la compra de esta comida.</p>
             {selectedSlot.servingsOverride ? <button type="button" onClick={() => changeServings(Math.max(1, household.members.length), false)} className="mt-3 min-h-11 text-sm underline">Usar tamaño del hogar ({household.members.length})</button> : null}
           </div>
-          <div className="mt-4 grid gap-3">
-            {availableRecipes.map((recipe) => {
-              const active = selectedSlot.recipeId === recipe.id;
-
-              return (
-                <button
-                  key={recipe.id}
-                  type="button"
-                  onClick={() => replaceSlotRecipe(selectedSlot.id, recipe)}
-                  className={`rounded-2xl border px-4 py-4 text-left transition ${
-                    active
-                      ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.12)]"
-                      : "border-[var(--color-border)] bg-[rgba(255,255,255,0.05)]"
-                  }`}
-                  disabled={active}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--color-paper)]">
-                        {recipe.title}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-                        {recipe.description}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-2 text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                      {recipe.durationMinutes} min
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-3">
-                    <span className="text-xs uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                      {formatServings(selectedSlot.servings)}
-                    </span>
-                    <span
-                      className={`text-xs font-semibold uppercase tracking-[0.16em] ${
-                        active
-                          ? "text-[var(--color-accent)]"
-                          : "text-[var(--color-accent-soft)]"
-                      }`}
-                    >
-                      {active ? "Receta actual" : "Usar esta receta"}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <RecipeBrowser key={selectedSlot.id} recipes={recipes} mealType={selectedSlot.mealType} selectedId={selectedSlot.recipeId} onSelect={(recipe) => replaceSlotRecipe(selectedSlot.id, recipe)} />
           </SectionCard>
         </div>
       ) : null}
@@ -400,10 +348,6 @@ async function deleteWeeklyPlan(planId: string) {
     method: "DELETE",
   });
   if (!response.ok) throw new Error("Unable to delete plan");
-}
-
-function formatServings(count: number) {
-  return `${count} ${count === 1 ? "persona" : "personas"}`;
 }
 
 function findSlotById(plan: WeeklyPlan | null, slotId: string | null): MealSlot | null {
