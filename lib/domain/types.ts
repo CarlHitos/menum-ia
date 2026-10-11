@@ -81,7 +81,16 @@ export type ProducedComponent = {
   expiresInDays?: number;
 };
 
+export type RecipeKind = "meal" | "bowl" | "protein" | "side" | "sharing" | "breakfast" | "sauce" | "dessert";
+export type RecipeSeason = "all_year" | "spring" | "summer" | "autumn" | "winter";
+export type RecipeCatalogMetadata = {
+  kind: RecipeKind;
+  season: RecipeSeason;
+  mealTypes: MealType[];
+};
+
 export type Recipe = {
+  catalogMetadata?: RecipeCatalogMetadata;
   id: string;
   title: string;
   description: string;

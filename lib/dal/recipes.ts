@@ -38,6 +38,7 @@ export async function upsertRecipes(recipes: Recipe[]) {
     .insert(recipesTable)
     .values(
       recipes.map((recipe) => ({
+        catalogMetadata: recipe.catalogMetadata ?? null,
         id: recipe.id,
         title: recipe.title,
         description: recipe.description,
@@ -59,6 +60,7 @@ export async function upsertRecipes(recipes: Recipe[]) {
     .onConflictDoUpdate({
       target: recipesTable.id,
       set: {
+        catalogMetadata: dbExcluded("catalog_metadata"),
         title: dbExcluded("title"),
         description: dbExcluded("description"),
         category: dbExcluded("category"),
@@ -82,6 +84,7 @@ export async function upsertRecipes(recipes: Recipe[]) {
 
 function mapRecipe(record: PersistedRecipeRecord): Recipe {
   return normalizeRecipeForServings({
+    catalogMetadata: record.catalogMetadata ?? undefined,
     id: record.id,
     title: record.title,
     description: record.description,
@@ -103,4 +106,23 @@ function mapRecipe(record: PersistedRecipeRecord): Recipe {
 
 function dbExcluded(column: string) {
   return sql.raw(`excluded.${column}`);
+}
+
+// Additive MVP migration: existing deployments can still read their original columns.
+export async function prepareRecipeCatalogSchema() {
+  await db.execute(sql`ALTER TABLE recipes ADD COLUMN IF NOT EXISTS catalog_metadata jsonb`);
+}
+
+export async function insertMissingRecipes(catalog: Recipe[]) {
+  const existing = new Set((await db.select({ id: recipesTable.id }).from(recipesTable)).map((row) => row.id));
+  const missing = catalog.filter((recipe) => !existing.has(recipe.id));
+  const inserted: string[] = [];
+  for (let offset = 0; offset < missing.length; offset += 20) {
+    const rows = await db.insert(recipesTable).values(missing.slice(offset, offset + 20).map((recipe) => ({
+      ...recipe,
+      catalogMetadata: recipe.catalogMetadata ?? null,
+    }))).onConflictDoNothing({ target: recipesTable.id }).returning({ id: recipesTable.id });
+    inserted.push(...rows.map((row) => row.id));
+  }
+  return inserted;
 }
