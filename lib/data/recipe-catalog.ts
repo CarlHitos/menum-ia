@@ -11,16 +11,16 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol", "Cuchara"],
     ingredients: [
-      { id: "oats-breakfast", name: "Copos de avena", quantity: 180, unit: "g", category: "carbs", scalable: true },
-      { id: "yogurt-breakfast", name: "Yogur natural", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "banana-breakfast", name: "Platano", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "berries-breakfast", name: "Fruta roja", quantity: 180, unit: "g", category: "fruit", scalable: true },
+      { id: "oats-breakfast", name: "Copos de avena", quantity: 180, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "yogurt-breakfast", name: "Yogur natural", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "banana-breakfast", name: "Platano", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "berries-breakfast", name: "Fruta roja", quantity: 180, unit: "g", category: "fruit", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
         id: "mix-base-breakfast",
         title: "Prepara la base",
-        detail: "Reparte la avena y el yogur en tres bols para dejar la base equilibrada y facil de terminar.",
+        detail: "Reparte la avena y el yogur entre los comensales para dejar la base equilibrada y facil de terminar.",
         checklist: ["Remueve para que la avena se hidrate", "Ajusta textura con un poco de agua o leche si hace falta"],
       },
       {
@@ -37,10 +37,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Queso fresco batido", "Manzana", "Avena fina"],
-    portionAdjustments: [
-      { id: "carlos-oats-breakfast-plus", memberId: "carlos", ingredientId: "oats-breakfast", deltaQuantity: 30, unit: "g" },
-      { id: "mandy-oats-breakfast-less", memberId: "mandy", ingredientId: "oats-breakfast", deltaQuantity: -20, unit: "g" },
-    ],
+    portionAdjustments: [],
     quickDinner: false,
   },
   {
@@ -53,10 +50,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten", "Tostadora"],
     ingredients: [
-      { id: "bread-avocado", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true },
-      { id: "eggs-avocado", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true },
-      { id: "avocado-breakfast", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true },
-      { id: "tomato-breakfast", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true },
+      { id: "bread-avocado", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "eggs-avocado", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "avocado-breakfast", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "tomato-breakfast", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -80,10 +77,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Queso fresco", "Pavo loncheado", "Pan de centeno"],
-    portionAdjustments: [
-      { id: "carlos-bread-avocado-plus", memberId: "carlos", ingredientId: "bread-avocado", deltaQuantity: 2, unit: "rebanadas" },
-      { id: "mandy-bread-avocado-less", memberId: "mandy", ingredientId: "bread-avocado", deltaQuantity: -1, unit: "rebanadas" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "overnight-oats-cacao-platano",
@@ -95,11 +89,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol", "Tarros"],
     ingredients: [
-      { id: "oats-overnight", name: "Copos de avena", quantity: 180, unit: "g", category: "carbs", scalable: true },
-      { id: "milk-overnight", name: "Leche o bebida vegetal", quantity: 450, unit: "ml", category: "dairy-drinks", scalable: true },
-      { id: "cocoa-overnight", name: "Cacao puro", quantity: 18, unit: "g", category: "fats-basics", scalable: false },
-      { id: "banana-overnight", name: "Platano", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "peanut-overnight", name: "Crema de cacahuete", quantity: 45, unit: "g", category: "fats-basics", scalable: true },
+      { id: "oats-overnight", name: "Copos de avena", quantity: 180, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "milk-overnight", name: "Leche o bebida vegetal", quantity: 450, unit: "ml", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "cocoa-overnight", name: "Cacao puro", quantity: 18, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
+      { id: "banana-overnight", name: "Platano", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "peanut-overnight", name: "Crema de cacahuete", quantity: 45, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -111,7 +105,7 @@ export const recipes: Recipe[] = [
       {
         id: "portion-overnight",
         title: "Reparte en tarros",
-        detail: "Divide la mezcla en tres recipientes para dejar el desayuno listo de una sola vez.",
+        detail: "Divide la mezcla entre los comensales para dejar el desayuno listo de una sola vez.",
       },
       {
         id: "rest-overnight",
@@ -126,10 +120,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Almendra en crema", "Frutos rojos", "Yogur griego"],
-    portionAdjustments: [
-      { id: "carlos-oats-overnight-plus", memberId: "carlos", ingredientId: "oats-overnight", deltaQuantity: 30, unit: "g" },
-      { id: "mandy-oats-overnight-less", memberId: "mandy", ingredientId: "oats-overnight", deltaQuantity: -20, unit: "g" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "granola-yogur-kiwi",
@@ -141,17 +132,17 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol", "Cuchillo"],
     ingredients: [
-      { id: "yogurt-granola", name: "Yogur natural", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "granola-main", name: "Granola", quantity: 120, unit: "g", category: "carbs", scalable: true },
-      { id: "kiwi-main", name: "Kiwi", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "strawberries-main", name: "Fresas", quantity: 240, unit: "g", category: "fruit", scalable: true },
-      { id: "pumpkin-seeds-main", name: "Pipas de calabaza", quantity: 24, unit: "g", category: "fats-basics", scalable: true },
+      { id: "yogurt-granola", name: "Yogur natural", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "granola-main", name: "Granola", quantity: 120, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "kiwi-main", name: "Kiwi", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "strawberries-main", name: "Fresas", quantity: 240, unit: "g", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "pumpkin-seeds-main", name: "Pipas de calabaza", quantity: 24, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
         id: "cut-fruit-granola",
         title: "Prepara la fruta",
-        detail: "Lava y corta kiwi y fresas en piezas pequenas para repartir bien el volumen entre los tres bowls.",
+        detail: "Lava y corta kiwi y fresas en piezas pequenas para repartir bien el volumen entre los comensales.",
       },
       {
         id: "portion-yogurt-granola",
@@ -178,11 +169,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten"],
     ingredients: [
-      { id: "wrap-breakfast-burrito", name: "Wraps integrales", quantity: 3, unit: "ud", category: "carbs", scalable: true },
-      { id: "eggs-breakfast-burrito", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true },
-      { id: "turkey-breakfast-burrito", name: "Pavo lonchas", quantity: 180, unit: "g", category: "protein", scalable: true },
-      { id: "spinach-breakfast-burrito", name: "Espinacas", quantity: 120, unit: "g", category: "vegetables", scalable: true },
-      { id: "cheese-breakfast-burrito", name: "Queso rallado", quantity: 60, unit: "g", category: "dairy-drinks", scalable: true },
+      { id: "wrap-breakfast-burrito", name: "Wraps integrales", quantity: 3, unit: "ud", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "eggs-breakfast-burrito", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "turkey-breakfast-burrito", name: "Pavo lonchas", quantity: 180, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "spinach-breakfast-burrito", name: "Espinacas", quantity: 120, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "cheese-breakfast-burrito", name: "Queso rallado", quantity: 60, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -204,9 +195,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pollo cocinado", "Tortilla de maiz", "Queso feta"],
-    portionAdjustments: [
-      { id: "carlos-wrap-breakfast-burrito-plus", memberId: "carlos", ingredientId: "wrap-breakfast-burrito", deltaQuantity: 1, unit: "ud" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "yogur-fruta-semillas",
@@ -218,16 +207,16 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol"],
     ingredients: [
-      { id: "yogurt-snack", name: "Yogur natural", quantity: 375, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "apple-snack", name: "Manzana", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "banana-snack", name: "Platano", quantity: 2, unit: "ud", category: "fruit", scalable: true },
-      { id: "seed-snack", name: "Semillas", quantity: 30, unit: "g", category: "fats-basics", scalable: true },
+      { id: "yogurt-snack", name: "Yogur natural", quantity: 375, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "apple-snack", name: "Manzana", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "banana-snack", name: "Platano", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "seed-snack", name: "Semillas", quantity: 30, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
         id: "portion-snack-yogurt",
         title: "Reparte y corta",
-        detail: "Sirve el yogur en tres cuencos y corta fruta de forma que se pueda comer rapido incluso fuera de casa.",
+        detail: "Sirve el yogur entre los comensales y corta fruta de forma que se pueda comer rapido incluso fuera de casa.",
         checklist: ["Haz trozos pequenos", "Deja una racion lista para llevar si hace falta"],
       },
       {
@@ -255,9 +244,9 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Cazo", "Bol"],
     ingredients: [
-      { id: "edamame-snack", name: "Edamame", quantity: 420, unit: "g", category: "legumes", scalable: true },
-      { id: "lime-snack", name: "Lima", quantity: 1, unit: "ud", category: "fruit", scalable: true },
-      { id: "sesame-snack", name: "Sesamo", quantity: 15, unit: "g", category: "fats-basics", scalable: true },
+      { id: "edamame-snack", name: "Edamame", quantity: 420, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "lime-snack", name: "Lima", quantity: 1, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "sesame-snack", name: "Sesamo", quantity: 15, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -290,9 +279,9 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Cuchillo"],
     ingredients: [
-      { id: "apple-almond-snack", name: "Manzana", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "almond-butter-snack", name: "Crema de almendra", quantity: 45, unit: "g", category: "fats-basics", scalable: true },
-      { id: "cinnamon-almond-snack", name: "Canela", quantity: 3, unit: "g", category: "fats-basics", scalable: false },
+      { id: "apple-almond-snack", name: "Manzana", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "almond-butter-snack", name: "Crema de almendra", quantity: 45, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
+      { id: "cinnamon-almond-snack", name: "Canela", quantity: 3, unit: "g", category: "fats-basics", scalable: false, amountType: "to_taste" },
     ],
     steps: [
       {
@@ -324,11 +313,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Batidora"],
     ingredients: [
-      { id: "pineapple-smoothie", name: "Pina", quantity: 300, unit: "g", category: "fruit", scalable: true },
-      { id: "spinach-smoothie", name: "Espinacas", quantity: 90, unit: "g", category: "vegetables", scalable: true },
-      { id: "yogurt-smoothie", name: "Yogur natural", quantity: 300, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "milk-smoothie", name: "Leche o bebida vegetal", quantity: 300, unit: "ml", category: "dairy-drinks", scalable: true },
-      { id: "banana-smoothie", name: "Platano", quantity: 2, unit: "ud", category: "fruit", scalable: true },
+      { id: "pineapple-smoothie", name: "Pina", quantity: 300, unit: "g", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "spinach-smoothie", name: "Espinacas", quantity: 90, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "yogurt-smoothie", name: "Yogur natural", quantity: 300, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "milk-smoothie", name: "Leche o bebida vegetal", quantity: 300, unit: "ml", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "banana-smoothie", name: "Platano", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -361,10 +350,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Tabla"],
     ingredients: [
-      { id: "hummus-snack", name: "Hummus", quantity: 210, unit: "g", category: "legumes", scalable: true },
-      { id: "carrot-snack", name: "Zanahoria", quantity: 300, unit: "g", category: "vegetables", scalable: true },
-      { id: "rice-cakes-snack", name: "Tortitas de maiz", quantity: 9, unit: "ud", category: "carbs", scalable: true },
-      { id: "cucumber-snack", name: "Pepino", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
+      { id: "hummus-snack", name: "Hummus", quantity: 210, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "carrot-snack", name: "Zanahoria", quantity: 300, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "rice-cakes-snack", name: "Tortitas de maiz", quantity: 9, unit: "ud", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "cucumber-snack", name: "Pepino", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -386,9 +375,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Guacamole", "Pan tostado", "Tomates cherry"],
-    portionAdjustments: [
-      { id: "carlos-rice-cakes-snack-plus", memberId: "carlos", ingredientId: "rice-cakes-snack", deltaQuantity: 2, unit: "ud" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "chia-mango-coco",
@@ -400,16 +387,16 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol", "Tarros"],
     ingredients: [
-      { id: "chia-main", name: "Semillas de chia", quantity: 75, unit: "g", category: "fats-basics", scalable: true },
-      { id: "milk-chia", name: "Leche o bebida vegetal", quantity: 600, unit: "ml", category: "dairy-drinks", scalable: true },
-      { id: "mango-chia", name: "Mango", quantity: 2, unit: "ud", category: "fruit", scalable: true },
-      { id: "coconut-chia", name: "Coco rallado", quantity: 25, unit: "g", category: "fats-basics", scalable: true },
+      { id: "chia-main", name: "Semillas de chia", quantity: 75, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
+      { id: "milk-chia", name: "Leche o bebida vegetal", quantity: 600, unit: "ml", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "mango-chia", name: "Mango", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "coconut-chia", name: "Coco rallado", quantity: 25, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
         id: "mix-chia",
         title: "Mezcla la base",
-        detail: "Combina chia y leche en un bol amplio hasta que no queden grumos y reparte en tres recipientes.",
+        detail: "Combina chia y leche en un bol amplio hasta que no queden grumos y reparte entre los comensales.",
         checklist: ["Remueve un par de veces", "No dejes semillas pegadas al fondo"],
       },
       {
@@ -438,16 +425,16 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol"],
     ingredients: [
-      { id: "fresh-cheese-snack", name: "Queso fresco batido", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "pear-snack", name: "Pera", quantity: 3, unit: "ud", category: "fruit", scalable: true },
-      { id: "walnuts-snack", name: "Nueces", quantity: 45, unit: "g", category: "fats-basics", scalable: true },
-      { id: "cinnamon-snack", name: "Canela", quantity: 3, unit: "g", category: "fats-basics", scalable: false },
+      { id: "fresh-cheese-snack", name: "Queso fresco batido", quantity: 450, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "pear-snack", name: "Pera", quantity: 3, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "walnuts-snack", name: "Nueces", quantity: 45, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
+      { id: "cinnamon-snack", name: "Canela", quantity: 3, unit: "g", category: "fats-basics", scalable: false, amountType: "to_taste" },
     ],
     steps: [
       {
         id: "portion-cheese-snack",
         title: "Reparte la base",
-        detail: "Sirve el queso fresco batido en tres bols para dejar una base comun facil de ajustar.",
+        detail: "Sirve el queso fresco batido entre los comensales para dejar una base comun facil de ajustar.",
       },
       {
         id: "cut-pear-snack",
@@ -474,10 +461,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten grande", "Cazo"],
     ingredients: [
-      { id: "rice-main", name: "Arroz", quantity: 240, unit: "g", category: "carbs", scalable: true, componentRef: "batch-rice" },
-      { id: "chicken-main", name: "Pollo", quantity: 450, unit: "g", category: "protein", scalable: true, componentRef: "batch-chicken" },
-      { id: "veg-mix-main", name: "Verduras variadas", quantity: 450, unit: "g", category: "vegetables", scalable: true, componentRef: "batch-veg" },
-      { id: "olive-oil-main", name: "Aceite de oliva", quantity: 20, unit: "ml", category: "fats-basics", scalable: false },
+      { id: "rice-main", name: "Arroz", quantity: 240, unit: "g", category: "carbs", scalable: true, amountType: "exact", componentRef: "batch-rice" },
+      { id: "chicken-main", name: "Pollo", quantity: 450, unit: "g", category: "protein", scalable: true, amountType: "exact", componentRef: "batch-chicken" },
+      { id: "veg-mix-main", name: "Verduras variadas", quantity: 450, unit: "g", category: "vegetables", scalable: true, amountType: "exact", componentRef: "batch-veg" },
+      { id: "olive-oil-main", name: "Aceite de oliva", quantity: 20, unit: "ml", category: "fats-basics", scalable: false, amountType: "as_needed" },
     ],
     steps: [
       {
@@ -508,11 +495,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pavo", "Arroz integral"],
-    portionAdjustments: [
-      { id: "carlos-rice-plus", memberId: "carlos", ingredientId: "rice-main", deltaQuantity: 60, unit: "g", note: "Extra de carbohidrato" },
-      { id: "carlos-chicken-plus", memberId: "carlos", ingredientId: "chicken-main", deltaQuantity: 80, unit: "g" },
-      { id: "mandy-rice-less", memberId: "mandy", ingredientId: "rice-main", deltaQuantity: -40, unit: "g" },
-    ],
+    portionAdjustments: [],
     batchCookingNotes: "Preparar doble de arroz, pollo y verduras para martes y viernes.",
     leftoverNotes: "Reserva arroz, pollo y verduras asadas para wraps y salteado.",
     baseYield: [
@@ -531,10 +514,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten antiadherente"],
     ingredients: [
-      { id: "potato-main", name: "Patata", quantity: 500, unit: "g", category: "carbs", scalable: true },
-      { id: "zucchini-main", name: "Calabacin", quantity: 300, unit: "g", category: "vegetables", scalable: true },
-      { id: "eggs-main", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true },
-      { id: "salad-lettuce", name: "Mezcla de ensalada", quantity: 150, unit: "g", category: "vegetables", scalable: true },
+      { id: "potato-main", name: "Patata", quantity: 500, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "zucchini-main", name: "Calabacin", quantity: 300, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "eggs-main", name: "Huevos", quantity: 6, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "salad-lettuce", name: "Mezcla de ensalada", quantity: 150, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -558,9 +541,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Boniato", "Claras + huevos"],
-    portionAdjustments: [
-      { id: "carlos-eggs-plus", memberId: "carlos", ingredientId: "eggs-main", deltaQuantity: 1, unit: "ud" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
     leftoverNotes: "La patata cocida que sobre sirve para otra tortilla o pure.",
   },
@@ -574,11 +555,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bandeja de horno", "Bol"],
     ingredients: [
-      { id: "chicken-bowl-dinner", name: "Pollo", quantity: 450, unit: "g", category: "protein", scalable: true },
-      { id: "sweet-potato-bowl-dinner", name: "Boniato", quantity: 600, unit: "g", category: "carbs", scalable: true },
-      { id: "kale-bowl-dinner", name: "Kale", quantity: 180, unit: "g", category: "vegetables", scalable: true },
-      { id: "avocado-bowl-dinner", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true },
-      { id: "yogurt-bowl-dinner", name: "Yogur natural", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true },
+      { id: "chicken-bowl-dinner", name: "Pollo", quantity: 450, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "sweet-potato-bowl-dinner", name: "Boniato", quantity: 600, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "kale-bowl-dinner", name: "Kale", quantity: 180, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "avocado-bowl-dinner", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "yogurt-bowl-dinner", name: "Yogur natural", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -617,11 +598,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Olla", "Batidora", "Sarten"],
     ingredients: [
-      { id: "pumpkin-cream-dinner", name: "Calabaza", quantity: 900, unit: "g", category: "vegetables", scalable: true },
-      { id: "onion-cream-dinner", name: "Cebolla", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
-      { id: "chickpeas-cream-dinner", name: "Garbanzos cocidos", quantity: 300, unit: "g", category: "legumes", scalable: true },
-      { id: "feta-cream-dinner", name: "Queso feta", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "broth-cream-dinner", name: "Caldo", quantity: 700, unit: "ml", category: "fats-basics", scalable: false },
+      { id: "pumpkin-cream-dinner", name: "Calabaza", quantity: 900, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "onion-cream-dinner", name: "Cebolla", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "chickpeas-cream-dinner", name: "Garbanzos cocidos", quantity: 300, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "feta-cream-dinner", name: "Queso feta", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "broth-cream-dinner", name: "Caldo", quantity: 700, unit: "ml", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -660,11 +641,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten", "Bol"],
     ingredients: [
-      { id: "taco-wraps-dinner", name: "Tortillas de maiz", quantity: 9, unit: "ud", category: "carbs", scalable: true },
-      { id: "turkey-tacos-dinner", name: "Pavo picado", quantity: 420, unit: "g", category: "protein", scalable: true },
-      { id: "avocado-tacos-dinner", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true },
-      { id: "tomato-tacos-dinner", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true },
-      { id: "lettuce-tacos-dinner", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
+      { id: "taco-wraps-dinner", name: "Tortillas de maiz", quantity: 9, unit: "ud", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "turkey-tacos-dinner", name: "Pavo picado", quantity: 420, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "avocado-tacos-dinner", name: "Aguacate", quantity: 2, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
+      { id: "tomato-tacos-dinner", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "lettuce-tacos-dinner", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -685,9 +666,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pollo picado", "Wraps", "Yogur en vez de guacamole"],
-    portionAdjustments: [
-      { id: "carlos-taco-wraps-dinner-plus", memberId: "carlos", ingredientId: "taco-wraps-dinner", deltaQuantity: 2, unit: "ud" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
   },
   {
@@ -700,11 +679,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten", "Cazo"],
     ingredients: [
-      { id: "salmon-teriyaki-dinner", name: "Salmon", quantity: 480, unit: "g", category: "protein", scalable: true },
-      { id: "rice-teriyaki-dinner", name: "Arroz", quantity: 210, unit: "g", category: "carbs", scalable: true },
-      { id: "broccoli-teriyaki-dinner", name: "Brocoli", quantity: 360, unit: "g", category: "vegetables", scalable: true },
-      { id: "soy-teriyaki-dinner", name: "Salsa de soja", quantity: 30, unit: "ml", category: "fats-basics", scalable: false },
-      { id: "honey-teriyaki-dinner", name: "Miel", quantity: 18, unit: "g", category: "fats-basics", scalable: false },
+      { id: "salmon-teriyaki-dinner", name: "Salmon", quantity: 480, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "rice-teriyaki-dinner", name: "Arroz", quantity: 210, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "broccoli-teriyaki-dinner", name: "Brocoli", quantity: 360, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "soy-teriyaki-dinner", name: "Salsa de soja", quantity: 30, unit: "ml", category: "fats-basics", scalable: true, amountType: "exact" },
+      { id: "honey-teriyaki-dinner", name: "Miel", quantity: 18, unit: "g", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -743,11 +722,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Olla"],
     ingredients: [
-      { id: "lentils-main", name: "Lentejas cocidas", quantity: 800, unit: "g", category: "legumes", scalable: true },
-      { id: "rice-lentils", name: "Arroz", quantity: 180, unit: "g", category: "carbs", scalable: true },
-      { id: "onion-lentils", name: "Cebolla", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
-      { id: "carrot-lentils", name: "Zanahoria", quantity: 300, unit: "g", category: "vegetables", scalable: true },
-      { id: "tomato-lentils", name: "Tomate triturado", quantity: 250, unit: "g", category: "vegetables", scalable: true },
+      { id: "lentils-main", name: "Lentejas cocidas", quantity: 800, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "rice-lentils", name: "Arroz", quantity: 180, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "onion-lentils", name: "Cebolla", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "carrot-lentils", name: "Zanahoria", quantity: 300, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "tomato-lentils", name: "Tomate triturado", quantity: 250, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -771,10 +750,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Garbanzos", "Arroz integral"],
-    portionAdjustments: [
-      { id: "carlos-rice-lentils-plus", memberId: "carlos", ingredientId: "rice-lentils", deltaQuantity: 40, unit: "g" },
-      { id: "mandy-rice-lentils-less", memberId: "mandy", ingredientId: "rice-lentils", deltaQuantity: -30, unit: "g" },
-    ],
+    portionAdjustments: [],
     batchCookingNotes: "Puede cocinarse extra para una cena de aprovechamiento.",
   },
   {
@@ -787,11 +763,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bol grande", "Sarten"],
     ingredients: [
-      { id: "cuscus-main", name: "Cuscus", quantity: 240, unit: "g", category: "carbs", scalable: true },
-      { id: "chicken-cuscus", name: "Pollo", quantity: 420, unit: "g", category: "protein", scalable: true },
-      { id: "chickpeas-cuscus", name: "Garbanzos cocidos", quantity: 360, unit: "g", category: "legumes", scalable: true },
-      { id: "pepper-cuscus", name: "Pimiento", quantity: 250, unit: "g", category: "vegetables", scalable: true },
-      { id: "zucchini-cuscus", name: "Calabacin", quantity: 250, unit: "g", category: "vegetables", scalable: true },
+      { id: "cuscus-main", name: "Cuscus", quantity: 240, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "chicken-cuscus", name: "Pollo", quantity: 420, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "chickpeas-cuscus", name: "Garbanzos cocidos", quantity: 360, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "pepper-cuscus", name: "Pimiento", quantity: 250, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "zucchini-cuscus", name: "Calabacin", quantity: 250, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -825,11 +801,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten"],
     ingredients: [
-      { id: "wraps-main", name: "Wraps integrales", quantity: 6, unit: "ud", category: "carbs", scalable: true },
-      { id: "chicken-wraps", name: "Pollo", quantity: 300, unit: "g", category: "protein", scalable: true, componentRef: "batch-chicken" },
-      { id: "lettuce-wraps", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
-      { id: "tomato-wraps", name: "Tomate", quantity: 3, unit: "ud", category: "vegetables", scalable: true },
-      { id: "yogurt-wraps", name: "Yogur griego", quantity: 200, unit: "g", category: "dairy-drinks", scalable: true },
+      { id: "wraps-main", name: "Wraps integrales", quantity: 6, unit: "ud", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "chicken-wraps", name: "Pollo", quantity: 300, unit: "g", category: "protein", scalable: true, amountType: "exact", componentRef: "batch-chicken" },
+      { id: "lettuce-wraps", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "tomato-wraps", name: "Tomate", quantity: 3, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "yogurt-wraps", name: "Yogur griego", quantity: 200, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -852,10 +828,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pavo", "Tortillas de maiz"],
-    portionAdjustments: [
-      { id: "carlos-wrap-plus", memberId: "carlos", ingredientId: "wraps-main", deltaQuantity: 1, unit: "ud" },
-      { id: "mandy-wrap-less", memberId: "mandy", ingredientId: "wraps-main", deltaQuantity: -1, unit: "ud" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
     leftoverNotes: "Usa pollo cocinado del domingo para evitar cocinar de cero.",
   },
@@ -869,10 +842,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Cazo", "Sarten"],
     ingredients: [
-      { id: "pasta-main", name: "Pasta integral", quantity: 300, unit: "g", category: "carbs", scalable: true },
-      { id: "beef-main", name: "Carne picada", quantity: 450, unit: "g", category: "protein", scalable: true, componentRef: "batch-meat-sauce" },
-      { id: "tomato-sauce-main", name: "Tomate triturado", quantity: 400, unit: "g", category: "vegetables", scalable: true, componentRef: "batch-meat-sauce" },
-      { id: "parmesan-main", name: "Parmesano", quantity: 40, unit: "g", category: "dairy-drinks", scalable: true },
+      { id: "pasta-main", name: "Pasta integral", quantity: 300, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "beef-main", name: "Carne picada", quantity: 450, unit: "g", category: "protein", scalable: true, amountType: "exact", componentRef: "batch-meat-sauce" },
+      { id: "tomato-sauce-main", name: "Tomate triturado", quantity: 400, unit: "g", category: "vegetables", scalable: true, amountType: "exact", componentRef: "batch-meat-sauce" },
+      { id: "parmesan-main", name: "Parmesano", quantity: 40, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -895,10 +868,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pavo picado", "Pasta corta"],
-    portionAdjustments: [
-      { id: "carlos-pasta-plus", memberId: "carlos", ingredientId: "pasta-main", deltaQuantity: 60, unit: "g" },
-      { id: "mandy-pasta-less", memberId: "mandy", ingredientId: "pasta-main", deltaQuantity: -40, unit: "g" },
-    ],
+    portionAdjustments: [],
     batchCookingNotes: "Reserva salsa de carne para pizza rapida del viernes.",
     leftoverNotes: "La salsa restante acelera una cena anti-delivery.",
     baseYield: [{ id: "batch-meat-sauce", name: "Salsa de carne", quantity: 500, unit: "g", expiresInDays: 3 }],
@@ -913,10 +883,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Batidora", "Olla"],
     ingredients: [
-      { id: "veg-soup", name: "Verduras variadas", quantity: 700, unit: "g", category: "vegetables", scalable: true },
-      { id: "bread-soup", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true },
-      { id: "tuna-soup", name: "Atun en lata", quantity: 2, unit: "ud", category: "protein", scalable: true },
-      { id: "fresh-cheese-soup", name: "Queso fresco", quantity: 150, unit: "g", category: "dairy-drinks", scalable: true },
+      { id: "veg-soup", name: "Verduras variadas", quantity: 700, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "bread-soup", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "tuna-soup", name: "Atun en lata", quantity: 2, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "fresh-cheese-soup", name: "Queso fresco", quantity: 150, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -952,10 +922,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Bandeja de horno"],
     ingredients: [
-      { id: "hake-main", name: "Merluza", quantity: 600, unit: "g", category: "protein", scalable: true },
-      { id: "potato-hake", name: "Patata", quantity: 700, unit: "g", category: "carbs", scalable: true },
-      { id: "broccoli-hake", name: "Brocoli", quantity: 400, unit: "g", category: "vegetables", scalable: true },
-      { id: "lemon-hake", name: "Limon", quantity: 1, unit: "ud", category: "fruit", scalable: true },
+      { id: "hake-main", name: "Merluza", quantity: 600, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "potato-hake", name: "Patata", quantity: 700, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "broccoli-hake", name: "Brocoli", quantity: 400, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "lemon-hake", name: "Limon", quantity: 1, unit: "ud", category: "fruit", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -978,10 +948,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Salmon", "Boniato"],
-    portionAdjustments: [
-      { id: "carlos-potato-hake-plus", memberId: "carlos", ingredientId: "potato-hake", deltaQuantity: 120, unit: "g" },
-      { id: "mandy-potato-hake-less", memberId: "mandy", ingredientId: "potato-hake", deltaQuantity: -80, unit: "g" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "ensalada-garbanzos-huevo",
@@ -993,11 +960,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Cazo"],
     ingredients: [
-      { id: "chickpeas-salad", name: "Garbanzos cocidos", quantity: 600, unit: "g", category: "legumes", scalable: true },
-      { id: "eggs-salad", name: "Huevos", quantity: 4, unit: "ud", category: "protein", scalable: true },
-      { id: "cucumber-salad", name: "Pepino", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
-      { id: "tomato-salad", name: "Tomate", quantity: 3, unit: "ud", category: "vegetables", scalable: true },
-      { id: "lettuce-salad", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
+      { id: "chickpeas-salad", name: "Garbanzos cocidos", quantity: 600, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "eggs-salad", name: "Huevos", quantity: 4, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "cucumber-salad", name: "Pepino", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "tomato-salad", name: "Tomate", quantity: 3, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "lettuce-salad", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1019,10 +986,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Alubias", "Queso fresco"],
-    portionAdjustments: [
-      { id: "carlos-chickpeas-plus", memberId: "carlos", ingredientId: "chickpeas-salad", deltaQuantity: 100, unit: "g" },
-      { id: "mandy-chickpeas-less", memberId: "mandy", ingredientId: "chickpeas-salad", deltaQuantity: -70, unit: "g" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
   },
   {
@@ -1035,10 +999,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Wok"],
     ingredients: [
-      { id: "rice-stir", name: "Arroz", quantity: 280, unit: "g", category: "carbs", scalable: true, componentRef: "batch-rice" },
-      { id: "turkey-stir", name: "Pavo", quantity: 400, unit: "g", category: "protein", scalable: true },
-      { id: "veg-stir", name: "Verduras variadas", quantity: 350, unit: "g", category: "vegetables", scalable: true, componentRef: "batch-veg" },
-      { id: "soy-stir", name: "Salsa de soja", quantity: 30, unit: "ml", category: "fats-basics", scalable: false },
+      { id: "rice-stir", name: "Arroz", quantity: 280, unit: "g", category: "carbs", scalable: true, amountType: "exact", componentRef: "batch-rice" },
+      { id: "turkey-stir", name: "Pavo", quantity: 400, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "veg-stir", name: "Verduras variadas", quantity: 350, unit: "g", category: "vegetables", scalable: true, amountType: "exact", componentRef: "batch-veg" },
+      { id: "soy-stir", name: "Salsa de soja", quantity: 30, unit: "ml", category: "fats-basics", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1061,10 +1025,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pollo", "Arroz basmati"],
-    portionAdjustments: [
-      { id: "carlos-rice-stir-plus", memberId: "carlos", ingredientId: "rice-stir", deltaQuantity: 40, unit: "g" },
-      { id: "mandy-rice-stir-less", memberId: "mandy", ingredientId: "rice-stir", deltaQuantity: -30, unit: "g" },
-    ],
+    portionAdjustments: [],
     batchCookingNotes: "Perfecta para cerrar semana con bases ya cocinadas.",
     leftoverNotes: "Reutiliza arroz y verduras del bloque de domingo.",
   },
@@ -1078,10 +1039,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten", "Cazo"],
     ingredients: [
-      { id: "rice-salmon", name: "Arroz", quantity: 240, unit: "g", category: "carbs", scalable: true },
-      { id: "salmon-main", name: "Salmon", quantity: 480, unit: "g", category: "protein", scalable: true },
-      { id: "edamame-main", name: "Edamame", quantity: 300, unit: "g", category: "legumes", scalable: true },
-      { id: "broccoli-salmon", name: "Brocoli", quantity: 300, unit: "g", category: "vegetables", scalable: true },
+      { id: "rice-salmon", name: "Arroz", quantity: 240, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "salmon-main", name: "Salmon", quantity: 480, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "edamame-main", name: "Edamame", quantity: 300, unit: "g", category: "legumes", scalable: true, amountType: "exact" },
+      { id: "broccoli-salmon", name: "Brocoli", quantity: 300, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1116,10 +1077,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Horno"],
     ingredients: [
-      { id: "wrap-base-pizza", name: "Wraps integrales", quantity: 3, unit: "ud", category: "carbs", scalable: true },
-      { id: "meat-sauce-pizza", name: "Salsa de carne", quantity: 250, unit: "g", category: "protein", scalable: true, componentRef: "batch-meat-sauce" },
-      { id: "mozzarella-pizza", name: "Mozzarella rallada", quantity: 180, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "tomato-extra-pizza", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true },
+      { id: "wrap-base-pizza", name: "Wraps integrales", quantity: 3, unit: "ud", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "meat-sauce-pizza", name: "Salsa de carne", quantity: 250, unit: "g", category: "protein", scalable: true, amountType: "exact", componentRef: "batch-meat-sauce" },
+      { id: "mozzarella-pizza", name: "Mozzarella rallada", quantity: 180, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "tomato-extra-pizza", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1141,9 +1102,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pan pita", "Verduras asadas"],
-    portionAdjustments: [
-      { id: "carlos-wrap-pizza-plus", memberId: "carlos", ingredientId: "wrap-base-pizza", deltaQuantity: 1, unit: "ud" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
     leftoverNotes: "Usa salsa de carne del miercoles para ahorrar tiempo y simplificar la cena.",
   },
@@ -1157,10 +1116,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten apta para horno"],
     ingredients: [
-      { id: "eggs-frittata", name: "Huevos", quantity: 7, unit: "ud", category: "protein", scalable: true },
-      { id: "spinach-frittata", name: "Espinacas", quantity: 250, unit: "g", category: "vegetables", scalable: true },
-      { id: "feta-frittata", name: "Queso feta", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "potato-frittata", name: "Patata", quantity: 450, unit: "g", category: "carbs", scalable: true },
+      { id: "eggs-frittata", name: "Huevos", quantity: 7, unit: "ud", category: "protein", scalable: true, amountType: "exact" },
+      { id: "spinach-frittata", name: "Espinacas", quantity: 250, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "feta-frittata", name: "Queso feta", quantity: 120, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "potato-frittata", name: "Patata", quantity: 450, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1195,10 +1154,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten", "Cazo"],
     ingredients: [
-      { id: "meatballs-meat", name: "Carne picada", quantity: 500, unit: "g", category: "protein", scalable: true },
-      { id: "breadcrumbs-meatballs", name: "Pan rallado", quantity: 40, unit: "g", category: "carbs", scalable: true },
-      { id: "potato-puree", name: "Patata", quantity: 900, unit: "g", category: "carbs", scalable: true },
-      { id: "tomato-meatballs", name: "Tomate triturado", quantity: 350, unit: "g", category: "vegetables", scalable: true },
+      { id: "meatballs-meat", name: "Carne picada", quantity: 500, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "breadcrumbs-meatballs", name: "Pan rallado", quantity: 40, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "potato-puree", name: "Patata", quantity: 900, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "tomato-meatballs", name: "Tomate triturado", quantity: 350, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1226,10 +1185,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pavo picado", "Boniato para el pure"],
-    portionAdjustments: [
-      { id: "carlos-potato-puree-plus", memberId: "carlos", ingredientId: "potato-puree", deltaQuantity: 140, unit: "g" },
-      { id: "mandy-potato-puree-less", memberId: "mandy", ingredientId: "potato-puree", deltaQuantity: -90, unit: "g" },
-    ],
+    portionAdjustments: [],
   },
   {
     id: "bocadillos-ensalada",
@@ -1241,11 +1197,11 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Tabla"],
     ingredients: [
-      { id: "bread-sandwich", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true },
-      { id: "turkey-sandwich", name: "Pavo lonchas", quantity: 240, unit: "g", category: "protein", scalable: true },
-      { id: "cheese-sandwich", name: "Queso fresco", quantity: 180, unit: "g", category: "dairy-drinks", scalable: true },
-      { id: "tomato-sandwich", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true },
-      { id: "lettuce-sandwich", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true },
+      { id: "bread-sandwich", name: "Pan integral", quantity: 6, unit: "rebanadas", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "turkey-sandwich", name: "Pavo lonchas", quantity: 240, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "cheese-sandwich", name: "Queso fresco", quantity: 180, unit: "g", category: "dairy-drinks", scalable: true, amountType: "exact" },
+      { id: "tomato-sandwich", name: "Tomate", quantity: 2, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "lettuce-sandwich", name: "Lechuga", quantity: 1, unit: "ud", category: "vegetables", scalable: true, amountType: "exact" },
     ],
     steps: [
       {
@@ -1265,9 +1221,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Atun", "Pan de molde integral"],
-    portionAdjustments: [
-      { id: "carlos-bread-sandwich-plus", memberId: "carlos", ingredientId: "bread-sandwich", deltaQuantity: 2, unit: "rebanadas" },
-    ],
+    portionAdjustments: [],
     quickDinner: true,
   },
   {
@@ -1280,10 +1234,10 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Horno"],
     ingredients: [
-      { id: "chicken-roast", name: "Pollo", quantity: 700, unit: "g", category: "protein", scalable: true, componentRef: "batch-sunday-chicken" },
-      { id: "sweet-potato-roast", name: "Boniato", quantity: 700, unit: "g", category: "carbs", scalable: true },
-      { id: "salad-roast", name: "Mezcla de ensalada", quantity: 180, unit: "g", category: "vegetables", scalable: true },
-      { id: "olive-roast", name: "Aceite de oliva", quantity: 20, unit: "ml", category: "fats-basics", scalable: false },
+      { id: "chicken-roast", name: "Pollo", quantity: 700, unit: "g", category: "protein", scalable: true, amountType: "exact", componentRef: "batch-sunday-chicken" },
+      { id: "sweet-potato-roast", name: "Boniato", quantity: 700, unit: "g", category: "carbs", scalable: true, amountType: "exact" },
+      { id: "salad-roast", name: "Mezcla de ensalada", quantity: 180, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "olive-roast", name: "Aceite de oliva", quantity: 20, unit: "ml", category: "fats-basics", scalable: false, amountType: "as_needed" },
     ],
     steps: [
       {
@@ -1310,10 +1264,7 @@ export const recipes: Recipe[] = [
       },
     ],
     substitutions: ["Pavo", "Patata asada"],
-    portionAdjustments: [
-      { id: "carlos-sweet-potato-plus", memberId: "carlos", ingredientId: "sweet-potato-roast", deltaQuantity: 120, unit: "g" },
-      { id: "mandy-sweet-potato-less", memberId: "mandy", ingredientId: "sweet-potato-roast", deltaQuantity: -80, unit: "g" },
-    ],
+    portionAdjustments: [],
     batchCookingNotes: "Ideal para lanzar la siguiente semana base con proteina ya lista.",
     baseYield: [{ id: "batch-sunday-chicken", name: "Pollo asado", quantity: 400, unit: "g", expiresInDays: 3 }],
   },
@@ -1327,9 +1278,9 @@ export const recipes: Recipe[] = [
     baseServings: 3,
     utensils: ["Sarten"],
     ingredients: [
-      { id: "leftover-protein", name: "Proteina cocinada sobrante", quantity: 300, unit: "g", category: "protein", scalable: true },
-      { id: "leftover-veg", name: "Verduras sobrantes", quantity: 300, unit: "g", category: "vegetables", scalable: true },
-      { id: "bread-leftover", name: "Pan integral", quantity: 4, unit: "rebanadas", category: "carbs", scalable: true },
+      { id: "leftover-protein", name: "Proteina cocinada sobrante", quantity: 300, unit: "g", category: "protein", scalable: true, amountType: "exact" },
+      { id: "leftover-veg", name: "Verduras sobrantes", quantity: 300, unit: "g", category: "vegetables", scalable: true, amountType: "exact" },
+      { id: "bread-leftover", name: "Pan integral", quantity: 4, unit: "rebanadas", category: "carbs", scalable: true, amountType: "exact" },
     ],
     steps: [
       {

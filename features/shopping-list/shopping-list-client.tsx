@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { formatShoppingAmount } from "@/features/shopping-list/shopping-quantity";
 import type { ShoppingCategory, ShoppingItem } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -21,50 +22,27 @@ export function ShoppingListClient({
     () =>
       categories.map((category) => {
         const checkedCount = category.items.filter((item) => item.checked).length;
-        const pendingItems = category.items.filter((item) => !item.checked);
+        const orderedItems = [
+          ...category.items.filter((item) => !item.checked),
+          ...category.items.filter((item) => item.checked),
+        ];
         const isComplete =
           category.items.length > 0 && checkedCount === category.items.length;
 
         return {
           ...category,
           checkedCount,
-          pendingItems,
+          orderedItems,
           isComplete,
         };
       }),
     [categories],
   );
-  const pendingCategories = categoriesWithProgress.filter(
-    (category) => !category.isComplete,
-  );
-  const completedCategories = categoriesWithProgress.filter(
-    (category) => category.isComplete,
-  );
   const [openCategoryKeys, setOpenCategoryKeys] = useState<string[]>(
     categories[0] ? [categories[0].key] : [],
   );
-  const [isCompletedOpen, setIsCompletedOpen] = useState(false);
-  const [openCompletedCategoryKeys, setOpenCompletedCategoryKeys] = useState<string[]>([]);
-  const completedItems = useMemo(
-    () =>
-      categories.flatMap((category) =>
-        category.items
-          .filter((item) => item.checked)
-          .map((item) => ({ ...item, categoryLabel: category.label })),
-      ),
-    [categories],
-  );
 
-  function toggleCategory(categoryKey: string, isComplete: boolean) {
-    if (isComplete) {
-      setOpenCompletedCategoryKeys((current) =>
-        current.includes(categoryKey)
-          ? current.filter((key) => key !== categoryKey)
-          : [...current, categoryKey],
-      );
-      return;
-    }
-
+  function toggleCategory(categoryKey: string) {
     setOpenCategoryKeys((current) =>
       current.includes(categoryKey)
         ? current.filter((key) => key !== categoryKey)
@@ -74,10 +52,8 @@ export function ShoppingListClient({
 
   return (
     <div className="space-y-3">
-      {[...pendingCategories, ...completedCategories].map((category) => {
-        const isOpen = category.isComplete
-          ? openCompletedCategoryKeys.includes(category.key)
-          : openCategoryKeys.includes(category.key);
+      {categoriesWithProgress.map((category) => {
+        const isOpen = openCategoryKeys.includes(category.key);
 
         return (
           <SectionCard
@@ -90,7 +66,9 @@ export function ShoppingListClient({
           >
             <button
               type="button"
-              onClick={() => toggleCategory(category.key, category.isComplete)}
+              onClick={() => toggleCategory(category.key)}
+              aria-expanded={isOpen}
+              aria-controls={`shopping-category-${category.key}`}
               className="flex w-full items-center justify-between gap-4 text-left"
             >
               <div className="flex items-center gap-3">
@@ -118,8 +96,8 @@ export function ShoppingListClient({
             </button>
 
             {isOpen ? (
-              <div className="mt-4 space-y-2">
-                {category.pendingItems.map((item) => {
+              <div id={`shopping-category-${category.key}`} className="mt-4 space-y-2">
+                {category.orderedItems.map((item) => {
                   const isChecked = item.checked;
 
                   return (
@@ -144,7 +122,8 @@ export function ShoppingListClient({
                           {item.name}
                         </span>
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                          {item.quantity} {item.unit} · {item.sourceRecipeIds.length} recetas
+                          {formatShoppingAmount(item)} · {item.sourceRecipeIds.length} {item.sourceRecipeIds.length === 1 ? "receta" : "recetas"}
+                          {item.hasUnquantifiedAmount && item.amountType === "exact" ? " + según necesidad" : ""}
                         </span>
                       </span>
                     </label>
@@ -160,59 +139,6 @@ export function ShoppingListClient({
           </SectionCard>
         );
       })}
-
-      {completedItems.length ? (
-        <SectionCard>
-          <button
-            type="button"
-            onClick={() => setIsCompletedOpen((current) => !current)}
-            className="flex w-full items-center justify-between gap-4 text-left"
-          >
-            <div className="flex items-center gap-3">
-              <span className="inline-flex min-w-16 items-center justify-center rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-success)]">
-                {isCompletedOpen ? "Ocultar" : "Ver"}
-              </span>
-              <div>
-                <h2 className="text-base font-semibold text-[var(--color-paper)]">
-                  Completados
-                </h2>
-                <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--color-success)]">
-                  Productos que ya tienes controlados
-                </p>
-              </div>
-            </div>
-            <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              {completedItems.length} productos
-            </span>
-          </button>
-
-          {isCompletedOpen ? (
-            <div className="mt-4 space-y-2">
-              {completedItems.map((item) => (
-                <label
-                  key={item.id}
-                  className="flex cursor-pointer items-start gap-3 rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-3"
-                >
-                  <input
-                    type="checkbox"
-                    checked
-                    onChange={() => onToggleItem(item.id)}
-                    className="mt-1 h-4 w-4 accent-[var(--color-accent)]"
-                  />
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium text-[var(--color-muted)] line-through">
-                      {item.name}
-                    </span>
-                    <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                      {item.quantity} {item.unit} · {item.categoryLabel}
-                    </span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          ) : null}
-        </SectionCard>
-      ) : null}
 
       {removedItems.length ? (
         <SectionCard>
@@ -240,7 +166,7 @@ export function ShoppingListClient({
                   {item.name}
                 </span>
                 <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                  {item.quantity} {item.unit}
+                  {formatShoppingAmount(item)}
                 </span>
               </div>
             ))}

@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/auth";
-import { getHouseholdByOwnerUserId } from "@/lib/dal/households";
+import { getHouseholdByOwnerUserId, getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
+import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
+import { resolvePlanServings, hasValidPlanServings } from "@/lib/domain/plan-servings";
 import { deleteWeeklyPlan, saveWeeklyPlan } from "@/lib/dal/plans";
 import type { WeeklyPlan } from "@/lib/domain/types";
 import { normalizeWeeklyPlan } from "@/lib/domain/weekly-plan-runtime";
@@ -13,19 +15,21 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const household = await getHouseholdByOwnerUserId(session.user.id);
+  const persistedHousehold = await getHouseholdWithMembersByOwnerUserId(session.user.id);
 
-  if (!household) {
+  if (!persistedHousehold) {
     return NextResponse.json({ error: "Household not found" }, { status: 404 });
   }
 
-  const payload = (await request.json()) as WeeklyPlan;
+  const household = buildHouseholdFromPersistence(persistedHousehold.household, persistedHousehold.members);
+  const payload = await request.json().catch(() => null);
 
   if (!isValidWeeklyPlanPayload(payload, household.id)) {
     return NextResponse.json({ error: "Invalid weekly plan payload" }, { status: 400 });
   }
 
-  const saved = await saveWeeklyPlan(normalizeWeeklyPlan(payload));
+  const saved = await saveWeeklyPlan(resolvePlanServings(normalizeWeeklyPlan(payload), household));
+  if (!saved) return NextResponse.json({ error: "Plan conflict" }, { status: 409 });
   return NextResponse.json({ plan: saved });
 }
 
@@ -72,7 +76,7 @@ function isValidWeeklyPlanPayload(
     typeof plan.rangeStart === "string" &&
     typeof plan.rangeEnd === "string" &&
     typeof plan.weekStart === "string" &&
-    Array.isArray(plan.days) &&
+    hasValidPlanServings(plan.days) &&
     Array.isArray(plan.batchBlocks) &&
     Array.isArray(plan.leftoverFlows) &&
     typeof plan.updatedAt === "string"

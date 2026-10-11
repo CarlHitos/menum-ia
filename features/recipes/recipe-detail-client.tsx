@@ -1,17 +1,20 @@
 import Link from "next/link";
 import { SectionCard } from "@/components/ui/section-card";
-import { formatGoalLabel } from "@/lib/domain/goal-labels";
-import type { Household, Recipe } from "@/lib/domain/types";
+import { scaleRecipeIngredients, formatIngredientAmount } from "@/lib/domain/portioning";
+import type { Recipe } from "@/lib/domain/types";
 
 type RecipeDetailClientProps = {
   recipe: Recipe;
-  household: Household;
+  requestedServings: number;
+  contextQuery?: string;
 };
 
 export function RecipeDetailClient({
   recipe,
-  household,
+  requestedServings,
+  contextQuery = "",
 }: RecipeDetailClientProps) {
+  const ingredients = scaleRecipeIngredients(recipe, requestedServings);
   return (
     <>
       <SectionCard className="mb-4">
@@ -28,7 +31,7 @@ export function RecipeDetailClient({
             </p>
           </div>
           <Link
-            href={`/cook/${recipe.id}`}
+            href={`/cook/${recipe.id}${contextQuery}`}
             className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
           >
             Cocinar
@@ -36,6 +39,7 @@ export function RecipeDetailClient({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
+          <RecipeChip label={`${requestedServings} comensales`} />
           <RecipeChip label={formatMealType(recipe.category)} />
           <RecipeChip label={`${recipe.durationMinutes} min`} />
           <RecipeChip label={formatDifficulty(recipe.difficulty)} />
@@ -44,10 +48,10 @@ export function RecipeDetailClient({
 
       <SectionCard className="mb-4">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          Ingredientes base
+          Ingredientes para {requestedServings} {requestedServings === 1 ? "comensal" : "comensales"}
         </p>
         <div className="mt-3 grid gap-2">
-          {recipe.ingredients.map((ingredient) => (
+          {ingredients.map((ingredient) => (
             <div
               key={ingredient.id}
               className="flex items-center justify-between gap-3 rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-3 text-sm"
@@ -61,60 +65,15 @@ export function RecipeDetailClient({
                     {ingredient.name}
                   </span>
                   <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                    {ingredient.scalable ? "Se ajusta por racion" : "Cantidad estable"}
+                    {ingredient.amountType === "exact" ? "Cantidad para esta comida" : "Ajusta al cocinar"}
                   </span>
                 </div>
               </div>
               <span className="text-[var(--color-muted)]">
-                {ingredient.quantity} {ingredient.unit}
+                {formatIngredientAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}
               </span>
             </div>
           ))}
-        </div>
-      </SectionCard>
-
-      <SectionCard className="mb-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          Ajustes por persona
-        </p>
-        <div className="mt-3 space-y-3">
-          {household.members.map((member) => {
-            const memberAdjustments = recipe.portionAdjustments.filter(
-              (adjustment) => adjustment.memberId === member.id,
-            );
-
-            return (
-              <div
-                key={member.id}
-                className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-4 py-3"
-              >
-                <p className="text-sm font-semibold text-[var(--color-paper)]">
-                  {member.name}
-                </p>
-                <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                  {formatGoalLabel(member.goal)}
-                </p>
-                <div className="mt-2 space-y-1 text-sm text-[var(--color-muted)]">
-                  {memberAdjustments.length ? (
-                    memberAdjustments.map((adjustment) => {
-                      const ingredient = recipe.ingredients.find(
-                        (item) => item.id === adjustment.ingredientId,
-                      );
-
-                      return (
-                        <p key={adjustment.id}>
-                          {ingredient?.name}: {adjustment.deltaQuantity > 0 ? "+" : ""}
-                          {adjustment.deltaQuantity} {adjustment.unit}
-                        </p>
-                      );
-                    })
-                  ) : (
-                    <p>Misma base comun, sin cambios para esta persona.</p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
         </div>
       </SectionCard>
 
@@ -181,7 +140,7 @@ export function RecipeDetailClient({
 
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.12),rgba(252,163,17,0.14))]">
         <Link
-          href={`/cook/${recipe.id}`}
+          href={`/cook/${recipe.id}${contextQuery}`}
           className="inline-flex rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
         >
           Abrir modo cocinar

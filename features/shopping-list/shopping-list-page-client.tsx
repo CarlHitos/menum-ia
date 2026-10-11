@@ -151,7 +151,7 @@ export function ShoppingListPageClient({
       <PageHeader
         eyebrow=""
         title="Lista inteligente"
-        description={`${recipeCount} recetas optimizadas para tu presupuesto.`}
+        description={`${recipeCount} recetas de tu menú semanal.`}
       />
 
       <SectionCard className="mb-4">
@@ -206,7 +206,7 @@ export function ShoppingListPageClient({
               Cobertura semanal
             </p>
             <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-              Desayunos, comidas, snacks y cenas de lunes a domingo
+              Compra de las comidas incluidas en tu plan
             </h2>
             <div className="mt-4 grid grid-cols-3 gap-2">
               <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-2 py-3 text-center">

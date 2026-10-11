@@ -40,7 +40,7 @@ export function buildActivePlanFromTemplate(
   }));
 
   return {
-    id: `plan-${startDate.toISOString().slice(0, 10)}`,
+    id: `plan-${options.householdId}-${startDate.toISOString().slice(0, 10)}`,
     householdId: options.householdId,
     templateId: template.id,
     status: "draft",

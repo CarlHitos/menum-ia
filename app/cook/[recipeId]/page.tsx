@@ -7,12 +7,14 @@ import { requireAuth } from "@/lib/auth/require-auth";
 import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
 import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
 import { getCatalogRecipeById } from "@/lib/server/recipes-catalog";
+import { getRecipeServingContext, type RecipeSearchParams } from "@/lib/server/recipe-serving-context";
 
 type CookPageProps = {
   params: Promise<{ recipeId: string }>;
+  searchParams: Promise<RecipeSearchParams>;
 };
 
-export default async function CookPage({ params }: CookPageProps) {
+export default async function CookPage({ params, searchParams }: CookPageProps) {
   const session = await requireAuth("/dashboard");
   const persistedHousehold = await getHouseholdWithMembersByOwnerUserId(
     session.user.id,
@@ -28,6 +30,8 @@ export default async function CookPage({ params }: CookPageProps) {
     persistedHousehold.household,
     persistedHousehold.members,
   );
+  const context = await getRecipeServingContext(recipeId, household, await searchParams);
+  if (!context) notFound();
 
   return (
     <AppShell currentPath="/dashboard">
@@ -42,7 +46,7 @@ export default async function CookPage({ params }: CookPageProps) {
             </h1>
           </div>
           <Link
-            href={`/recipes/${recipe.id}`}
+            href={`/recipes/${recipe.id}${context.query}`}
             className="rounded-full border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
           >
             Receta
@@ -63,13 +67,13 @@ export default async function CookPage({ params }: CookPageProps) {
               Raciones
             </p>
             <p className="mt-1 text-base font-semibold text-[var(--color-paper)]">
-              {recipe.baseServings} {recipe.baseServings === 1 ? "persona" : "personas"}
+              {context.requestedServings} {context.requestedServings === 1 ? "persona" : "personas"}
             </p>
           </div>
         </div>
       </SectionCard>
 
-      <CookingMode recipe={recipe} household={household} />
+      <CookingMode recipe={recipe} requestedServings={context.requestedServings} contextQuery={context.query} />
     </AppShell>
   );
 }

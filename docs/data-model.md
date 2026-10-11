@@ -1,5 +1,8 @@
 # MenumIA — Data Model
 
+Actualización 2026-10-05: el contrato de comensales, cantidades y compra se detalla
+en [Cantidades dinámicas — fase 1](dynamic-servings.md).
+
 ## 1. Propósito
 
 Este documento define el modelo de datos del MVP de MenumIA desde dos perspectivas:
@@ -184,6 +187,7 @@ Campos clave:
 - `recipeId`
 - `dayKey`
 - `servings`
+- `servingsOverride?`: comensales específicos para este bloque
 - `tags[]`
 - `notes?`
 
@@ -232,7 +236,9 @@ Campos clave:
 - `quantity`
 - `unit`
 - `category`
-- `scalable`
+- `scalable` (compatibilidad)
+- `amountType?`: `exact`, `to_taste` o `as_needed`
+- `productId?`: identidad revisada para consolidar productos
 - `componentRef?`
 
 Responsabilidad:
@@ -272,7 +278,10 @@ Campos clave:
 
 Responsabilidad:
 
-- aplicar cambios de ración sin crear recetas distintas por defecto
+- representar posibles cambios de ración sin crear recetas distintas por defecto
+
+Los ajustes del hogar de ejemplo se han retirado. El cálculo compartido no aplica
+ajustes globales del catálogo: requieren participantes explícitos del hogar.
 
 ### 4.11 ProducedComponent
 
@@ -337,7 +346,10 @@ Responsabilidad:
 
 Nota:
 
-En el modelo conceptual del MVP se considera un dato derivado. En una fase futura podría persistirse parcialmente si se quiere guardar estado de check, edición manual o histórico.
+La lista se calcula desde el plan y las recetas. Los checks se guardan separadamente
+en `shopping_list_states`; la edición manual de cantidades y el inventario de
+despensa siguen pendientes. `totalNeeded` conserva la suma calculada y
+`purchaseAmount` aplica el redondeo final de compra.
 
 ## 5. Relaciones entre entidades
 
@@ -357,7 +369,7 @@ Relaciones principales:
 - `WeeklyPlan` 1:N `LeftoverFlow`
 - `BatchCookingBlock` 1:N `ProducedComponent`
 - `LeftoverFlow` enlaza `MealSlot` origen + `ProducedComponent` + `MealSlot` destino
-- `ShoppingList` se deriva de `WeeklyPlan + Recipe + RecipeIngredient + PortionAdjustment`
+- `ShoppingList` se deriva del plan filtrado por las comidas del hogar y de `Recipe + RecipeIngredient`, usando los comensales de cada bloque
 
 ## 6. Datos que vienen del onboarding
 
@@ -400,7 +412,7 @@ Se deriva hoy desde:
 - `WeeklyPlan`
 - `Recipe`
 - `RecipeIngredient`
-- `PortionAdjustment`
+- comensales de cada bloque y comidas seleccionadas por el hogar
 
 No debe considerarse la fuente canónica del dominio.
 
@@ -464,8 +476,8 @@ El proyecto ya usa lógica derivada para:
 
 Aunque el modelo conceptual objetivo es más amplio, el estado implementado aún simplifica varios puntos:
 
-- el onboarding local usa `OnboardingDraft`, no construye todavía una entidad `Household` persistente real
-- la vista semanal se centra en comida y cena, no en desayuno y snack dentro de la UI principal
+- el onboarding usa `OnboardingDraft` como entrada editable y persiste hogar y miembros a través de la API
+- la vista semanal incluye desayuno, comida, snack y cena según las preferencias del hogar
 - la shopping list todavía es una derivación local y no guarda edición manual persistente
 - el progreso del modo cocinar es solo local de sesión
 
@@ -503,7 +515,7 @@ Estas partes son mejores candidatas a seguir como derivadas:
 ### 10.1 Lo que ya está alineado
 
 - base común de comidas para todo el hogar
-- ajustes por persona mediante `PortionAdjustment`
+- escalado común por comensales; `PortionAdjustment` conserva su tipo para una futura gestión explícita por participante
 - semana base repetible con `WeekTemplate`
 - semana activa con `WeeklyPlan`
 - batch cooking explícito con `BatchCookingBlock`
@@ -512,30 +524,19 @@ Estas partes son mejores candidatas a seguir como derivadas:
 
 ### 10.2 Lo que todavía está simplificado
 
-- onboarding no separa todavía alergias y restricciones en campos distintos del flujo UI
-- el onboarding guarda strings simples, no arrays normalizados ni entidad `Household` persistente
-- desayuno y snack están presentes en el modelo conceptual, pero no forman parte de la vista principal del menú actual
+- los ajustes individuales todavía no tienen selección explícita de participantes
+- el onboarding captura listas como texto y las transforma en arrays al persistir el hogar
+- las preferencias del hogar determinan qué bloques aparecen y entran en la compra
 - shopping list no soporta todavía edición manual persistente ni merge con items añadidos por usuario
 - no existe aún historial real de semanas ni favoritos persistidos
 
 ## 11. Inconsistencias y puntos a vigilar
 
-### 11.1 Onboarding vs dominio de miembros
+### 11.1 Comensales y participantes
 
-El dominio actual soporta:
-
-- `restrictions[]`
-- `allergies[]`
-- `dislikes[]`
-
-Pero el onboarding implementado captura solo:
-
-- `restrictions` como string
-- `dislikes` como string
-
-No captura todavía `allergies` por separado.
-
-Esta es la inconsistencia principal entre modelo ideal y estado actual.
+El número de comensales se resuelve desde el hogar salvo que el bloque tenga
+`servingsOverride`. Esto aún no selecciona qué miembros concretos comen ni
+aplica automáticamente objetivos o perfiles nutricionales.
 
 ### 11.2 Shopping list como entidad
 
@@ -555,17 +556,16 @@ Debe seguir tratándose como:
 
 No como sustituto de `Household` persistido remotamente.
 
-## 12. Recomendación para la siguiente fase
+## 12. Siguiente fase
 
-Antes de introducir backend o auth, conviene mantener esta separación:
+La separación actual mantiene:
 
-- dominio persistible en `lib/domain`
-- datos estáticos temporales en `lib/data`
-- proyecciones y mapeos en selectores y mappers
-- estado local de cliente fuera del modelo canónico
+- dominio y cálculos en `lib/domain`
+- catálogo inicial en `lib/data` y recetas persistidas en BD
+- acceso a datos en `lib/dal`
+- estado y proyecciones de interfaz fuera del modelo canónico
 
-Cuando llegue persistencia remota, la transición más limpia será:
-
-1. mapear `OnboardingDraft` a `Household`
-2. persistir `Household`, `WeekTemplate` y `WeeklyPlan`
-3. seguir derivando `ShoppingList` y proyecciones de UI a partir del dominio persistido
+La ampliación de recetas debe conservar los identificadores actuales, añadir
+metadatos de tipo/temporada y utilizar una carga incremental. Las preparaciones
+reutilizables y sobras requieren resolver rendimientos y consumo antes de
+poder descontarlos automáticamente de la compra.

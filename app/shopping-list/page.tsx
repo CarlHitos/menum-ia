@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { ShoppingListPageClient } from "@/features/shopping-list/shopping-list-page-client";
 import { requireAuth } from "@/lib/auth/require-auth";
-import { getHouseholdByOwnerUserId } from "@/lib/dal/households";
+import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
+import { buildHouseholdFromPersistence } from "@/lib/domain/household-mappers";
+import { applyHouseholdToPlan } from "@/lib/domain/plan-servings";
 import {
   getLatestWeeklyPlanByHouseholdId,
   getShoppingListState,
@@ -11,13 +13,15 @@ import { getCatalogRecipes } from "@/lib/server/recipes-catalog";
 
 export default async function ShoppingListPage() {
   const session = await requireAuth("/shopping-list");
-  const household = await getHouseholdByOwnerUserId(session.user.id);
+  const persistedHousehold = await getHouseholdWithMembersByOwnerUserId(session.user.id);
 
-  if (!household) {
+  if (!persistedHousehold) {
     redirect("/onboarding");
   }
 
-  const plan = await getLatestWeeklyPlanByHouseholdId(household.id);
+  const household = buildHouseholdFromPersistence(persistedHousehold.household, persistedHousehold.members);
+  const storedPlan = await getLatestWeeklyPlanByHouseholdId(household.id);
+  const plan = storedPlan ? applyHouseholdToPlan(storedPlan, household) : null;
   const shoppingState = plan ? await getShoppingListState(plan.id) : null;
   const recipes = await getCatalogRecipes();
 
