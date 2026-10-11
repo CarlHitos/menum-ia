@@ -4,6 +4,7 @@ import Link from "next/link";
 const items = [
   { href: "/", label: "Hogar", icon: "/branding/hogar.svg" },
   { href: "/dashboard", label: "Menu", icon: "/branding/meal.svg" },
+  { href: "/recipes", label: "Recetas", icon: "/branding/meal.svg" },
   { href: "/shopping-list", label: "Compra", icon: "/branding/list.svg" },
 ];
 

@@ -32,7 +32,7 @@ export default async function RecipePage({ params, searchParams }: RecipePagePro
   if (!context) notFound();
 
   return (
-    <AppShell currentPath="/dashboard">
+    <AppShell currentPath={context.query ? "/dashboard" : "/recipes"}>
       <RecipeDetailClient recipe={recipe} requestedServings={context.requestedServings} contextQuery={context.query} />
     </AppShell>
   );
