@@ -65,6 +65,23 @@ base positiva entera y no contiene divisiones fijas por 3.
 
 ## Compatibilidad y datos
 
+### Presentación de compra (2026-10-11)
+
+La interfaz de compra muestra cantidades orientativas prácticas. Para peso y
+volumen, redondea hacia arriba a incrementos de 50 g/ml desde 500, de 10 g/ml
+desde 100 y de 1 g/ml para cantidades menores; por debajo de 1 mantiene décimas.
+Indica `≈` cuando hay aproximación y usa kg/l desde 1000 g/ml.
+
+Por ejemplo: 633,33 g se muestra como «≈ 650 g», 966,67 g como «≈ 1 kg» y
+166,67 g como «≈ 170 g». Los huevos se muestran como «19 unidades» sin el
+desglose «Necesario: 18,67».
+
+Esta presentación no cambia `totalNeeded`, `purchaseAmount`, las cantidades de
+receta ni el estado persistido. Tampoco supone un tamaño de envase comercial.
+Los productos marcados aparecen tachados al final de su propia categoría y
+pueden desmarcarse allí. Se elimina el bloque global duplicado de completados;
+las categorías conservan su orden y su estado abierto al completar productos.
+
 No hace falta migración SQL. Los campos adicionales viven en estructuras JSON
 ya existentes y las cantidades de compra se calculan en memoria.
 

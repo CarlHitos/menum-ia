@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { RecipeDetailClient } from "../features/recipes/recipe-detail-client";
 import { CookingMode } from "../features/cooking/cooking-mode";
 import { ShoppingListClient } from "../features/shopping-list/shopping-list-client";
+import { formatShoppingAmount } from "../features/shopping-list/shopping-quantity";
 import { recipes } from "../lib/data/recipe-catalog";
 import { buildDefaultWeekTemplate } from "../lib/domain/default-week-template";
 import { calculatePurchaseAmount, ingredientKey } from "../lib/domain/ingredient-identity";
@@ -257,16 +258,63 @@ test("saving servings preserves inactive meal slots so preferences can be change
   assert.equal(applyHouseholdToPlan(resolved, household(4, ["lunch", "dinner"])).days[0].slots.length, 2);
 });
 
-test("shopping screen distinguishes calculated need from whole-unit purchase and qualitative items", () => {
+test("shopping screen shows whole-unit purchase and qualitative items without raw calculation noise", () => {
   const catalog = [recipe("avocado", [ingredient(2.6, "Aguacate"), ingredient(1, "Sal", "g", { amountType: "to_taste" })])];
   const list = buildShoppingListFromPlan(planFor(catalog), catalog);
   const markup = renderToStaticMarkup(createElement(ShoppingListClient, {
     categories: list.categories, onToggleItem: () => {}, onClearMarked: () => {},
   }));
-  assert(markup.includes("3 ud"));
-  assert(markup.includes("Necesario: 2,6 ud"));
+  assert(markup.includes("3 unidades"));
+  assert(!markup.includes("Necesario:"));
+  assert(!markup.includes("2,6"));
   assert(markup.includes("Al gusto"));
   assert(!markup.includes("0 g"));
+});
+
+test("shopping suggestions simplify the reported quantities while retaining precise data", () => {
+  const catalog = [recipe("purchase", [
+    ingredient(633.3333333333334, "Carne picada", "g"),
+    ingredient(966.6666666666666, "Pollo", "g"),
+    ingredient(166.66666666666666, "Salsa de carne", "g"),
+    ingredient(18.666666666666668, "Huevos", "ud"),
+  ])];
+  const items = itemsFor(catalog);
+  const original = structuredClone(items);
+  assert.equal(formatShoppingAmount(items.find((item) => item.name === "Carne picada")!), "≈ 650 g");
+  assert.equal(formatShoppingAmount(items.find((item) => item.name === "Pollo")!), "≈ 1 kg");
+  assert.equal(formatShoppingAmount(items.find((item) => item.name === "Salsa de carne")!), "≈ 170 g");
+  assert.equal(formatShoppingAmount(items.find((item) => item.name === "Huevos")!), "19 unidades");
+  assert.deepEqual(items, original);
+  assert.equal(formatShoppingAmount({ quantity: 0.75, unit: "kg" }), "750 g");
+  assert.equal(formatShoppingAmount({ quantity: 1000.0000000000001, unit: "ml" }), "1 l");
+});
+
+test("checked products remain visible once in their category after pending products", () => {
+  const list = buildShoppingListFromPlan(planFor([recipe("a", [ingredient(1, "Marcado"), ingredient(2, "Pendiente")])]), [recipe("a", [ingredient(1, "Marcado"), ingredient(2, "Pendiente")])]);
+  list.categories[0].items.find((item) => item.name === "Marcado")!.checked = true;
+  const markup = renderToStaticMarkup(createElement(ShoppingListClient, {
+    categories: list.categories, onToggleItem: () => {}, onClearMarked: () => {},
+  }));
+  assert.equal((markup.match(/>Marcado</g) ?? []).length, 1);
+  assert.equal((markup.match(/type="checkbox"/g) ?? []).length, 2);
+  assert(markup.indexOf(">Pendiente<") < markup.indexOf(">Marcado<"));
+  assert(markup.includes('checked=""'));
+  assert(!markup.includes("Productos que ya tienes controlados"));
+  assert(!markup.includes(">Completados<"));
+});
+
+test("a fully checked category still exposes its checkboxes to undo purchases", () => {
+  const catalog = [recipe("a", [ingredient(1, "Cebolla"), ingredient(2, "Aguacate")])];
+  const list = buildShoppingListFromPlan(planFor(catalog), catalog);
+  list.categories[0].items.forEach((item) => { item.checked = true; });
+  const markup = renderToStaticMarkup(createElement(ShoppingListClient, {
+    categories: list.categories, onToggleItem: () => {}, onClearMarked: () => {},
+  }));
+  assert.equal((markup.match(/type="checkbox"/g) ?? []).length, 2);
+  assert.equal((markup.match(/checked=""/g) ?? []).length, 2);
+  assert(markup.includes('aria-expanded="true"'));
+  assert(markup.includes("2/2 marcados"));
+  assert(!markup.includes(">Completados<"));
 });
 
 test("removed qualitative ingredients retain their display semantics", () => {
