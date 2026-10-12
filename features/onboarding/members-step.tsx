@@ -38,12 +38,10 @@ export function MembersStep({
     <div className="space-y-4">
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-          {currentMemberIndex === 0 ? "¿A quien anadimos primero?" : "¿A quien mas anadimos?"}
+          Persona {currentMemberIndex + 1} de {draft.memberCount}
         </p>
         <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-          {currentMemberIndex === 0
-            ? "Personalicemos tu mesa"
-            : `Casi terminamos · Miembro ${currentMemberIndex + 1} de ${draft.memberCount}`}
+          {member.name.trim() ? `Conozcamos a ${member.name}` : "Conozcamos a esta persona"}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
           MenumIA necesita conocer a cada miembro para que el plan, la compra y las recetas encajen mejor con cada persona.
@@ -73,6 +71,7 @@ export function MembersStep({
 
           <div
             id={`member-goal-${member.id}`}
+            tabIndex={-1}
             className={`rounded-[1.5rem] border px-4 py-3 ${
               showGoalError
                 ? "border-red-400/70 bg-red-500/5"

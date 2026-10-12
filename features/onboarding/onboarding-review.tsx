@@ -24,15 +24,14 @@ export function OnboardingReview({
           Resumen final
         </p>
         <span className="mt-3 inline-flex rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-soft)]">
-          Ahorro estimado: ~15% en delivery
+          Revisa los datos de tu hogar
         </span>
         <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
           {`Todo listo, ${householdName}`}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          MenumIA ya sabe lo que necesitas. Hemos disenado un plan inteligente
-          para tu hogar de {formatMemberCount(draft.memberCount)}, con una
-          compra mas afinada para que aproveches mejor cada euro.
+          Guarda la configuración de tu hogar de {formatMemberCount(draft.memberCount)}.
+          Después podrás elegir cuándo empezar y revisar las comidas antes de confirmar el menú.
         </p>
       </SectionCard>
 
@@ -109,7 +108,7 @@ export function OnboardingReview({
         disabled={isSubmitting}
         className="inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-4 text-sm font-semibold text-slate-950"
       >
-        {isSubmitting ? "Guardando hogar..." : "Generar mi menu inteligente ✨"}
+        {isSubmitting ? "Guardando hogar..." : "Preparar mi menú semanal"}
       </button>
     </div>
   );
