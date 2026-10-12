@@ -1,12 +1,16 @@
 "use client";
 
+import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
 type WeeklyMenuProps = {
   plan: WeeklyPlanPreviewDay[];
+  viewKey?: string;
+  headingLabel?: string;
+  onDayChange?: () => void;
   selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
   initialDayKey?: string | null;
@@ -25,6 +29,9 @@ const weekdayOrder = [
 
 export function WeeklyMenu({
   plan,
+  viewKey,
+  headingLabel = "Comidas del día",
+  onDayChange,
   selectedSlotId = null,
   onSelectSlot,
   initialDayKey = null,
@@ -39,15 +46,16 @@ export function WeeklyMenu({
     return plan.some((day) => day.dayKey === todayKey) ? todayKey : plan[0]?.dayKey ?? "";
   }, [initialDayKey, plan]);
 
-  const [selectedDayKey, setSelectedDayKey] = useState(defaultDayKey);
+  const restoredDayKey = useSyncExternalStore(
+    subscribeMenuDay,
+    () => viewKey ? readMenuDay(viewKey, plan.map((day) => day.dayKey), defaultDayKey) : defaultDayKey,
+    () => defaultDayKey,
+  );
+  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
   const [openInfoSlotId, setOpenInfoSlotId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setSelectedDayKey(defaultDayKey);
-  }, [defaultDayKey]);
-
   const selectedDay =
-    plan.find((day) => day.dayKey === selectedDayKey) ?? plan[0] ?? null;
+    plan.find((day) => day.dayKey === (selectedDayKey ?? restoredDayKey)) ?? plan[0] ?? null;
 
   if (!selectedDay) {
     return null;
@@ -59,7 +67,7 @@ export function WeeklyMenu({
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-              Semana activa
+              {headingLabel}
             </p>
             <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
               {selectedDay.fullDateLabel}
@@ -81,8 +89,11 @@ export function WeeklyMenu({
                 type="button"
                 onClick={() => {
                   setSelectedDayKey(day.dayKey);
+                  if (viewKey) rememberMenuDay(viewKey, day.dayKey);
+                  onDayChange?.();
                   setOpenInfoSlotId(null);
                 }}
+                aria-pressed={isSelected}
                 className={`flex min-h-12 items-center justify-center rounded-2xl px-2 py-3 transition ${
                   isSelected
                     ? "bg-[var(--color-accent)] text-slate-950"
@@ -114,6 +125,9 @@ export function WeeklyMenu({
           return (
             <div
               key={slot.id}
+              id={`meal-${slot.id}`}
+              tabIndex={-1}
+              aria-label={`${slot.mealLabel}: ${slot.title}`}
               className={`rounded-2xl border px-4 py-4 transition ${
                 slot.status === "planned"
                   ? isSelected
