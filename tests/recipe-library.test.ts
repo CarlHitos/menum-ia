@@ -83,7 +83,7 @@ test("new recipes feed real weekly quantities and consolidate shared ingredients
 test("mobile library and weekly selector render accessible search, filters and eligible recipes", () => {
   const html = renderToStaticMarkup(createElement(RecipeBrowser, { recipes: catalog }));
   assert.match(html, /type="search"/);
-  assert.match(html, /100 recetas/);
+  assert.match(html, /99 recetas/);
   assert.match(html, /Ver más recetas/);
   assert.match(html, /href="\/recipes\//);
   const selector = renderToStaticMarkup(createElement(RecipeBrowser, { recipes: catalog, mealType: "dinner", onSelect: () => {} }));

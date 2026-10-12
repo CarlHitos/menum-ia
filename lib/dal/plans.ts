@@ -1,3 +1,4 @@
+import { normalizePlanRecipes, normalizeTemplateRecipes } from "@/lib/domain/recipe-availability";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { shoppingListStates, weekTemplates, weeklyPlans } from "@/db/schema";
@@ -22,6 +23,7 @@ export async function getWeekTemplateByHouseholdId(householdId: string) {
 }
 
 export async function saveWeekTemplate(template: WeekTemplate) {
+  template = normalizeTemplateRecipes(template);
   const [saved] = await db
     .insert(weekTemplates)
     .values({
@@ -75,6 +77,7 @@ export async function getWeeklyPlanByIdForHousehold(
 }
 
 export async function saveWeeklyPlan(plan: WeeklyPlan) {
+  plan = normalizePlanRecipes(plan);
   const [saved] = await db
     .insert(weeklyPlans)
     .values({
@@ -154,7 +157,7 @@ export async function saveShoppingListState(state: ShoppingListState) {
 }
 
 function mapWeekTemplate(record: PersistedWeekTemplateRecord): WeekTemplate {
-  return {
+  return normalizeTemplateRecipes({
     id: record.id,
     householdId: record.householdId,
     name: record.name,
@@ -162,11 +165,11 @@ function mapWeekTemplate(record: PersistedWeekTemplateRecord): WeekTemplate {
     days: record.days as WeekTemplate["days"],
     batchBlocks: record.batchBlocks as WeekTemplate["batchBlocks"],
     leftoverFlows: record.leftoverFlows as WeekTemplate["leftoverFlows"],
-  };
+  });
 }
 
 function mapWeeklyPlan(record: PersistedWeeklyPlanRecord): WeeklyPlan {
-  return {
+  return normalizePlanRecipes({
     id: record.id,
     householdId: record.householdId,
     templateId: record.templateId ?? undefined,
@@ -180,7 +183,7 @@ function mapWeeklyPlan(record: PersistedWeeklyPlanRecord): WeeklyPlan {
     leftoverFlows: record.leftoverFlows as WeeklyPlan["leftoverFlows"],
     confirmedAt: record.confirmedAt ?? undefined,
     updatedAt: record.updatedAt.toISOString(),
-  };
+  });
 }
 
 function mapShoppingListState(
