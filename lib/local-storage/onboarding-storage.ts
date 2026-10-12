@@ -1,3 +1,4 @@
+import { isMealType } from "@/lib/domain/meal-types";
 import type { OnboardingDraft } from "@/features/onboarding/types";
 
 const STORAGE_KEY_V3 = "menumia:onboarding:v3";
@@ -48,7 +49,7 @@ function isValidOnboardingDraft(value: unknown): value is OnboardingDraft {
     Array.isArray(draft.members) &&
     draft.members.every(isValidOnboardingMemberDraft) &&
     Array.isArray(draft.mealsPerDay) &&
-    draft.mealsPerDay.every(isValidMealType) &&
+    draft.mealsPerDay.every(isMealType) &&
     typeof draft.weeklyBudget === "string" &&
     typeof draft.cookingLoad === "string" &&
     typeof draft.preferredStore === "string" &&
@@ -70,15 +71,6 @@ function isValidOnboardingMemberDraft(value: unknown): value is OnboardingDraft[
     typeof member.allergies === "string" &&
     typeof member.restrictions === "string" &&
     typeof member.dislikes === "string"
-  );
-}
-
-function isValidMealType(value: unknown): value is OnboardingDraft["mealsPerDay"][number] {
-  return (
-    value === "breakfast" ||
-    value === "lunch" ||
-    value === "snack" ||
-    value === "dinner"
   );
 }
 

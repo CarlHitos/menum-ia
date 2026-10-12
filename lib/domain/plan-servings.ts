@@ -1,11 +1,16 @@
+import { isMealType } from "@/lib/domain/meal-types";
+import { addMidMorningSlots } from "@/lib/domain/mid-morning";
 import type { Household, WeeklyPlan } from "@/lib/domain/types";
 import { isValidServings } from "@/lib/domain/portioning";
 
 export function resolvePlanServings(plan: WeeklyPlan, household: Household): WeeklyPlan {
   const servings = Math.max(1, household.members.length);
+  const addsMidMorning = household.planningPreferences.mealsPerDay.includes("mid-morning") && plan.days.some((day) => !day.slots.some((slot) => slot.mealType === "mid-morning"));
+  const days = addsMidMorning ? addMidMorningSlots(plan.days, servings) : plan.days;
   return {
     ...plan,
-    days: plan.days.map((day) => ({
+    status: addsMidMorning ? "draft" : plan.status,
+    days: days.map((day) => ({
       ...day,
       slots: day.slots.map((slot) => ({
         ...slot,
@@ -51,7 +56,7 @@ export function hasValidPlanServings(days: unknown): boolean {
     Array.isArray(day.slots) && day.slots.every((slot: Record<string, unknown>) => {
       if (!slot || typeof slot !== "object" || typeof slot.id !== "string" || slotIds.has(slot.id) ||
         typeof slot.recipeId !== "string" || typeof slot.dayKey !== "string" ||
-        !["breakfast", "lunch", "dinner", "snack"].includes(String(slot.mealType)) ||
+        !isMealType(slot.mealType) ||
         !Array.isArray(slot.tags) || !isValidServings(slot.servings) ||
         (slot.servingsOverride !== undefined && typeof slot.servingsOverride !== "boolean")) return false;
       slotIds.add(slot.id);
