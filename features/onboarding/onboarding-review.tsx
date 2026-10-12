@@ -1,3 +1,5 @@
+import { mealTypeLabels } from "@/lib/domain/meal-types";
+import type { MealType } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
 import type { OnboardingDraft } from "@/features/onboarding/types";
 import { formatGoalLabel } from "@/lib/domain/goal-labels";
@@ -118,19 +120,8 @@ function formatMemberCount(count: number) {
   return `${count} ${count === 1 ? "persona" : "personas"}`;
 }
 
-function formatMealType(mealType: string) {
-  switch (mealType) {
-    case "breakfast":
-      return "desayuno";
-    case "lunch":
-      return "comida";
-    case "snack":
-      return "snack o merienda";
-    case "dinner":
-      return "cena";
-    default:
-      return mealType;
-  }
+function formatMealType(mealType: MealType) {
+  return mealTypeLabels[mealType].toLocaleLowerCase("es");
 }
 
 function formatBudget(value: string) {

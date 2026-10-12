@@ -97,9 +97,10 @@ Al iniciar la app, debe preguntar:
 ### 6.2 Menú semanal clickable
 La app debe mostrar una semana completa con:
 - desayuno
+- media mañana opcional
 - comida
+- merienda opcional
 - cena
-- snacks opcionales
 
 Cada bloque del menú debe ser clickable.
 

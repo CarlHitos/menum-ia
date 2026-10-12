@@ -1,3 +1,4 @@
+import { mealTypeLabels, mealTypeOrder } from "@/lib/domain/meal-types";
 import { ChoiceChip } from "@/components/ui/choice-chip";
 import { InputCard } from "@/components/ui/input-card";
 import { SectionCard } from "@/components/ui/section-card";
@@ -23,12 +24,7 @@ const repeatOptions = [
   { value: "vary-week", label: "Variedad total" },
 ] as const;
 
-const mealOptions: Array<{ value: MealType; label: string }> = [
-  { value: "breakfast", label: "Desayuno" },
-  { value: "lunch", label: "Comida" },
-  { value: "snack", label: "Snack / merienda" },
-  { value: "dinner", label: "Cena" },
-];
+const mealOptions = mealTypeOrder.map((value) => ({ value, label: mealTypeLabels[value] }));
 
 export function PreferencesStep({
   draft,

@@ -58,7 +58,6 @@ export function DashboardClient({
   const weeklyPlanPreview = plan
     ? buildWeeklyPlanPreview(plan, recipes, visibleMeals)
     : [];
-  const visibleMealsLabel = visibleMeals.map(formatMealTypeLabel).join(", ");
   const rangeLabel = plan ? getPlanRangeLabel(plan) : "";
   const hasChangesAfterConfirmation =
     plan?.status === "draft" && Boolean(plan.confirmedAt);
@@ -204,7 +203,7 @@ export function DashboardClient({
       </div> : null}
       <div className="mb-4 grid grid-cols-2 gap-3">
         <StatPill label="Hogar" value={context.householdName} />
-        <StatPill label="Comidas" value={visibleMealsLabel} />
+        <StatPill label="Comidas" value={String(new Set(visibleMeals).size)} suffix="/ día" />
       </div>
 
       {!plan ? (
