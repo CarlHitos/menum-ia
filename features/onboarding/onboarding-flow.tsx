@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { focusStepStart } from "@/lib/ui/step-navigation";
+import { useStepNavigation } from "@/lib/ui/use-step-navigation";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { StepActions } from "@/components/ui/step-actions";
@@ -138,36 +140,29 @@ export function OnboardingFlow({
 
     if (currentStep === 1 && !canContinueFromMemberGoal) {
       setShowMemberGoalError(true);
-      document
-        .getElementById(`member-goal-${draft.members[safeCurrentMemberIndex]?.id}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const goal = document.getElementById(`member-goal-${draft.members[safeCurrentMemberIndex]?.id}`);
+      if (goal) focusStepStart(goal);
       return;
     }
 
     if (currentStep === 2 && !canContinueFromMeals) {
       setShowMealsError(true);
-      document.getElementById("preferences-meals")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      const field = document.getElementById("preferences-meals");
+      if (field) focusStepStart(field);
       return;
     }
 
     if (currentStep === 2 && !canContinueFromCookingLoad) {
       setShowCookingLoadError(true);
-      document.getElementById("preferences-cooking-load")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      const field = document.getElementById("preferences-cooking-load");
+      if (field) focusStepStart(field);
       return;
     }
 
     if (currentStep === 2 && !canContinueFromRepeatMode) {
       setShowRepeatModeError(true);
-      document.getElementById("preferences-repeat-mode")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      const field = document.getElementById("preferences-repeat-mode");
+      if (field) focusStepStart(field);
       return;
     }
 
@@ -209,6 +204,7 @@ export function OnboardingFlow({
     currentMemberIndex,
     Math.max(draft.memberCount - 1, 0),
   );
+  const stepStartRef = useStepNavigation(`${currentStep}:${currentStep === 1 ? safeCurrentMemberIndex : ""}`);
   const canContinueFromMembers =
     draft.members[safeCurrentMemberIndex]?.name.trim();
   const canContinueFromMemberGoal =
@@ -248,6 +244,7 @@ export function OnboardingFlow({
 
   return (
     <div>
+      <div ref={stepStartRef} tabIndex={-1} className="scroll-mt-6 outline-none" role="group" aria-label={currentStep === 1 ? `Miembros · Persona ${safeCurrentMemberIndex + 1} de ${draft.memberCount}` : steps[currentStep]}>
       {currentStep === 0 ? (
         <PageHeader
           eyebrow=""
@@ -261,6 +258,7 @@ export function OnboardingFlow({
         totalSteps={steps.length}
         labels={steps}
       />
+      </div>
 
       {currentStep === 0 ? (
         <HouseholdSizeStep
@@ -305,8 +303,10 @@ export function OnboardingFlow({
           onBack={goBack}
           primaryLabel={
             currentStep === steps.length - 2
-              ? "✨ Finalizar configuracion"
-              : "Continuar →"
+              ? "Revisar configuración"
+              : currentStep === 1 && safeCurrentMemberIndex < draft.memberCount - 1
+                ? "Siguiente persona →"
+                : "Continuar →"
           }
           primaryTone={currentStep === steps.length - 2 ? "subtle" : "solid"}
           onPrimary={goNext}

@@ -1,3 +1,4 @@
+import { isRecipeAvailable } from "./recipe-availability";
 import type { MealType, Recipe, RecipeKind, RecipeSeason } from "./types";
 
 export const recipeKindLabels: Record<RecipeKind, string> = {
@@ -26,7 +27,7 @@ export function filterRecipes(recipes: Recipe[], filters: RecipeFilters) {
   return recipes.filter((recipe) => {
     const metadata = getRecipeMetadata(recipe);
     const text = searchable([recipe.title, ...recipe.ingredients.map((ingredient) => ingredient.name)].join(" "));
-    return terms.every((term) => text.includes(term))
+    return isRecipeAvailable(recipe.id) && terms.every((term) => text.includes(term))
       && (!filters.kind || metadata.kind === filters.kind)
       && (!filters.season || metadata.season === "all_year" || metadata.season === filters.season)
       && (!filters.maxMinutes || recipe.durationMinutes <= filters.maxMinutes)

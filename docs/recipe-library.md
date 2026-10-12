@@ -1,6 +1,6 @@
 # Biblioteca ampliada
 
-La biblioteca contiene las 33 recetas originales y 67 preparaciones nuevas con nombres e identificadores descriptivos de MenumIA. El material temporal de `codex-input/` se utiliza solamente como entrada editorial y no se importa ni distribuye con la aplicación. Las nuevas preparaciones son adaptaciones domésticas: no se presentan como recetas oficiales ni se publican nombres de marca, etiquetas comerciales, afirmaciones nutricionales ni garantías sobre alergias.
+El catálogo fuente conserva las 33 recetas originales y 67 preparaciones nuevas con nombres e identificadores descriptivos de MenumIA. El material temporal de `codex-input/` se utiliza solamente como entrada editorial y no se importa ni distribuye con la aplicación. Las nuevas preparaciones son adaptaciones domésticas: no se presentan como recetas oficiales ni se publican nombres de marca, etiquetas comerciales, afirmaciones nutricionales ni garantías sobre alergias.
 
 ## Datos y cantidades
 
@@ -39,3 +39,9 @@ Los boles se pueden elegir para comida y cena; los desayunos para desayuno o mer
 ## Validación
 
 Pruebas de integridad de las 100 recetas, escalado de todas las nuevas para 1/2/4/7 personas, consolidación en la compra semanal, búsqueda, temporadas, compatibilidad y renderizado de biblioteca/editor. Se mantienen las pruebas de raciones y lista de compra existentes. La importación online y la navegación con una sesión real se comprueban en la preview; las pruebas locales no acceden a credenciales ni a la BD compartida.
+
+## Disponibilidad temporal de la cena de aprovechamiento
+
+`cena-aprovechamiento` queda oculta mientras no exista una gestión real de sobras. La biblioteca ofrece 99 recetas activas. Su definición y las filas ya almacenadas se conservan, pero no se ofrece en búsquedas ni se puede abrir su ficha o modo cocinar. Tampoco se inserta al inicializar una BD nueva.
+
+Las nuevas plantillas usan tortilla de patata y calabacín en su lugar. Las plantillas y semanas antiguas se adaptan al leerlas y al guardarlas, conservando identificadores y comensales, incluidos los ajustes de una comida. Se retiran los enlaces de sobras del bloque sustituido; si la semana estaba confirmada, queda en borrador para revisar el cambio. El menú y la compra utilizan la misma sustitución y dejan de sumar «proteína cocinada sobrante» y «verduras sobrantes». No se ejecuta una migración masiva ni se eliminan filas de BD.

@@ -65,7 +65,7 @@ export function PreferencesStep({
           showMealsError ? "border-red-400/70 bg-red-500/5" : undefined
         }
       >
-        <div id="preferences-meals">
+        <div id="preferences-meals" tabIndex={-1}>
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
           ¿Que comidas quieres organizar?
         </p>
@@ -105,7 +105,7 @@ export function PreferencesStep({
           showCookingLoadError ? "border-red-400/70 bg-red-500/5" : undefined
         }
       >
-        <div id="preferences-cooking-load">
+        <div id="preferences-cooking-load" tabIndex={-1}>
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
           ¿De cuanto tiempo dispones?
         </p>
@@ -139,7 +139,7 @@ export function PreferencesStep({
           showRepeatModeError ? "border-red-400/70 bg-red-500/5" : undefined
         }
       >
-        <div id="preferences-repeat-mode">
+        <div id="preferences-repeat-mode" tabIndex={-1}>
         <p className="mb-3 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
           ¿Como prefieres tu menu?
         </p>

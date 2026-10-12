@@ -265,10 +265,10 @@ export const weekTemplate: WeekTemplate = {
         {
           id: "sun-dinner",
           mealType: "dinner",
-          recipeId: "cena-aprovechamiento",
+          recipeId: "tortilla-calabacin",
           dayKey: "sunday",
           servings: 3,
-          tags: ["quick-dinner", "uses-leftovers"],
+          tags: ["quick-dinner"],
         },
       ],
     },
@@ -319,12 +319,6 @@ export const weekTemplate: WeekTemplate = {
       producedComponentId: "batch-meat-sauce",
       targetMealSlotId: "fri-dinner",
       note: "La salsa de carne acelera la pizza rapida del viernes.",
-    },
-    {
-      sourceMealSlotId: "sun-lunch",
-      producedComponentId: "batch-sunday-chicken",
-      targetMealSlotId: "sun-dinner",
-      note: "El pollo del domingo ayuda a resolver la cena de aprovechamiento.",
     },
   ],
 };

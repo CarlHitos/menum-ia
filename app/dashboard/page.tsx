@@ -42,7 +42,7 @@ export default async function DashboardPage() {
       <PageHeader
         eyebrow=""
         title="Plan semanal"
-        description="Prepara tu semana activa, ajusta recetas y pasa a la compra cuando este lista."
+        description="Revisa las comidas de tu semana, ajusta lo que necesites y prepara la compra."
       />
       <DashboardClient
         household={household}

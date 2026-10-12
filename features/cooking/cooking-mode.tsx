@@ -1,5 +1,6 @@
 "use client";
 
+import { useStepNavigation } from "@/lib/ui/use-step-navigation";
 import Link from "next/link";
 import { scaleRecipeIngredients, formatIngredientAmount } from "@/lib/domain/portioning";
 import { useEffect, useState } from "react";
@@ -15,6 +16,7 @@ type CookingModeProps = {
 export function CookingMode({ recipe, requestedServings, contextQuery = "" }: CookingModeProps) {
   const ingredients = scaleRecipeIngredients(recipe, requestedServings);
   const [activeStep, setActiveStep] = useState(0);
+  const stepStartRef = useStepNavigation(activeStep);
   const initialSeconds = recipe.steps[0]?.timerSeconds ?? 0;
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const [running, setRunning] = useState(false);
@@ -86,6 +88,7 @@ export function CookingMode({ recipe, requestedServings, contextQuery = "" }: Co
           </ul>
         </details>
       </SectionCard>
+      <div ref={stepStartRef} tabIndex={-1} role="group" aria-label={`Paso ${activeStep + 1} de ${recipe.steps.length}`} className="scroll-mt-6 outline-none">
       <SectionCard className="border-[rgba(252,163,17,0.4)] bg-[linear-gradient(135deg,rgba(252,163,17,0.24),rgba(255,255,255,0.1))] shadow-[0_0_0_1px_rgba(252,163,17,0.12)]">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -135,6 +138,7 @@ export function CookingMode({ recipe, requestedServings, contextQuery = "" }: Co
           {completedSteps.length}/{recipe.steps.length} pasos completados
         </p>
       </SectionCard>
+      </div>
 
       {timerAvailable ? (
         <SectionCard>
