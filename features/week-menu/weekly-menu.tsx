@@ -17,6 +17,14 @@ type WeeklyMenuProps = {
   onOpenRecipe?: (href: string) => void;
 };
 
+// Match links and buttons despite the global form-control font reset.
+const mealActionTypography = {
+  fontFamily: "inherit",
+  fontSize: "0.875rem",
+  fontWeight: 600,
+  lineHeight: "1.25rem",
+};
+
 const weekdayOrder = [
   "sunday",
   "monday",
@@ -172,12 +180,13 @@ export function WeeklyMenu({
                 <div className="flex items-center gap-3">
                   {slot.status === "planned" && slot.recipeId ? (
                     <Link
+                      style={mealActionTypography}
                       href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
                       onClick={onOpenRecipe ? (event) => {
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-4 py-2.5 text-sm font-semibold text-[var(--color-paper)] transition-all duration-150 ease-in-out hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:scale-95 active:bg-[var(--color-accent)] active:text-slate-950"
+                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-4 py-2.5 text-[var(--color-paper)] transition-all duration-150 ease-in-out hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:scale-95 active:bg-[var(--color-accent)] active:text-slate-950"
                     >
                       Ver receta
                     </Link>
@@ -186,8 +195,9 @@ export function WeeklyMenu({
                   {onSelectSlot ? (
                     <button
                       type="button"
+                      style={mealActionTypography}
                       onClick={() => onSelectSlot(slot.id)}
-                      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+                      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full border px-4 py-2.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                         isSelected
                           ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.08)] text-[var(--color-accent-soft)]"
                           : "border-[var(--color-border)] text-[var(--color-paper)] hover:bg-[rgba(255,255,255,0.06)] active:bg-[rgba(255,255,255,0.1)]"
