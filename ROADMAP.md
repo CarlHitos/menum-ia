@@ -23,6 +23,7 @@
 - Guardado de recetas y preferencias
 
 ## Fase 4 — Mejoras funcionales
+- Edición del hogar y sus comidas del día: activar/desactivar momentos desde ajustes, sincronizando menú y compra sin perder elecciones previas. Primera prioridad de esta fase; alcance y criterios en `TASKS.md`.
 - Repetir semana
 - Historial
 - Favoritos

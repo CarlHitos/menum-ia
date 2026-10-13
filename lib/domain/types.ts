@@ -1,6 +1,6 @@
 export type Goal = "gain" | "lose" | "maintain" | "eat-better";
 
-export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
+export type MealType = "breakfast" | "mid-morning" | "lunch" | "dinner" | "snack";
 
 export type PlanningStartMode = "today" | "next-monday";
 

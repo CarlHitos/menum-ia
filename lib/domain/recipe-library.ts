@@ -9,11 +9,15 @@ export const recipeSeasonLabels: Record<RecipeSeason, string> = {
   all_year: "Todo el año", spring: "Primavera", summer: "Verano", autumn: "Otoño", winter: "Invierno",
 };
 export function getRecipeMetadata(recipe: Recipe) {
-  return recipe.catalogMetadata ?? {
-    kind: recipe.category === "breakfast" ? "breakfast" as const : recipe.category === "snack" ? "dessert" as const : "meal" as const,
+  const metadata = recipe.catalogMetadata ?? {
+    kind: recipe.category === "breakfast" ? "breakfast" as const : recipe.category === "snack" || recipe.category === "mid-morning" ? "dessert" as const : "meal" as const,
     season: "all_year" as const,
     mealTypes: [recipe.category],
   };
+  // Shared eligibility applies equally to imported JSON and persisted recipes.
+  return metadata.mealTypes.includes("snack") && !metadata.mealTypes.includes("mid-morning")
+    ? { ...metadata, mealTypes: [...metadata.mealTypes, "mid-morning" as const] }
+    : metadata;
 }
 export function canPlanRecipe(recipe: Recipe, mealType: MealType) {
   return getRecipeMetadata(recipe).mealTypes.includes(mealType);

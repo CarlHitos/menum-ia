@@ -477,7 +477,7 @@ El proyecto ya usa lógica derivada para:
 Aunque el modelo conceptual objetivo es más amplio, el estado implementado aún simplifica varios puntos:
 
 - el onboarding usa `OnboardingDraft` como entrada editable y persiste hogar y miembros a través de la API
-- la vista semanal incluye desayuno, comida, snack y cena según las preferencias del hogar
+- la vista semanal incluye desayuno, media mañana, comida, merienda y cena según las preferencias del hogar; media mañana es opcional y `snack` conserva su identificador interno para merienda
 - la shopping list todavía es una derivación local y no guarda edición manual persistente
 - el progreso del modo cocinar es solo local de sesión
 

@@ -1,3 +1,4 @@
+import { mealTypeLabels, mealTypeOrder } from "@/lib/domain/meal-types";
 import type { MealTag, MealType, Recipe, WeeklyPlan } from "@/lib/domain/types";
 import { recipeContextQuery } from "@/lib/domain/plan-servings";
 
@@ -26,15 +27,6 @@ export type WeeklyPlanPreviewDay = {
   fullDateLabel: string;
   activeSlots: number;
   slots: WeeklyPlanPreviewSlot[];
-};
-
-const mealTypeOrder: MealType[] = ["breakfast", "lunch", "snack", "dinner"];
-
-const mealTypeLabels: Record<MealType, string> = {
-  breakfast: "Desayuno",
-  lunch: "Comida",
-  snack: "Snack / merienda",
-  dinner: "Cena",
 };
 
 const tagLabels: Record<MealTag, string> = {

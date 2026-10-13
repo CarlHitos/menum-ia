@@ -1,3 +1,7 @@
+import { isMealType } from "@/lib/domain/meal-types";
+import { resolvePlanServings } from "@/lib/domain/plan-servings";
+import { getLatestWeeklyPlanByHouseholdId, saveWeeklyPlan } from "@/lib/dal/plans";
+import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/auth";
@@ -8,6 +12,7 @@ import {
   updateHouseholdBasics,
 } from "@/lib/dal/households";
 import {
+  buildHouseholdFromPersistence,
   buildHouseholdMemberPersistenceInput,
   buildHouseholdPersistenceInput,
 } from "@/lib/domain/household-mappers";
@@ -49,6 +54,21 @@ export async function PUT(request: Request) {
     buildHouseholdMemberPersistenceInput(draft),
   );
 
+  const mealsChanged = existingHousehold && (
+    existingHousehold.mealsPerDay.length !== householdInput.mealsPerDay.length ||
+    existingHousehold.mealsPerDay.some((meal) => !householdInput.mealsPerDay.some((selected) => selected === meal))
+  );
+  if (mealsChanged) {
+    const plan = await getLatestWeeklyPlanByHouseholdId(household.id);
+    if (plan) {
+      const persisted = await getHouseholdWithMembersByOwnerUserId(session.user.id);
+      if (!persisted) return NextResponse.json({ error: "Household not found" }, { status: 404 });
+      const resolved = resolvePlanServings(plan, buildHouseholdFromPersistence(persisted.household, persisted.members));
+      const saved = await saveWeeklyPlan({ ...resolved, status: "draft", updatedAt: new Date().toISOString() });
+      if (!saved) return NextResponse.json({ error: "Plan conflict" }, { status: 409 });
+    }
+  }
+
   return NextResponse.json({ ok: true, householdId: household.id });
 }
 
@@ -77,6 +97,8 @@ function isValidOnboardingDraftPayload(value: unknown): value is OnboardingDraft
     ) &&
     Array.isArray(draft.mealsPerDay) &&
     draft.mealsPerDay.length > 0 &&
+    draft.mealsPerDay.every(isMealType) &&
+    new Set(draft.mealsPerDay).size === draft.mealsPerDay.length &&
     typeof draft.weeklyBudget === "string" &&
     (draft.cookingLoad === "low" ||
       draft.cookingLoad === "medium" ||
