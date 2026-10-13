@@ -141,7 +141,7 @@ export function WeeklyMenu({
                         {slot.mealLabel}
                       </p>
                       {slot.servings ? (
-                        <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-muted)]">
+                        <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-paper)]/85">
                           {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
                         </span>
                       ) : null}
@@ -177,7 +177,7 @@ export function WeeklyMenu({
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[rgba(252,163,17,0.35)] bg-[rgba(252,163,17,0.16)] px-4 py-2.5 text-sm font-semibold text-[var(--color-accent-soft)] transition hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.24)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:bg-[var(--color-accent)] active:text-slate-950"
+                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--color-accent)] bg-[var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:brightness-95"
                     >
                       Ver receta
                     </Link>
