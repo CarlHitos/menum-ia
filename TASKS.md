@@ -38,9 +38,10 @@ Las listas generales que siguen contienen tareas históricas pendientes de revis
 - [ ] Crear lista de compra por categorías
 
 ## Producto
+- [x] Adaptar las recetas de la V1 para cocinarlas de forma independiente, retirar mensajes de reutilización y alinear la compra; ver `docs/standalone-recipes-v1.md`.
 - [ ] Soportar ajustes de ración por persona
-- [ ] Soportar batch cooking
-- [ ] Soportar aprovechamiento de sobras
+- [ ] Soportar batch cooking (fase posterior a la V1)
+- [ ] Soportar aprovechamiento de sobras (fase posterior a la V1)
 - [ ] Permitir repetir semanas
 
 ## Datos y auth

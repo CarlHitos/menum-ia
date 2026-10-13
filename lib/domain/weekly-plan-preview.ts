@@ -88,7 +88,7 @@ export function buildWeeklyPlanPreview(
         servings: slot.servings,
         title: recipe.title,
         minutes: recipe.durationMinutes,
-        description: buildSlotDescription(slot.tags, recipe.description),
+        description: recipe.description,
         badges: slot.tags.map((tag) => ({
           tag,
           label: tagLabels[tag],
@@ -158,22 +158,6 @@ export function getTagGuide() {
       description: tagDescriptions["quick-dinner"],
     },
   ];
-}
-
-function buildSlotDescription(tags: MealTag[], fallbackDescription: string) {
-  if (tags.includes("batch-friendly")) {
-    return "Ideal para cocinar de mas y dejar otra comida medio resuelta.";
-  }
-
-  if (tags.includes("uses-leftovers")) {
-    return "Perfecta para aprovechar lo que ya teneis preparado.";
-  }
-
-  if (tags.includes("quick-dinner")) {
-    return "Opcion ligera y sin complicaciones para resolver el dia.";
-  }
-
-  return fallbackDescription;
 }
 
 function addDaysToDate(dateString: string, days: number) {

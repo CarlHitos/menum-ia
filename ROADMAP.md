@@ -28,7 +28,7 @@
 - Historial
 - Favoritos
 - Edición manual de menús
-- Gestión de sobras y batch cooking
+- Gestión de sobras y batch cooking, posterior a la V1 de recetas independientes
 
 ## Fase 5 — IA contextual
 - Chat con contexto del hogar
