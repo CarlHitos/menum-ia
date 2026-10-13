@@ -52,7 +52,6 @@ export function WeeklyMenu({
     () => defaultDayKey,
   );
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
-  const [openInfoSlotId, setOpenInfoSlotId] = useState<string | null>(null);
 
   const selectedDay =
     plan.find((day) => day.dayKey === (selectedDayKey ?? restoredDayKey)) ?? plan[0] ?? null;
@@ -91,7 +90,6 @@ export function WeeklyMenu({
                   setSelectedDayKey(day.dayKey);
                   if (viewKey) rememberMenuDay(viewKey, day.dayKey);
                   onDayChange?.();
-                  setOpenInfoSlotId(null);
                 }}
                 aria-pressed={isSelected}
                 className={`flex min-h-12 items-center justify-center rounded-2xl px-2 py-3 transition ${
@@ -119,7 +117,6 @@ export function WeeklyMenu({
 
       <div className="grid gap-3">
         {selectedDay.slots.map((slot) => {
-          const infoOpen = openInfoSlotId === slot.id;
           const isSelected = selectedSlotId === slot.id;
 
           return (
@@ -199,54 +196,7 @@ export function WeeklyMenu({
                       {isSelected ? "Editando" : "Editar"}
                     </button>
                   ) : null}
-
-                  {slot.badges.length ? (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setOpenInfoSlotId((current) =>
-                          current === slot.id ? null : slot.id,
-                        );
-                      }}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border)] text-sm font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
-                      aria-label={`Mas informacion sobre ${slot.title}`}
-                    >
-                      i
-                    </button>
-                  ) : null}
                 </div>
-
-              {slot.badges.length ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {slot.badges.map((badge) => (
-                    <span
-                      key={badge.tag}
-                      className="rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-[var(--color-muted)]"
-                    >
-                      {badge.label}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-
-              {infoOpen ? (
-                <div className="mt-3 rounded-2xl bg-[rgba(255,255,255,0.05)] px-3 py-3">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-                    Informacion del bloque
-                  </p>
-                  <div className="mt-2 space-y-2 text-sm leading-6 text-[var(--color-muted)]">
-                    {slot.badges.map((badge) => (
-                      <p key={badge.tag}>
-                        <span className="font-semibold text-[var(--color-paper)]">
-                          {badge.label}:
-                        </span>{" "}
-                        {badge.description}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
               </div>
             </div>
           );
