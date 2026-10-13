@@ -136,13 +136,15 @@ export function WeeklyMenu({
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
                         {slot.mealLabel}
                       </p>
-                      <span className="inline-flex min-w-20 items-center justify-center rounded-full bg-[rgba(255,255,255,0.08)] px-2 py-1 text-center text-[10px] font-semibold text-[var(--color-accent-soft)]">
-                        {selectedDay.shortLabel} · {selectedDay.dateLabel}
-                      </span>
+                      {slot.servings ? (
+                        <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-muted)]">
+                          {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
+                        </span>
+                      ) : null}
                     </div>
                     <h3 className="mt-3 text-lg font-semibold leading-tight text-[var(--color-paper)]">
                       {slot.title}
@@ -167,8 +169,7 @@ export function WeeklyMenu({
                   </p>
                 ) : null}
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {slot.servings ? <span className="text-xs text-[var(--color-muted)]">{slot.servings} comensales</span> : null}
+                <div className="flex items-center gap-3">
                   {slot.status === "planned" && slot.recipeId ? (
                     <Link
                       href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
@@ -176,7 +177,7 @@ export function WeeklyMenu({
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
+                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[rgba(252,163,17,0.35)] bg-[rgba(252,163,17,0.16)] px-4 py-2.5 text-sm font-semibold text-[var(--color-accent-soft)] transition hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.24)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:bg-[var(--color-accent)] active:text-slate-950"
                     >
                       Ver receta
                     </Link>
@@ -186,12 +187,11 @@ export function WeeklyMenu({
                     <button
                       type="button"
                       onClick={() => onSelectSlot(slot.id)}
-                      className={`inline-flex items-center justify-center rounded-full border px-3 py-2 font-semibold uppercase transition ${
+                      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full border px-4 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                         isSelected
-                          ? "border-[rgba(252,163,17,0.55)] bg-[var(--color-accent)] text-slate-950"
-                          : "border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] text-[var(--color-paper)] hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
+                          ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.08)] text-[var(--color-accent-soft)]"
+                          : "border-[var(--color-border)] text-[var(--color-paper)] hover:bg-[rgba(255,255,255,0.06)] active:bg-[rgba(255,255,255,0.1)]"
                       }`}
-                      style={{ fontSize: "11px", letterSpacing: "0.1em" }}
                     >
                       {isSelected ? "Editando" : "Editar"}
                     </button>
