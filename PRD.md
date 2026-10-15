@@ -243,6 +243,8 @@ La interfaz debe ser:
 
 ## 8. MVP
 
+Alcance de la primera versión: cada receta se cocina de forma independiente. La reutilización de alimentos preparados entre comidas y el batch cooking automatizado quedan para una fase posterior. Sus metadatos pueden conservarse internamente, pero la UI y los pasos de cocina no deben presuponer preparaciones de otro día.
+
 El MVP debe incluir:
 
 1. onboarding del hogar

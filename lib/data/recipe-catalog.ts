@@ -1,6 +1,7 @@
+import { normalizeStandaloneRecipe } from "@/lib/domain/standalone-recipes";
 import type { Recipe } from "@/lib/domain/types";
 
-export const recipes: Recipe[] = [
+const originalRecipes: Recipe[] = [
   {
     id: "avena-yogur-fruta",
     title: "Avena cremosa con yogur y fruta",
@@ -1307,6 +1308,8 @@ export const recipes: Recipe[] = [
     leftoverNotes: "Pensada para consumir lo pendiente antes de reiniciar la semana base.",
   },
 ];
+
+export const recipes = originalRecipes.map(normalizeStandaloneRecipe);
 
 export const recipesById = Object.fromEntries(
   recipes.map((recipe) => [recipe.id, recipe]),

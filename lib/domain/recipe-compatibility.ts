@@ -1,3 +1,4 @@
+import { normalizeStandaloneRecipe } from "@/lib/domain/standalone-recipes";
 import type { Recipe } from "@/lib/domain/types";
 
 // Read-time upgrade for the original catalogue already stored in JSON columns.
@@ -8,7 +9,7 @@ const exactIngredientIds = new Set([
 ]);
 
 export function normalizeRecipeForServings(recipe: Recipe): Recipe {
-  return {
+  return normalizeStandaloneRecipe({
     ...recipe,
     portionAdjustments: recipe.portionAdjustments.filter(
       (adjustment) => !["carlos", "mandy", "sergi"].includes(adjustment.memberId),
@@ -25,5 +26,5 @@ export function normalizeRecipeForServings(recipe: Recipe): Recipe {
       detail: step.detail.replace(/en tres (bols|recipientes|cuencos)/g, "entre los comensales")
         .replace(/entre los tres bowls/g, "entre los comensales"),
     })),
-  };
+  });
 }
