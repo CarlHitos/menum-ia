@@ -241,6 +241,21 @@ export function isOnboardingComplete(userId?: string) {
   }
 }
 
+// Account deletion only clears this user's data, never other local accounts.
+export function clearOnboardingState(userId: string) {
+  clearOnboardingDraft(userId);
+
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(getStorageKey(COMPLETION_KEY_V1, userId));
+  } catch {
+    // Storage may be unavailable; session revocation must still proceed.
+  }
+}
+
 export function setOnboardingComplete(
   completed: boolean,
   userId?: string,

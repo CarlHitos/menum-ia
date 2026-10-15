@@ -10,6 +10,8 @@ import {
   verificationTokens,
 } from "@/db/schema";
 import { getServerEnv } from "@/lib/server/env";
+import { getUserById } from "@/lib/dal/users";
+import { createSessionCallbacks } from "@/lib/auth/session-validation";
 
 const env = getServerEnv();
 
@@ -28,15 +30,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  callbacks: {
-    session({ session, token }) {
-      if (session.user && token.sub) {
-        session.user.id = token.sub;
-      }
-
-      return session;
-    },
-  },
+  callbacks: createSessionCallbacks(getUserById),
   providers: [
     GoogleProvider({
       clientId: env.authGoogleId,
