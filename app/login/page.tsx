@@ -7,6 +7,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
 import { SectionCard } from "@/components/ui/section-card";
 import { GoogleSignInButton } from "@/features/auth/google-sign-in-button";
+import { InvalidSessionCleanup } from "@/features/auth/invalid-session-cleanup";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -21,7 +22,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const error = params.error;
   const session = await getServerSession(authOptions);
 
-  if (session) {
+  if (session?.user?.id) {
     redirect(callbackUrl);
   }
 
@@ -47,7 +48,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           Sincroniza tu hogar para acceder a tus menus desde cualquier dispositivo.
         </p>
 
-        <GoogleSignInButton callbackUrl={callbackUrl} />
+        {session?.invalidUserId ? (
+          <InvalidSessionCleanup userId={session.invalidUserId} />
+        ) : (
+          <GoogleSignInButton callbackUrl={callbackUrl} />
+        )}
 
         {error ? (
           <p className="mt-3 rounded-2xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-center text-xs leading-5 text-red-100">
