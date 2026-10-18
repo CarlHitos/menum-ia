@@ -2,8 +2,6 @@
 
 import { useStepNavigation } from "@/lib/ui/use-step-navigation";
 import Link from "next/link";
-import { formatRecipeAmount } from "@/features/recipes/ingredient-amount";
-import { scaleRecipeIngredients } from "@/lib/domain/portioning";
 import { useEffect, useState } from "react";
 import type { Recipe } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
@@ -15,7 +13,6 @@ type CookingModeProps = {
 };
 
 export function CookingMode({ recipe, requestedServings, contextQuery = "" }: CookingModeProps) {
-  const ingredients = scaleRecipeIngredients(recipe, requestedServings);
   const [activeStep, setActiveStep] = useState(0);
   const [reviewing, setReviewing] = useState(false);
   const initialSeconds = recipe.steps[0]?.timerSeconds ?? 0;
@@ -109,27 +106,11 @@ export function CookingMode({ recipe, requestedServings, contextQuery = "" }: Co
 
   return (
     <div className="space-y-4">
-      <SectionCard>
-        <details>
-          <summary className="cursor-pointer py-2 font-semibold">Ingredientes para {requestedServings} {requestedServings === 1 ? "comensal" : "comensales"}</summary>
-          <ul className="mt-3 space-y-2 text-sm">
-            {ingredients.map((ingredient) => (
-              <li key={ingredient.id} className="flex justify-between gap-3">
-                <span>{ingredient.name}</span>
-                <span>{formatRecipeAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}</span>
-              </li>
-            ))}
-          </ul>
-        </details>
-      </SectionCard>
       <div ref={stepStartRef} tabIndex={-1} role="group" aria-label={`Paso ${activeStep + 1} de ${recipe.steps.length}`} className="scroll-mt-6 outline-none">
         <SectionCard className="border-[rgba(252,163,17,0.4)] bg-[linear-gradient(135deg,rgba(252,163,17,0.24),rgba(255,255,255,0.1))] shadow-[0_0_0_1px_rgba(252,163,17,0.12)]">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-                Paso {activeStep + 1} de {recipe.steps.length}
-              </p>
-              <h2 className="mt-2 break-words font-display text-2xl font-semibold leading-tight text-[var(--color-paper)]">
+              <h2 className="break-words font-display text-2xl font-semibold leading-tight text-[var(--color-paper)]">
                 {currentStep.title}
               </h2>
             </div>

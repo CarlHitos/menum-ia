@@ -6,10 +6,12 @@
   singular/plural de comensales, título «Pasos a seguir» y un único CTA inferior
   «Abrir modo cocinar» a todo el ancho útil de la tarjeta.
 - Cocinar: salida explícita a la receta manteniendo `planId` y `slotId`, singular
-  de comensal y navegación compacta de pasos mediante botones numerados. El título
-  y estado de cada paso siguen disponibles en su etiqueta accesible.
+  de ración al servir y navegación compacta de pasos mediante botones numerados.
+  La tarjeta activa muestra únicamente el título de la acción; el contexto de
+  paso se mantiene en los chips, el progreso y las etiquetas accesibles. Los
+  ingredientes se consultan en el detalle de receta, sin repetirlos al cocinar.
 - Al completar todos los pasos, la tarjeta de éxito sustituye al paso activo,
-  ingredientes, temporizador y controles de pasos. Muestra «Sirve la preparación
+  temporizador y controles de pasos. Muestra «Sirve la preparación
   (1 ración)» o su plural, un único CTA «¡A comer!» y una opción para revisar.
 - Revisar conserva los pasos completados; permite saltar a cualquiera, deshacer
   su finalización y volver al resumen final. Los temporizadores se detienen al
@@ -18,7 +20,7 @@
 
 ## Cantidades de presentación
 
-`features/recipes/ingredient-amount.ts` se comparte entre detalle y cocina.
+`features/recipes/ingredient-amount.ts` formatea los ingredientes del detalle.
 Expresa unidades habituales como fracciones (por ejemplo, `0.67 ud` como `2/3 ud`)
 y cantidades fraccionarias de peso/volumen con incrementos prácticos. Conserva
 los gramos/mililitros enteros y la precisión útil de ingredientes pequeños:

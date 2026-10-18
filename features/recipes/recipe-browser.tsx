@@ -1,38 +1,76 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { filterRecipes, getRecipeMetadata, recipeKindLabels, recipeSeasonLabels } from "@/lib/domain/recipe-library";
 import type { MealType, Recipe, RecipeKind, RecipeSeason } from "@/lib/domain/types";
 
-type Props = { recipes: Recipe[]; mealType?: MealType; selectedId?: string; onSelect?: (recipe: Recipe) => void };
-export function RecipeBrowser({ recipes, mealType, selectedId, onSelect }: Props) {
+type Props = {
+  recipes: Recipe[];
+  mealType?: MealType;
+  selectedId?: string;
+  onSelect?: (recipe: Recipe) => void;
+  layout?: "page" | "sheet";
+  leadingControls?: ReactNode;
+};
+
+export function RecipeBrowser({ recipes, mealType, selectedId, onSelect, layout = "page", leadingControls }: Props) {
   const id = useId();
+  const sheet = layout === "sheet";
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<RecipeKind | "">("");
   const [season, setSeason] = useState<RecipeSeason | "">("");
+  const [difficulty, setDifficulty] = useState<Recipe["difficulty"] | "">("");
   const [maxMinutes, setMaxMinutes] = useState(0);
   const [limit, setLimit] = useState(20);
-  const visible = useMemo(() => filterRecipes(recipes, { query, kind, season, maxMinutes, mealType }), [recipes, query, kind, season, maxMinutes, mealType]);
+  const visible = useMemo(() => filterRecipes(recipes, { query, kind, season, difficulty, maxMinutes, mealType }), [recipes, query, kind, season, difficulty, maxMinutes, mealType]);
   const kinds = Object.keys(recipeKindLabels).filter((value) => recipes.some((recipe) => getRecipeMetadata(recipe).kind === value && (!mealType || getRecipeMetadata(recipe).mealTypes.includes(mealType)))) as RecipeKind[];
-  const inputClass = "min-h-11 w-full min-w-0 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-paper)]";
-  return <div className="mt-4 space-y-3">
-    <label className="block text-sm" htmlFor={`${id}-search`}>Buscar por receta o ingrediente</label>
-    <input id={`${id}-search`} type="search" placeholder="Por ejemplo: pollo, lentejas, aguacate…" value={query} onChange={(event) => { setQuery(event.target.value); setLimit(20); }} className={inputClass} />
-    <div className="grid grid-cols-2 gap-3">
-      <label className="text-xs text-[var(--color-muted)]">Tipo<select className={`${inputClass} mt-1`} value={kind} onChange={(event) => { setKind(event.target.value as RecipeKind | ""); setLimit(20); }}><option value="">Todos los tipos</option>{kinds.map((value) => <option key={value} value={value}>{recipeKindLabels[value]}</option>)}</select></label>
-      <label className="text-xs text-[var(--color-muted)]">Temporada<select className={`${inputClass} mt-1`} value={season} onChange={(event) => { setSeason(event.target.value as RecipeSeason | ""); setLimit(20); }}><option value="">Todas</option>{Object.entries(recipeSeasonLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-      <label className="col-span-2 text-xs text-[var(--color-muted)]">Tiempo de preparación<select className={`${inputClass} mt-1`} value={maxMinutes} onChange={(event) => { setMaxMinutes(Number(event.target.value)); setLimit(20); }}><option value={0}>Cualquier duración</option><option value={15}>Hasta 15 minutos</option><option value={30}>Hasta 30 minutos</option><option value={45}>Hasta 45 minutos</option></select></label>
+  const inputClass = `min-h-11 w-full min-w-0 rounded-xl border border-[var(--color-border)] ${sheet ? "bg-[var(--color-ink)]" : "bg-[var(--color-card)]"} px-3 text-sm text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]`;
+
+  function resetResults() {
+    setLimit(20);
+    if (resultsRef.current) resultsRef.current.scrollTop = 0;
+  }
+
+  return (
+    <div className={sheet ? "flex min-h-0 flex-1 flex-col" : "mt-4 space-y-3"}>
+      <div className={sheet ? "max-h-[55dvh] shrink-0 space-y-3 overflow-y-auto overscroll-contain border-b border-[var(--color-border)] px-4 pb-3" : "space-y-3"}>
+        {leadingControls}
+        <div>
+          <label className="mb-1 block text-sm" htmlFor={`${id}-search`}>Buscar por receta o ingrediente</label>
+          <input id={`${id}-search`} type="search" placeholder="Por ejemplo: pollo, lentejas, aguacate…" value={query} onChange={(event) => { setQuery(event.target.value); resetResults(); }} className={inputClass} />
+        </div>
+        <div className={`grid gap-2 ${sheet ? "grid-cols-3" : "grid-cols-2"}`}>
+          <label className="min-w-0 text-xs text-[var(--color-muted)]">Tipo<select className={`${inputClass} mt-1`} value={kind} onChange={(event) => { setKind(event.target.value as RecipeKind | ""); resetResults(); }}><option value="">{sheet ? "Todos" : "Todos los tipos"}</option>{kinds.map((value) => <option key={value} value={value}>{recipeKindLabels[value]}</option>)}</select></label>
+          {!sheet ? <label className="text-xs text-[var(--color-muted)]">Temporada<select className={`${inputClass} mt-1`} value={season} onChange={(event) => { setSeason(event.target.value as RecipeSeason | ""); resetResults(); }}><option value="">Todas</option>{Object.entries(recipeSeasonLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label> : null}
+          <label className={`${sheet ? "" : "col-span-2"} min-w-0 text-xs text-[var(--color-muted)]`}>{sheet ? "Tiempo" : "Tiempo de preparación"}<select className={`${inputClass} mt-1`} value={maxMinutes} onChange={(event) => { setMaxMinutes(Number(event.target.value)); resetResults(); }}><option value={0}>{sheet ? "Cualquiera" : "Cualquier duración"}</option><option value={15}>{sheet ? "≤ 15 min" : "Hasta 15 minutos"}</option><option value={30}>{sheet ? "≤ 30 min" : "Hasta 30 minutos"}</option><option value={45}>{sheet ? "≤ 45 min" : "Hasta 45 minutos"}</option></select></label>
+          {sheet ? <label className="min-w-0 text-xs text-[var(--color-muted)]">Dificultad<select className={`${inputClass} mt-1`} value={difficulty} onChange={(event) => { setDifficulty(event.target.value as Recipe["difficulty"] | ""); resetResults(); }}><option value="">Todas</option><option value="easy">Fácil</option><option value="medium">Media</option></select></label> : null}
+        </div>
+        <p role="status" className="text-sm text-[var(--color-muted)]">{visible.length} {visible.length === 1 ? "receta" : "recetas"}{season && season !== "all_year" ? " · Incluye recetas de todo el año" : ""}</p>
+      </div>
+      <div ref={resultsRef} role={sheet ? "region" : undefined} aria-label={sheet ? "Recetas alternativas" : undefined} tabIndex={sheet ? 0 : undefined} className={sheet ? "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]" : "space-y-3"}>
+        {visible.length === 0 ? <p className="py-4 text-sm">No hay recetas con estos filtros. Prueba otro ingrediente o amplía la búsqueda.</p> : null}
+        <div className="grid gap-3">{visible.slice(0, limit).map((recipe) => {
+          const metadata = getRecipeMetadata(recipe);
+          const active = recipe.id === selectedId;
+          const contents = <><p className="font-semibold">{recipe.title}</p><p className="mt-2 text-xs text-[var(--color-muted)]">{recipeKindLabels[metadata.kind]} · {recipe.durationMinutes} min · {recipeSeasonLabels[metadata.season]}</p>{onSelect && !sheet ? <p className="mt-3 text-sm text-[var(--color-accent-soft)]">{active ? "Receta actual" : "Usar en esta comida"}</p> : null}</>;
+          const className = `block rounded-2xl border p-4 text-left ${active ? "border-[var(--color-accent)] bg-[rgba(252,163,17,0.12)]" : "border-[var(--color-border)] bg-[rgba(255,255,255,0.05)]"}`;
+          if (sheet && onSelect) return (
+            <div key={recipe.id} className={className}>
+              {contents}
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <span className="text-xs text-[var(--color-muted)]">{recipe.difficulty === "easy" ? "Fácil" : "Media"}</span>
+                <button type="button" disabled={active} aria-label={active ? `Receta actual: ${recipe.title}` : `Reemplazar por ${recipe.title}`} onClick={() => onSelect(recipe)} className="min-h-11 rounded-full bg-[var(--color-accent)] px-4 text-sm font-semibold text-slate-950 disabled:bg-[rgba(255,255,255,0.08)] disabled:text-[var(--color-muted)]">
+                  {active ? "Receta actual" : "Reemplazar"}
+                </button>
+              </div>
+            </div>
+          );
+          return onSelect ? <button key={recipe.id} type="button" className={className} disabled={active} onClick={() => onSelect(recipe)}>{contents}</button> : <Link key={recipe.id} href={`/recipes/${recipe.id}`} className={className}>{contents}</Link>;
+        })}</div>
+        {visible.length > limit ? <button type="button" onClick={() => setLimit(limit + 20)} className="mt-3 min-h-11 w-full rounded-full border border-[var(--color-border)] text-sm">Ver más recetas</button> : null}
+      </div>
     </div>
-    <p role="status" className="text-sm text-[var(--color-muted)]">{visible.length} {visible.length === 1 ? "receta" : "recetas"}{season && season !== "all_year" ? " · Incluye recetas de todo el año" : ""}</p>
-    {visible.length === 0 ? <p className="py-4 text-sm">No hay recetas con estos filtros. Prueba otro ingrediente o amplía la búsqueda.</p> : null}
-    <div className="grid gap-3">{visible.slice(0, limit).map((recipe) => {
-      const metadata = getRecipeMetadata(recipe);
-      const active = recipe.id === selectedId;
-      const contents = <><p className="font-semibold">{recipe.title}</p><p className="mt-2 text-xs text-[var(--color-muted)]">{recipeKindLabels[metadata.kind]} · {recipe.durationMinutes} min · {recipeSeasonLabels[metadata.season]}</p>{onSelect ? <p className="mt-3 text-sm text-[var(--color-accent-soft)]">{active ? "Receta actual" : "Usar en esta comida"}</p> : null}</>;
-      const className = `block rounded-2xl border p-4 text-left ${active ? "border-[var(--color-accent)] bg-[rgba(252,163,17,0.12)]" : "border-[var(--color-border)] bg-[rgba(255,255,255,0.05)]"}`;
-      return onSelect ? <button key={recipe.id} type="button" className={className} disabled={active} onClick={() => onSelect(recipe)}>{contents}</button> : <Link key={recipe.id} href={`/recipes/${recipe.id}`} className={className}>{contents}</Link>;
-    })}</div>
-    {visible.length > limit ? <button type="button" onClick={() => setLimit(limit + 20)} className="min-h-11 w-full rounded-full border border-[var(--color-border)] text-sm">Ver más recetas</button> : null}
-  </div>;
+  );
 }

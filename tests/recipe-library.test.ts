@@ -67,6 +67,14 @@ test("components never replace full meals; bowls work for lunch and dinner and o
   }
   for (const recipe of recipes) assert.equal(canPlanRecipe(recipe, recipe.category), true);
 });
+test("difficulty combines with meal eligibility and time without admitting standalone components", () => {
+  for (const difficulty of ["easy", "medium"] as const) {
+    const results = filterRecipes(catalog, { difficulty, mealType: "lunch", maxMinutes: 45 });
+    assert.ok(results.length > 0);
+    assert.ok(results.every((recipe) => recipe.difficulty === difficulty && recipe.durationMinutes <= 45 && canPlanRecipe(recipe, "lunch")));
+    assert.ok(results.every((recipe) => !["side", "sauce", "protein", "sharing"].includes(getRecipeMetadata(recipe).kind)));
+  }
+});
 test("new recipes feed real weekly quantities and consolidate shared ingredients before purchase rounding", () => {
   const selected = expandedRecipes.filter((recipe) => recipe.title.startsWith("Bol de quinoa"));
   assert.equal(selected.length, 2);

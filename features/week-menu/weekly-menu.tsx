@@ -2,7 +2,7 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useId, useMemo, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -45,6 +45,8 @@ export function WeeklyMenu({
   initialDayKey = null,
   onOpenRecipe,
 }: WeeklyMenuProps) {
+  const descriptionIdPrefix = useId();
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(() => new Set());
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
       return initialDayKey;
@@ -126,6 +128,9 @@ export function WeeklyMenu({
       <div className="grid gap-3">
         {selectedDay.slots.map((slot) => {
           const isSelected = selectedSlotId === slot.id;
+          const descriptionKey = `${slot.id}:${slot.recipeId ?? ""}:${slot.description ?? ""}`;
+          const descriptionExpanded = expandedDescriptions.has(descriptionKey);
+          const descriptionId = `${descriptionIdPrefix}-description-${slot.id}`;
 
           return (
             <div
@@ -133,7 +138,7 @@ export function WeeklyMenu({
               id={`meal-${slot.id}`}
               tabIndex={-1}
               aria-label={`${slot.mealLabel}: ${slot.title}`}
-              className={`rounded-2xl border px-4 py-4 transition ${
+              className={`relative isolate rounded-2xl border px-4 py-4 transition-colors ${
                 slot.status === "planned"
                   ? isSelected
                     ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.1)]"
@@ -152,6 +157,26 @@ export function WeeklyMenu({
                         <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-paper)]/85">
                           {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
                         </span>
+                      ) : null}
+                      {slot.description ? (
+                        <button
+                          type="button"
+                          aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
+                          aria-expanded={descriptionExpanded}
+                          aria-controls={descriptionId}
+                          onClick={() => setExpandedDescriptions((current) => {
+                            const next = new Set(current);
+                            if (next.has(descriptionKey)) next.delete(descriptionKey);
+                            else next.add(descriptionKey);
+                            return next;
+                          })}
+                          className={`relative z-10 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
+                        >
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
+                            <circle cx="12" cy="12" r="9" />
+                            <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
+                          </svg>
+                        </button>
                       ) : null}
                     </div>
                     <h3 className="mt-3 text-lg font-semibold leading-tight text-[var(--color-paper)]">
@@ -172,7 +197,7 @@ export function WeeklyMenu({
                 </div>
 
                 {slot.description ? (
-                  <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  <p id={descriptionId} hidden={!descriptionExpanded} className="text-sm leading-6 text-[var(--color-muted)]">
                     {slot.description}
                   </p>
                 ) : null}
@@ -181,12 +206,13 @@ export function WeeklyMenu({
                   {slot.status === "planned" && slot.recipeId ? (
                     <Link
                       style={mealActionTypography}
+                      aria-label={`Ver receta: ${slot.title}`}
                       href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
                       onClick={onOpenRecipe ? (event) => {
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-4 py-2.5 text-[var(--color-paper)] transition-all duration-150 ease-in-out hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:scale-95 active:bg-[var(--color-accent)] active:text-slate-950"
+                      className="inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] px-4 py-2.5 text-[var(--color-paper)] transition-colors duration-150 after:absolute after:inset-0 after:rounded-2xl after:content-[''] hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-accent)] active:bg-[rgba(252,163,17,0.18)]"
                     >
                       Ver receta
                     </Link>
@@ -195,15 +221,19 @@ export function WeeklyMenu({
                   {onSelectSlot ? (
                     <button
                       type="button"
-                      style={mealActionTypography}
+                      aria-label={`Cambiar comida: ${slot.title}`}
+                      aria-pressed={isSelected}
+                      title={isSelected ? "Editando comida" : "Cambiar comida"}
                       onClick={() => onSelectSlot(slot.id)}
-                      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full border px-4 py-2.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+                      className={`relative z-10 inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                         isSelected
                           ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.08)] text-[var(--color-accent-soft)]"
                           : "border-[var(--color-border)] text-[var(--color-paper)] hover:bg-[rgba(255,255,255,0.06)] active:bg-[rgba(255,255,255,0.1)]"
                       }`}
                     >
-                      {isSelected ? "Editando" : "Editar"}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 3a2.83 2.83 0 0 1 4 4L7 20l-4 1 1-4Z M14 5l4 4" />
+                      </svg>
                     </button>
                   ) : null}
                 </div>

@@ -5,7 +5,7 @@ import { focusStepStart } from "@/lib/ui/step-navigation";
 import { useRouter } from "next/navigation";
 import { resolvePlanServings, updateSlotServings } from "@/lib/domain/plan-servings";
 import { useEffect, useRef, useState } from "react";
-import { RecipeBrowser } from "@/features/recipes/recipe-browser";
+import { MealEditorSheet } from "@/features/week-menu/meal-editor-sheet";
 import { SectionCard } from "@/components/ui/section-card";
 import { StatPill } from "@/components/ui/stat-pill";
 import { WeeklyMenu } from "@/features/week-menu/weekly-menu";
@@ -19,7 +19,6 @@ import type {
 } from "@/lib/domain/types";
 import {
   buildWeeklyPlanPreview,
-  formatMealTypeLabel,
 } from "@/lib/domain/weekly-plan-preview";
 import {
   buildActivePlanFromTemplate,
@@ -45,7 +44,6 @@ export function DashboardClient({
   const [plan, setPlan] = useState<WeeklyPlan | null>(initialPlan);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const saveErrorRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<HTMLDivElement | null>(null);
   const saveQueue = useRef<Promise<void>>(Promise.resolve());
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -62,17 +60,7 @@ export function DashboardClient({
   const hasChangesAfterConfirmation =
     plan?.status === "draft" && Boolean(plan.confirmedAt);
   const selectedSlot = findSlotById(plan, selectedSlotId);
-  const selectedRecipe = selectedSlot
-    ? recipes.find((recipe) => recipe.id === selectedSlot.recipeId) ?? null
-    : null;
-
-  useEffect(() => {
-    if (!selectedSlotId || !editorRef.current) {
-      return;
-    }
-
-    focusStepStart(editorRef.current);
-  }, [selectedSlotId]);
+  const selectedDayLabel = weeklyPlanPreview.find((day) => day.slots.some((slot) => slot.id === selectedSlotId))?.fullDateLabel ?? "";
 
   const returnPosition = useRef<{ key: string; position: number | null } | null>(null);
   const viewKey = plan ? menuViewKey(household.id, plan.id) : undefined;
@@ -124,28 +112,20 @@ export function DashboardClient({
     enqueueSave(() => persistWeeklyPlan(next));
   }
 
-  function replaceSlotRecipe(slotId: string, nextRecipe: Recipe) {
-    if (!plan) return;
-    const currentSlot = findSlotById(plan, slotId);
-    if (!currentSlot || currentSlot.recipeId === nextRecipe.id) return;
+  function applyMealEdit(nextRecipe: Recipe | null, servings: number, override: boolean) {
+    if (!plan || !selectedSlot) return;
+    const slotId = selectedSlot.id;
+    const next = updateSlotServings(plan, slotId, servings, override);
     savePlan({
-      ...plan,
+      ...next,
       status: "draft",
       updatedAt: new Date().toISOString(),
-      days: plan.days.map((day) => ({
+      days: next.days.map((day) => ({
         ...day,
-        slots: day.slots.map((slot) => slot.id === slotId ? { ...slot, recipeId: nextRecipe.id } : slot),
+        slots: day.slots.map((slot) => slot.id === slotId && nextRecipe ? { ...slot, recipeId: nextRecipe.id } : slot),
       })),
     });
-    closeEditor(slotId);
-  }
-
-  function closeEditor(slotId: string) {
     setSelectedSlotId(null);
-    window.requestAnimationFrame(() => {
-      const meal = document.getElementById(`meal-${slotId}`);
-      if (meal) focusStepStart(meal);
-    });
   }
 
   async function navigateAfterSave(href: string) {
@@ -190,13 +170,9 @@ export function DashboardClient({
     });
   }
 
-  function changeServings(servings: number, override = true) {
-    if (plan && selectedSlot) savePlan(updateSlotServings(plan, selectedSlot.id, servings, override));
-  }
-
   return (
     <>
-      {saving ? <p role="status" className="mb-3 text-sm text-[var(--color-muted)]">Guardando cambios…</p> : null}
+      {saving ? <p role="status" className="pointer-events-none fixed right-4 top-4 z-40 rounded-full border border-[var(--color-border)] bg-[var(--color-ink)] px-3 py-2 text-sm text-[var(--color-muted)]">Guardando cambios…</p> : null}
       {saveError ? <div ref={saveErrorRef} tabIndex={-1} role="alert" className="mb-3 scroll-mt-6 rounded-2xl border border-[var(--color-accent)] p-3 text-sm">
         {saveError}
         {plan ? <button type="button" className="ml-2 underline" onClick={() => savePlan(plan)}>Reintentar</button> : null}
@@ -270,34 +246,15 @@ export function DashboardClient({
       />
 
       {selectedSlot ? (
-        <div ref={editorRef} tabIndex={-1} role="group" aria-label={`Cambiar ${formatMealTypeLabel(selectedSlot.mealType)}`} className="scroll-mt-6 outline-none">
-          <SectionCard className="mt-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-            Cambiar comida
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-            {formatMealTypeLabel(selectedSlot.mealType)}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-            {selectedRecipe
-              ? `La receta actual es ${selectedRecipe.title}. Toca otra receta para sustituirla.`
-              : "Selecciona una receta para este bloque."}
-          </p>
-
-          <div className="mt-4 rounded-2xl bg-[rgba(255,255,255,0.06)] p-4">
-            <p className="text-sm font-semibold">Comensales para esta comida</p>
-            <div className="mt-3 flex items-center gap-4">
-              <button type="button" aria-label="Un comensal menos" disabled={selectedSlot.servings <= 1} onClick={() => changeServings(selectedSlot.servings - 1)} className="h-11 w-11 rounded-full border border-[var(--color-border)] disabled:opacity-30">−</button>
-              <output aria-live="polite" className="text-xl font-semibold">{selectedSlot.servings}</output>
-              <button type="button" aria-label="Un comensal más" onClick={() => changeServings(selectedSlot.servings + 1)} className="h-11 w-11 rounded-full border border-[var(--color-border)]">+</button>
-            </div>
-            <p className="mt-2 text-xs text-[var(--color-muted)]">Actualiza los ingredientes y la compra de esta comida.</p>
-            {selectedSlot.servingsOverride ? <button type="button" onClick={() => changeServings(Math.max(1, household.members.length), false)} className="mt-3 min-h-11 text-sm underline">Usar tamaño del hogar ({household.members.length})</button> : null}
-          </div>
-          <button type="button" onClick={() => closeEditor(selectedSlot.id)} className="mt-3 min-h-11 text-sm underline">Volver al menú</button>
-          <RecipeBrowser key={selectedSlot.id} recipes={recipes} mealType={selectedSlot.mealType} selectedId={selectedSlot.recipeId} onSelect={(recipe) => replaceSlotRecipe(selectedSlot.id, recipe)} />
-          </SectionCard>
-        </div>
+        <MealEditorSheet
+          key={selectedSlot.id}
+          slot={selectedSlot}
+          dayLabel={selectedDayLabel}
+          recipes={recipes}
+          householdSize={Math.max(1, household.members.length)}
+          onClose={() => setSelectedSlotId(null)}
+          onApply={applyMealEdit}
+        />
       ) : null}
       <SectionCard className="mt-4 bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
         <div className="flex flex-col gap-4">

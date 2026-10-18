@@ -82,15 +82,16 @@ test("changing a recipe cannot inherit promotional reuse descriptions from store
   assert.equal(preview[0].slots[0].description, replacement.description);
   assert.ok(plan.days[0].slots[0].tags.includes("batch-friendly"));
 });
-test("recipe and cooking views use the same corrected pizza ingredients and retain its serving context", () => {
+test("recipe detail shows corrected pizza ingredients and cooking exposes its corrected steps", () => {
   const recipe = normalizeRecipeForServings(legacyPizza());
   const query = "?planId=test&slotId=pizza";
   const detail = renderToStaticMarkup(createElement(RecipeDetailClient, { recipe, requestedServings: 4, contextQuery: query }));
   const cooking = renderToStaticMarkup(createElement(CookingMode, { recipe, requestedServings: 4, contextQuery: query }));
+  assert.match(detail, /Carne picada/);
+  assert.match(detail, /Tomate triturado/);
+  assert.match(detail, /200 g/);
+  assert.doesNotMatch(cooking, /Ingredientes para/);
   for (const html of [detail, cooking]) {
-    assert.match(html, /Carne picada/);
-    assert.match(html, /Tomate triturado/);
-    assert.match(html, /200 g/);
     assert.doesNotMatch(html, /Salsa de carne|sobras|del miercoles/);
   }
   assert.match(detail, /planId=test&amp;slotId=pizza/);

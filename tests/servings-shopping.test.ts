@@ -235,18 +235,19 @@ test("a missing recipe cannot silently produce an incomplete shopping list", () 
   assert.throws(() => buildShoppingListFromPlan(planFor([recipes[0]]), []), /Missing recipe/);
 });
 
-test("recipe and cooking screens show the same scaled amounts and retain the meal context", () => {
+test("recipe detail shows scaled amounts while cooking keeps the steps without repeating ingredients", () => {
   const props = { recipe: recipes[0], requestedServings: 4, contextQuery: "?planId=plan-test&slotId=slot-test" };
   const detail = renderToStaticMarkup(createElement(RecipeDetailClient, props));
   const cooking = renderToStaticMarkup(createElement(CookingMode, props));
-  for (const markup of [detail, cooking]) {
-    assert(markup.includes("240 g"));
-    assert(markup.includes("600 g"));
-    assert(markup.includes("4 ud"));
-    assert(!markup.includes("180 g"));
-    assert(!markup.includes("Carlos"));
-    assert(markup.includes("Ingredientes para 4 comensales"));
-  }
+  assert(detail.includes("240 g"));
+  assert(detail.includes("600 g"));
+  assert(detail.includes("4 ud"));
+  assert(!detail.includes("180 g"));
+  assert(!detail.includes("Carlos"));
+  assert(detail.includes("Ingredientes para 4 comensales"));
+  assert(!cooking.includes("Ingredientes para"));
+  assert(cooking.includes(recipes[0].steps[0].title));
+  assert(cooking.includes("Pasos de la receta"));
   assert(detail.includes("/cook/avena-yogur-fruta?planId=plan-test&amp;slotId=slot-test"));
 });
 
