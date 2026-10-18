@@ -177,7 +177,7 @@ export function DashboardClient({
         {saveError}
         {plan ? <button type="button" className="ml-2 underline" onClick={() => savePlan(plan)}>Reintentar</button> : null}
       </div> : null}
-      <div className="mb-4 grid grid-cols-2 gap-3">
+      <div className="mb-2 grid grid-cols-2 gap-3">
         <StatPill label="Hogar" value={context.householdName} />
         <StatPill label="Comidas" value={String(new Set(visibleMeals).size)} suffix="/ día" />
       </div>
@@ -225,18 +225,11 @@ export function DashboardClient({
       {plan ? (
         <>
 
-      <SectionCard className="mb-4">
-        <p className="text-xs text-[var(--color-accent-soft)]">{rangeLabel}</p>
-        <h2 className="mt-2 text-xl font-semibold">{plan.status === "confirmed" ? "Tu menú semanal" : "Revisa tu menú"}</h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          {plan.status === "confirmed" ? "Consulta las comidas de cada día. Puedes ver una receta o cambiarla cuando lo necesites." : "Recorre los días y cambia las comidas o los comensales si lo necesitas. Al terminar, confirma el menú debajo de las comidas para ver la compra."}
-        </p>
-      </SectionCard>
-
       <WeeklyMenu
         key={plan.id}
         viewKey={viewKey}
         headingLabel={plan.status === "confirmed" ? "Menú confirmado" : "Comidas del día"}
+        rangeLabel={rangeLabel}
         onDayChange={() => setSelectedSlotId(null)}
         plan={weeklyPlanPreview}
         initialDayKey={plan.days[0]?.dayKey ?? null}
@@ -277,9 +270,6 @@ export function DashboardClient({
                 {plan.status === "confirmed" ? "Confirmada" : "Borrador"}
               </span>
             </div>
-            <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-              {rangeLabel}
-            </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
               {plan.status === "confirmed"
                 ? "Tu menú está guardado. Puedes consultar la compra o seguir ajustando las comidas."

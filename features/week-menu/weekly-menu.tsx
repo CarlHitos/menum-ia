@@ -2,7 +2,7 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { useId, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -10,6 +10,7 @@ type WeeklyMenuProps = {
   plan: WeeklyPlanPreviewDay[];
   viewKey?: string;
   headingLabel?: string;
+  rangeLabel?: string;
   onDayChange?: () => void;
   selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
@@ -39,6 +40,7 @@ export function WeeklyMenu({
   plan,
   viewKey,
   headingLabel = "Comidas del día",
+  rangeLabel,
   onDayChange,
   selectedSlotId = null,
   onSelectSlot,
@@ -46,6 +48,7 @@ export function WeeklyMenu({
   onOpenRecipe,
 }: WeeklyMenuProps) {
   const descriptionIdPrefix = useId();
+  const daySelectorRef = useRef<HTMLDivElement>(null);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(() => new Set());
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
@@ -66,31 +69,39 @@ export function WeeklyMenu({
   const selectedDay =
     plan.find((day) => day.dayKey === (selectedDayKey ?? restoredDayKey)) ?? plan[0] ?? null;
 
+  useEffect(() => {
+    const selector = daySelectorRef.current;
+    const active = selector?.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+    if (!selector || !active) return;
+    const bounds = selector.getBoundingClientRect();
+    const button = active.getBoundingClientRect();
+    if (button.left < bounds.left) selector.scrollLeft -= bounds.left - button.left;
+    else if (button.right > bounds.right) selector.scrollLeft += button.right - bounds.right;
+  }, [selectedDay?.dayKey]);
+
   if (!selectedDay) {
     return null;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <SectionCard>
-        <div className="flex items-center justify-between gap-4">
-          <div>
+        <div>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
               {headingLabel}
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-              {selectedDay.fullDateLabel}
-            </h2>
+            {rangeLabel ? <p className="whitespace-nowrap text-[11px] text-[var(--color-muted)]">{rangeLabel}</p> : null}
           </div>
-          <span className="inline-flex min-w-20 items-center justify-center rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-center text-[11px] font-semibold text-[var(--color-muted)]">
-            {selectedDay.shortLabel} · {selectedDay.dateLabel}
-          </span>
+          <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
+            {selectedDay.fullDateLabel}
+          </h2>
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-7">
+        <div ref={daySelectorRef} role="group" aria-label="Días del menú" className="mt-3 flex gap-1.5 overflow-x-auto overscroll-x-contain pb-1">
           {plan.map((day) => {
             const isSelected = day.dayKey === selectedDay.dayKey;
-            const [dayNumber, dayMonth] = splitDateLabel(day.dateLabel);
+            const [dayNumber] = splitDateLabel(day.dateLabel);
 
             return (
               <button
@@ -101,8 +112,9 @@ export function WeeklyMenu({
                   if (viewKey) rememberMenuDay(viewKey, day.dayKey);
                   onDayChange?.();
                 }}
+                aria-label={day.fullDateLabel}
                 aria-pressed={isSelected}
-                className={`flex min-h-12 items-center justify-center rounded-2xl px-2 py-3 transition ${
+                className={`flex min-h-12 min-w-9 flex-1 items-center justify-center rounded-xl px-1 py-2 transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                   isSelected
                     ? "bg-[var(--color-accent)] text-slate-950"
                     : "border border-[var(--color-border)] bg-[rgba(255,255,255,0.05)] text-[var(--color-paper)] hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
@@ -114,9 +126,6 @@ export function WeeklyMenu({
                   </span>
                   <span className="mt-1 block text-[10px] leading-none opacity-80">
                     {dayNumber}
-                  </span>
-                  <span className="mt-1 block text-[10px] leading-none opacity-80">
-                    {dayMonth}
                   </span>
                 </span>
               </button>

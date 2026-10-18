@@ -5,6 +5,7 @@ type PageHeaderProps = {
   title: string;
   description?: string;
   action?: ReactNode;
+  compact?: boolean;
 };
 
 export function PageHeader({
@@ -12,9 +13,10 @@ export function PageHeader({
   title,
   description,
   action,
+  compact = false,
 }: PageHeaderProps) {
   return (
-    <header className="mb-6 flex items-start justify-between gap-4">
+    <header className={`${compact ? "mb-2" : "mb-6"} flex items-start justify-between gap-4`}>
       <div>
         {eyebrow ? (
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-accent-soft)]">
