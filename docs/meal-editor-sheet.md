@@ -38,8 +38,9 @@ redondeadas y el fondo sigue difuminado. En escritorio conserva el tamaño máxi
 y la posición centrada.
 
 La cabecera separa «Cambiar desayuno» y la fecha en una línea secundaria. Los
-comensales aparecen en una fila sin tarjeta interior y la búsqueda permanece
-visible. Los filtros empiezan plegados: abrirlos no borra la selección y su
+comensales conservan su caja con fondo y esquinas redondeadas, con botones
+circulares de 32 px y un número más pequeño; la zona táctil se amplía a 44 px.
+La búsqueda permanece visible. Los filtros empiezan plegados: abrirlos no borra la selección y su
 resumen indica cuántos siguen activos. «Limpiar filtros» restablece tipo, tiempo
 y dificultad, conservando la búsqueda.
 
@@ -60,6 +61,5 @@ Esta comprobación no accede a la BD ni prueba el login real del preview.
 
 La distribución compacta se ha revisado a 390 × 844, 320 × 568 y 1200 × 900 px,
 incluidos filtros plegados, conservación de filtros activos, cierre y guardado.
-Con los datos de prueba y los filtros plegados, la lista dispone de unos 592 px
-de alto en el primer móvil y 292 px en el segundo. Las medidas reales dependen
-del título y de las áreas seguras del dispositivo.
+Las medidas reales de la lista dependen del título, los controles desplegados y
+las áreas seguras del dispositivo.

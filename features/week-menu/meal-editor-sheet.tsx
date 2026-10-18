@@ -33,13 +33,13 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
         selectedId={slot.recipeId}
         onSelect={(recipe) => onApply(recipe, servings, override)}
         leadingControls={
-          <div>
+          <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-2">
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-semibold">Comensales</span>
-              <div className="flex items-center gap-2">
-                <button type="button" aria-label="Un comensal menos" disabled={servings <= 1} onClick={() => { setServings(servings - 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)] disabled:opacity-30">−</button>
-                <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-5 text-center text-lg font-semibold">{servings}</output>
-                <button type="button" aria-label="Un comensal más" onClick={() => { setServings(servings + 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)]">+</button>
+              <div className="flex items-center gap-3">
+                <button type="button" aria-label="Un comensal menos" disabled={servings <= 1} onClick={() => { setServings(servings - 1); setOverride(true); }} className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] after:absolute after:-inset-1.5 after:content-[''] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)] disabled:opacity-30"><span className="text-sm">−</span></button>
+                <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-4 text-center text-base font-semibold">{servings}</output>
+                <button type="button" aria-label="Un comensal más" onClick={() => { setServings(servings + 1); setOverride(true); }} className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] after:absolute after:-inset-1.5 after:content-[''] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]"><span className="text-sm">+</span></button>
               </div>
             </div>
             {override ? <button type="button" onClick={() => { setServings(householdSize); setOverride(false); }} className="min-h-9 text-xs text-[var(--color-muted)] underline">Usar tamaño del hogar ({householdSize})</button> : null}
