@@ -25,7 +25,7 @@ export function canPlanRecipe(recipe: Recipe, mealType: MealType) {
 function searchable(text: string) {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
-export type RecipeFilters = { query?: string; kind?: RecipeKind | ""; season?: RecipeSeason | ""; maxMinutes?: number; mealType?: MealType };
+export type RecipeFilters = { query?: string; kind?: RecipeKind | ""; season?: RecipeSeason | ""; maxMinutes?: number; difficulty?: Recipe["difficulty"] | ""; mealType?: MealType };
 export function filterRecipes(recipes: Recipe[], filters: RecipeFilters) {
   const terms = searchable(filters.query ?? "").trim().split(/\s+/).filter(Boolean);
   return recipes.filter((recipe) => {
@@ -34,6 +34,7 @@ export function filterRecipes(recipes: Recipe[], filters: RecipeFilters) {
     return isRecipeAvailable(recipe.id) && terms.every((term) => text.includes(term))
       && (!filters.kind || metadata.kind === filters.kind)
       && (!filters.season || metadata.season === "all_year" || metadata.season === filters.season)
+      && (!filters.difficulty || recipe.difficulty === filters.difficulty)
       && (!filters.maxMinutes || recipe.durationMinutes <= filters.maxMinutes)
       && (!filters.mealType || canPlanRecipe(recipe, filters.mealType));
   });
