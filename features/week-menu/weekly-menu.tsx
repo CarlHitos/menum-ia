@@ -138,7 +138,7 @@ export function WeeklyMenu({
               id={`meal-${slot.id}`}
               tabIndex={-1}
               aria-label={`${slot.mealLabel}: ${slot.title}`}
-              className={`rounded-2xl border px-4 py-4 transition ${
+              className={`relative isolate rounded-2xl border px-4 py-4 transition-colors ${
                 slot.status === "planned"
                   ? isSelected
                     ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.1)]"
@@ -170,7 +170,7 @@ export function WeeklyMenu({
                             else next.add(descriptionKey);
                             return next;
                           })}
-                          className={`relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
+                          className={`relative z-10 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
                         >
                           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
                             <circle cx="12" cy="12" r="9" />
@@ -206,12 +206,13 @@ export function WeeklyMenu({
                   {slot.status === "planned" && slot.recipeId ? (
                     <Link
                       style={mealActionTypography}
+                      aria-label={`Ver receta: ${slot.title}`}
                       href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
                       onClick={onOpenRecipe ? (event) => {
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.06)] px-4 py-2.5 text-[var(--color-paper)] transition-all duration-150 ease-in-out hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] active:scale-95 active:bg-[var(--color-accent)] active:text-slate-950"
+                      className="inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] px-4 py-2.5 text-[var(--color-paper)] transition-colors duration-150 after:absolute after:inset-0 after:rounded-2xl after:content-[''] hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-accent)] active:bg-[rgba(252,163,17,0.18)]"
                     >
                       Ver receta
                     </Link>
@@ -220,15 +221,19 @@ export function WeeklyMenu({
                   {onSelectSlot ? (
                     <button
                       type="button"
-                      style={mealActionTypography}
+                      aria-label={`Cambiar comida: ${slot.title}`}
+                      aria-pressed={isSelected}
+                      title={isSelected ? "Editando comida" : "Cambiar comida"}
                       onClick={() => onSelectSlot(slot.id)}
-                      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full border px-4 py-2.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+                      className={`relative z-10 inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                         isSelected
                           ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.08)] text-[var(--color-accent-soft)]"
                           : "border-[var(--color-border)] text-[var(--color-paper)] hover:bg-[rgba(255,255,255,0.06)] active:bg-[rgba(255,255,255,0.1)]"
                       }`}
                     >
-                      {isSelected ? "Editando" : "Editar"}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 3a2.83 2.83 0 0 1 4 4L7 20l-4 1 1-4Z M14 5l4 4" />
+                      </svg>
                     </button>
                   ) : null}
                 </div>
