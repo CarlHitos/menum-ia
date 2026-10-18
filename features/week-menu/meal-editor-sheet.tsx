@@ -19,12 +19,11 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
   const [servings, setServings] = useState(slot.servings);
   const [override, setOverride] = useState(slot.servingsOverride ?? false);
   const changed = servings !== slot.servings || override !== Boolean(slot.servingsOverride);
-  const currentRecipe = recipes.find((recipe) => recipe.id === slot.recipeId);
 
   return (
     <BottomSheet
-      title={`Cambiar ${formatMealTypeLabel(slot.mealType)} · ${dayLabel}`}
-      description={currentRecipe ? `Ahora: ${currentRecipe.title}` : "Elige una receta para esta comida."}
+      title={`Cambiar ${formatMealTypeLabel(slot.mealType)}`}
+      description={dayLabel}
       onClose={onClose}
     >
       <RecipeBrowser
@@ -34,10 +33,10 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
         selectedId={slot.recipeId}
         onSelect={(recipe) => onApply(recipe, servings, override)}
         leadingControls={
-          <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-2">
+          <div>
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-semibold">Comensales</span>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button type="button" aria-label="Un comensal menos" disabled={servings <= 1} onClick={() => { setServings(servings - 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)] disabled:opacity-30">−</button>
                 <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-5 text-center text-lg font-semibold">{servings}</output>
                 <button type="button" aria-label="Un comensal más" onClick={() => { setServings(servings + 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)]">+</button>

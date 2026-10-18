@@ -50,9 +50,9 @@ export function BottomSheet({ title, description, onClose, children }: BottomShe
       onCancel={(event) => { event.preventDefault(); onClose(); }}
       className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-hidden border-0 bg-transparent p-0 text-[var(--color-paper)] backdrop:bg-black/60 backdrop:backdrop-blur-sm"
     >
-      <div className="flex h-full items-end justify-center sm:items-center sm:p-6" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-        <div className="flex h-[90dvh] max-h-[52rem] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl border border-[var(--color-border)] bg-[var(--color-ink)] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:rounded-3xl">
-          <header className="flex shrink-0 items-start justify-between gap-3 p-4">
+      <div className="flex h-full items-end justify-center px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:items-center sm:p-6" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+        <div className="flex h-full w-full max-w-xl flex-col overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-ink)] shadow-2xl sm:h-[90dvh] sm:max-h-[52rem]">
+          <header className="flex shrink-0 items-start justify-between gap-3 px-4 pb-2 pt-3">
             <div className="min-w-0">
               <h2 id={`${id}-title`} className="text-lg font-semibold leading-snug">{title}</h2>
               {description ? <p id={`${id}-description`} className="mt-1 text-xs leading-5 text-[var(--color-muted)]">{description}</p> : null}
