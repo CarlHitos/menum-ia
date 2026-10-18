@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { formatRecipeAmount } from "./ingredient-amount";
+import { RecipeBackLink } from "./recipe-back-link";
 import { SectionCard } from "@/components/ui/section-card";
-import { scaleRecipeIngredients, formatIngredientAmount } from "@/lib/domain/portioning";
+import { scaleRecipeIngredients } from "@/lib/domain/portioning";
 import { getRecipeMetadata, recipeKindLabels, recipeSeasonLabels } from "@/lib/domain/recipe-library";
 import type { Recipe } from "@/lib/domain/types";
 
@@ -18,6 +20,9 @@ export function RecipeDetailClient({
   const ingredients = scaleRecipeIngredients(recipe, requestedServings);
   return (
     <>
+      <div className="mb-4">
+        <RecipeBackLink href={contextQuery ? "/dashboard" : "/recipes"} label={contextQuery ? "Volver al menú" : "Volver a recetas"} />
+      </div>
       <SectionCard className="mb-4">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -31,16 +36,10 @@ export function RecipeDetailClient({
               {recipe.description}
             </p>
           </div>
-          <Link
-            href={`/cook/${recipe.id}${contextQuery}`}
-            className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
-          >
-            Cocinar
-          </Link>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <RecipeChip label={`${requestedServings} comensales`} />
+          <RecipeChip label={`${requestedServings} ${requestedServings === 1 ? "comensal" : "comensales"}`} />
           <RecipeChip label={recipeKindLabels[getRecipeMetadata(recipe).kind]} />
           <RecipeChip label={recipeSeasonLabels[getRecipeMetadata(recipe).season]} />
           <RecipeChip label={`${recipe.durationMinutes} min`} />
@@ -71,8 +70,8 @@ export function RecipeDetailClient({
                   </span>
                 </div>
               </div>
-              <span className="text-[var(--color-muted)]">
-                {formatIngredientAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}
+              <span className="shrink-0 text-right font-medium text-[var(--color-paper)]">
+                {formatRecipeAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}
               </span>
             </div>
           ))}
@@ -81,7 +80,7 @@ export function RecipeDetailClient({
 
       <SectionCard className="mb-4">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          Resumen del flujo
+          Pasos a seguir
         </p>
         <div className="mt-3 space-y-2">
           {recipe.steps.map((step, index) => (
@@ -143,9 +142,9 @@ export function RecipeDetailClient({
       <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.12),rgba(252,163,17,0.14))]">
         <Link
           href={`/cook/${recipe.id}${contextQuery}`}
-          className="inline-flex rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-slate-950 transition hover:brightness-110 active:scale-[0.98]"
         >
-          Abrir modo cocinar
+          <span className="text-slate-950">Abrir modo cocinar</span>
         </Link>
       </SectionCard>
     </>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { RecipeBackLink } from "@/features/recipes/recipe-back-link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/ui/section-card";
@@ -45,12 +45,11 @@ export default async function CookPage({ params, searchParams }: CookPageProps) 
               {recipe.title}
             </h1>
           </div>
-          <Link
+          <RecipeBackLink
             href={`/recipes/${recipe.id}${context.query}`}
-            className="rounded-full border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
-          >
-            Receta
-          </Link>
+            label="Salir"
+            close
+          />
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
