@@ -125,16 +125,16 @@ export function CookingMode({ recipe, requestedServings, contextQuery = "" }: Co
       <div ref={stepStartRef} tabIndex={-1} role="group" aria-label={`Paso ${activeStep + 1} de ${recipe.steps.length}`} className="scroll-mt-6 outline-none">
         <SectionCard className="border-[rgba(252,163,17,0.4)] bg-[linear-gradient(135deg,rgba(252,163,17,0.24),rgba(255,255,255,0.1))] shadow-[0_0_0_1px_rgba(252,163,17,0.12)]">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
                 Paso {activeStep + 1} de {recipe.steps.length}
               </p>
-              <h2 className="mt-2 font-display text-2xl font-semibold leading-tight text-[var(--color-paper)]">
+              <h2 className="mt-2 break-words font-display text-2xl font-semibold leading-tight text-[var(--color-paper)]">
                 {currentStep.title}
               </h2>
             </div>
             <span
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ${
                 completedSteps.includes(currentStep.id)
                   ? "bg-[var(--color-success)] text-slate-950"
                   : "border border-[var(--color-border)] text-[var(--color-paper)]"
