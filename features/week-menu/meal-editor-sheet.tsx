@@ -34,12 +34,27 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
         onSelect={(recipe) => onApply(recipe, servings, override)}
         leadingControls={
           <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-2">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">Comensales</span>
-              <div className="flex items-center gap-3">
-                <button type="button" aria-label="Un comensal menos" disabled={servings <= 1} onClick={() => { setServings(servings - 1); setOverride(true); }} className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] after:absolute after:-inset-0.5 after:content-[''] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)] disabled:opacity-30"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path strokeLinecap="round" d="M5 12h14" /></svg></button>
-                <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-4 text-center text-base font-semibold">{servings}</output>
-                <button type="button" aria-label="Un comensal más" onClick={() => { setServings(servings + 1); setOverride(true); }} className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] after:absolute after:-inset-0.5 after:content-[''] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4"><path strokeLinecap="round" d="M12 5v14M5 12h14" /></svg></button>
+              <div className="flex h-[62px] w-40 shrink-0 items-center justify-between rounded-full border border-[#8A704C] bg-[#303034] px-[7px] max-[360px]:w-36">
+                <button
+                  type="button"
+                  aria-label="Un comensal menos"
+                  disabled={servings <= 1}
+                  onClick={() => { setServings(servings - 1); setOverride(true); }}
+                  className="inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[#EBA83F] text-black transition-colors hover:bg-[#F3B957] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBA83F] disabled:cursor-not-allowed disabled:bg-[#414146] disabled:text-[#85858B]"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" className="h-6 w-6"><path strokeLinecap="round" d="M5 12h14" /></svg>
+                </button>
+                <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-7 text-center text-[26px] font-semibold leading-none tabular-nums text-[#E5A345]">{servings}</output>
+                <button
+                  type="button"
+                  aria-label="Un comensal más"
+                  onClick={() => { setServings(servings + 1); setOverride(true); }}
+                  className="inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[#EBA83F] text-black transition-colors hover:bg-[#F3B957] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBA83F]"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" className="h-6 w-6"><path strokeLinecap="round" d="M12 5v14M5 12h14" /></svg>
+                </button>
               </div>
             </div>
             {override ? <button type="button" onClick={() => { setServings(householdSize); setOverride(false); }} className="min-h-9 text-xs text-[var(--color-muted)] underline">Usar tamaño del hogar ({householdSize})</button> : null}
