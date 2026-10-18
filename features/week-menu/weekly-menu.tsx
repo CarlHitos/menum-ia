@@ -2,6 +2,7 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
+import { CalendarDays } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
@@ -91,7 +92,12 @@ export function WeeklyMenu({
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
               {headingLabel}
             </p>
-            {rangeLabel ? <p className="whitespace-nowrap text-[11px] text-[var(--color-muted)]">{rangeLabel}</p> : null}
+            {rangeLabel ? (
+              <p className="-mr-1.5 inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#D5A45F] bg-[#343C50] px-2.5 py-1.5 text-[11px] font-light leading-none text-[#F1EDE7]">
+                <CalendarDays aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[#D5A45F]" strokeWidth={1.5} />
+                <span>{rangeLabel.replace(" - ", " · ")}</span>
+              </p>
+            ) : null}
           </div>
           <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
             {selectedDay.fullDateLabel}
@@ -147,7 +153,7 @@ export function WeeklyMenu({
               id={`meal-${slot.id}`}
               tabIndex={-1}
               aria-label={`${slot.mealLabel}: ${slot.title}`}
-              className={`relative isolate rounded-2xl border px-4 py-4 transition-colors ${
+              className={`relative isolate rounded-2xl border px-4 py-3 transition-colors ${
                 slot.status === "planned"
                   ? isSelected
                     ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.1)]"
@@ -155,7 +161,7 @@ export function WeeklyMenu({
                   : "border-dashed border-[var(--color-border)] bg-[rgba(255,255,255,0.03)]"
               }`}
             >
-              <div className="space-y-4">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -187,22 +193,16 @@ export function WeeklyMenu({
                           </svg>
                         </button>
                       ) : null}
+                      {slot.minutes ? (
+                        <span className="-mr-1.5 ml-auto inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] px-2 py-1 text-[11px] font-semibold text-[var(--color-accent)]">
+                          {slot.minutes} min
+                        </span>
+                      ) : null}
                     </div>
-                    <h3 className="mt-3 text-lg font-semibold leading-tight text-[var(--color-paper)]">
+                    <h3 className="mt-1 text-base font-semibold leading-tight text-[var(--color-paper)]">
                       {slot.title}
                     </h3>
                   </div>
-
-                  {slot.minutes ? (
-                    <div className="flex min-w-16 flex-col items-center justify-center rounded-2xl bg-[rgba(252,163,17,0.16)] px-3 py-2 text-center">
-                      <p className="text-lg font-semibold text-[var(--color-accent)]">
-                        {slot.minutes}
-                      </p>
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                        min
-                      </p>
-                    </div>
-                  ) : null}
                 </div>
 
                 {slot.description ? (
