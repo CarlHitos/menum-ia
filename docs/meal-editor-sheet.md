@@ -39,7 +39,7 @@ y la posición centrada.
 
 La cabecera separa «Cambiar desayuno» y la fecha en una línea secundaria. Los
 comensales conservan su caja con fondo y esquinas redondeadas, con botones
-circulares de 32 px y un número más pequeño; la zona táctil se amplía a 44 px.
+circulares de 40 px con iconos vectoriales centrados y un número más pequeño; la zona táctil se amplía a 44 px.
 La búsqueda permanece visible. Los filtros empiezan plegados: abrirlos no borra la selección y su
 resumen indica cuántos siguen activos. «Limpiar filtros» restablece tipo, tiempo
 y dificultad, conservando la búsqueda.
