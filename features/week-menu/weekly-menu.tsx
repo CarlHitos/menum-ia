@@ -2,7 +2,7 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useId, useMemo, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -45,6 +45,8 @@ export function WeeklyMenu({
   initialDayKey = null,
   onOpenRecipe,
 }: WeeklyMenuProps) {
+  const descriptionIdPrefix = useId();
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(() => new Set());
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
       return initialDayKey;
@@ -126,6 +128,9 @@ export function WeeklyMenu({
       <div className="grid gap-3">
         {selectedDay.slots.map((slot) => {
           const isSelected = selectedSlotId === slot.id;
+          const descriptionKey = `${slot.id}:${slot.recipeId ?? ""}:${slot.description ?? ""}`;
+          const descriptionExpanded = expandedDescriptions.has(descriptionKey);
+          const descriptionId = `${descriptionIdPrefix}-description-${slot.id}`;
 
           return (
             <div
@@ -153,6 +158,26 @@ export function WeeklyMenu({
                           {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
                         </span>
                       ) : null}
+                      {slot.description ? (
+                        <button
+                          type="button"
+                          aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
+                          aria-expanded={descriptionExpanded}
+                          aria-controls={descriptionId}
+                          onClick={() => setExpandedDescriptions((current) => {
+                            const next = new Set(current);
+                            if (next.has(descriptionKey)) next.delete(descriptionKey);
+                            else next.add(descriptionKey);
+                            return next;
+                          })}
+                          className={`relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
+                        >
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
+                            <circle cx="12" cy="12" r="9" />
+                            <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
+                          </svg>
+                        </button>
+                      ) : null}
                     </div>
                     <h3 className="mt-3 text-lg font-semibold leading-tight text-[var(--color-paper)]">
                       {slot.title}
@@ -172,7 +197,7 @@ export function WeeklyMenu({
                 </div>
 
                 {slot.description ? (
-                  <p className="text-sm leading-6 text-[var(--color-muted)]">
+                  <p id={descriptionId} hidden={!descriptionExpanded} className="text-sm leading-6 text-[var(--color-muted)]">
                     {slot.description}
                   </p>
                 ) : null}
