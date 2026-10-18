@@ -19,12 +19,11 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
   const [servings, setServings] = useState(slot.servings);
   const [override, setOverride] = useState(slot.servingsOverride ?? false);
   const changed = servings !== slot.servings || override !== Boolean(slot.servingsOverride);
-  const currentRecipe = recipes.find((recipe) => recipe.id === slot.recipeId);
 
   return (
     <BottomSheet
-      title={`Cambiar ${formatMealTypeLabel(slot.mealType)} · ${dayLabel}`}
-      description={currentRecipe ? `Ahora: ${currentRecipe.title}` : "Elige una receta para esta comida."}
+      title={`Cambiar ${formatMealTypeLabel(slot.mealType)}`}
+      description={dayLabel}
       onClose={onClose}
     >
       <RecipeBrowser
@@ -35,12 +34,27 @@ export function MealEditorSheet({ slot, dayLabel, recipes, householdSize, onClos
         onSelect={(recipe) => onApply(recipe, servings, override)}
         leadingControls={
           <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-2">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">Comensales</span>
-              <div className="flex items-center gap-3">
-                <button type="button" aria-label="Un comensal menos" disabled={servings <= 1} onClick={() => { setServings(servings - 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)] disabled:opacity-30">−</button>
-                <output aria-live="polite" aria-label="Comensales para esta comida" className="min-w-5 text-center text-lg font-semibold">{servings}</output>
-                <button type="button" aria-label="Un comensal más" onClick={() => { setServings(servings + 1); setOverride(true); }} className="h-11 w-11 rounded-full border border-[var(--color-border)]">+</button>
+              <div className="grid h-9 w-[108px] shrink-0 grid-cols-[24px_minmax(0,1fr)_24px] items-center rounded-full border-[0.5px] border-[#8A704C] bg-[#303034] px-[5px]">
+                <button
+                  type="button"
+                  aria-label="Un comensal menos"
+                  disabled={servings <= 1}
+                  onClick={() => { setServings(servings - 1); setOverride(true); }}
+                  className="relative inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EBA83F] text-black transition-colors after:absolute after:-inset-2.5 after:content-[''] hover:bg-[#F3B957] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBA83F] disabled:cursor-not-allowed disabled:bg-[#414146] disabled:text-[#85858B]"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5"><path strokeLinecap="round" d="M5 12h14" /></svg>
+                </button>
+                <output aria-live="polite" aria-label="Comensales para esta comida" className="flex h-full min-w-0 items-center justify-center text-center text-[16px] font-semibold leading-none tabular-nums text-[#E5A345]">{servings}</output>
+                <button
+                  type="button"
+                  aria-label="Un comensal más"
+                  onClick={() => { setServings(servings + 1); setOverride(true); }}
+                  className="relative inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EBA83F] text-black transition-colors after:absolute after:-inset-2.5 after:content-[''] hover:bg-[#F3B957] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#EBA83F]"
+                >
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="h-3.5 w-3.5"><path strokeLinecap="round" d="M12 5v14M5 12h14" /></svg>
+                </button>
               </div>
             </div>
             {override ? <button type="button" onClick={() => { setServings(householdSize); setOverride(false); }} className="min-h-9 text-xs text-[var(--color-muted)] underline">Usar tamaño del hogar ({householdSize})</button> : null}

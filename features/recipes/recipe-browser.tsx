@@ -33,21 +33,40 @@ export function RecipeBrowser({ recipes, mealType, selectedId, onSelect, layout 
     if (resultsRef.current) resultsRef.current.scrollTop = 0;
   }
 
+  const activeFilters = Number(Boolean(kind)) + Number(Boolean(maxMinutes)) + Number(Boolean(difficulty));
+  const filters = (
+    <div className={`grid gap-2 ${sheet ? "grid-cols-3" : "grid-cols-2"}`}>
+      <label className="min-w-0 text-xs text-[var(--color-muted)]">Tipo<select className={`${inputClass} mt-1`} value={kind} onChange={(event) => { setKind(event.target.value as RecipeKind | ""); resetResults(); }}><option value="">{sheet ? "Todos" : "Todos los tipos"}</option>{kinds.map((value) => <option key={value} value={value}>{recipeKindLabels[value]}</option>)}</select></label>
+      {!sheet ? <label className="text-xs text-[var(--color-muted)]">Temporada<select className={`${inputClass} mt-1`} value={season} onChange={(event) => { setSeason(event.target.value as RecipeSeason | ""); resetResults(); }}><option value="">Todas</option>{Object.entries(recipeSeasonLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label> : null}
+      <label className={`${sheet ? "" : "col-span-2"} min-w-0 text-xs text-[var(--color-muted)]`}>{sheet ? "Tiempo" : "Tiempo de preparación"}<select className={`${inputClass} mt-1`} value={maxMinutes} onChange={(event) => { setMaxMinutes(Number(event.target.value)); resetResults(); }}><option value={0}>{sheet ? "Cualquiera" : "Cualquier duración"}</option><option value={15}>{sheet ? "≤ 15 min" : "Hasta 15 minutos"}</option><option value={30}>{sheet ? "≤ 30 min" : "Hasta 30 minutos"}</option><option value={45}>{sheet ? "≤ 45 min" : "Hasta 45 minutos"}</option></select></label>
+      {sheet ? <label className="min-w-0 text-xs text-[var(--color-muted)]">Dificultad<select className={`${inputClass} mt-1`} value={difficulty} onChange={(event) => { setDifficulty(event.target.value as Recipe["difficulty"] | ""); resetResults(); }}><option value="">Todas</option><option value="easy">Fácil</option><option value="medium">Media</option></select></label> : null}
+    </div>
+  );
+  const resultCount = `${visible.length} ${visible.length === 1 ? "receta" : "recetas"}${season && season !== "all_year" ? " · Incluye recetas de todo el año" : ""}`;
+
   return (
     <div className={sheet ? "flex min-h-0 flex-1 flex-col" : "mt-4 space-y-3"}>
-      <div className={sheet ? "max-h-[55dvh] shrink-0 space-y-3 overflow-y-auto overscroll-contain border-b border-[var(--color-border)] px-4 pb-3" : "space-y-3"}>
+      <div className={sheet ? "shrink-0 space-y-2 border-b border-[var(--color-border)] px-4 pb-2" : "space-y-3"}>
         {leadingControls}
         <div>
-          <label className="mb-1 block text-sm" htmlFor={`${id}-search`}>Buscar por receta o ingrediente</label>
-          <input id={`${id}-search`} type="search" placeholder="Por ejemplo: pollo, lentejas, aguacate…" value={query} onChange={(event) => { setQuery(event.target.value); resetResults(); }} className={inputClass} />
+          <label className={sheet ? "sr-only" : "mb-1 block text-sm"} htmlFor={`${id}-search`}>Buscar por receta o ingrediente</label>
+          <input id={`${id}-search`} type="search" placeholder={sheet ? "Buscar receta o ingrediente…" : "Por ejemplo: pollo, lentejas, aguacate…"} value={query} onChange={(event) => { setQuery(event.target.value); resetResults(); }} className={inputClass} />
         </div>
-        <div className={`grid gap-2 ${sheet ? "grid-cols-3" : "grid-cols-2"}`}>
-          <label className="min-w-0 text-xs text-[var(--color-muted)]">Tipo<select className={`${inputClass} mt-1`} value={kind} onChange={(event) => { setKind(event.target.value as RecipeKind | ""); resetResults(); }}><option value="">{sheet ? "Todos" : "Todos los tipos"}</option>{kinds.map((value) => <option key={value} value={value}>{recipeKindLabels[value]}</option>)}</select></label>
-          {!sheet ? <label className="text-xs text-[var(--color-muted)]">Temporada<select className={`${inputClass} mt-1`} value={season} onChange={(event) => { setSeason(event.target.value as RecipeSeason | ""); resetResults(); }}><option value="">Todas</option>{Object.entries(recipeSeasonLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label> : null}
-          <label className={`${sheet ? "" : "col-span-2"} min-w-0 text-xs text-[var(--color-muted)]`}>{sheet ? "Tiempo" : "Tiempo de preparación"}<select className={`${inputClass} mt-1`} value={maxMinutes} onChange={(event) => { setMaxMinutes(Number(event.target.value)); resetResults(); }}><option value={0}>{sheet ? "Cualquiera" : "Cualquier duración"}</option><option value={15}>{sheet ? "≤ 15 min" : "Hasta 15 minutos"}</option><option value={30}>{sheet ? "≤ 30 min" : "Hasta 30 minutos"}</option><option value={45}>{sheet ? "≤ 45 min" : "Hasta 45 minutos"}</option></select></label>
-          {sheet ? <label className="min-w-0 text-xs text-[var(--color-muted)]">Dificultad<select className={`${inputClass} mt-1`} value={difficulty} onChange={(event) => { setDifficulty(event.target.value as Recipe["difficulty"] | ""); resetResults(); }}><option value="">Todas</option><option value="easy">Fácil</option><option value="medium">Media</option></select></label> : null}
-        </div>
-        <p role="status" className="text-sm text-[var(--color-muted)]">{visible.length} {visible.length === 1 ? "receta" : "recetas"}{season && season !== "all_year" ? " · Incluye recetas de todo el año" : ""}</p>
+        {sheet ? (
+          <details className="group">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-sm text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)] [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-2">
+                Filtros{activeFilters ? <span className="rounded-full bg-[rgba(252,163,17,0.16)] px-2 text-xs text-[var(--color-accent)]">{activeFilters} {activeFilters === 1 ? "activo" : "activos"}</span> : null}
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4 transition-transform group-open:rotate-180"><path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" /></svg>
+              </span>
+              <span role="status" className="text-xs text-[var(--color-muted)]">{resultCount}</span>
+            </summary>
+            <div className="max-h-[20dvh] overflow-y-auto overscroll-contain pb-2">
+              {filters}
+              {activeFilters ? <button type="button" onClick={() => { setKind(""); setMaxMinutes(0); setDifficulty(""); resetResults(); }} className="mt-1 min-h-9 text-xs text-[var(--color-muted)] underline">Limpiar filtros</button> : null}
+            </div>
+          </details>
+        ) : <>{filters}<p role="status" className="text-sm text-[var(--color-muted)]">{resultCount}</p></>}
       </div>
       <div ref={resultsRef} role={sheet ? "region" : undefined} aria-label={sheet ? "Recetas alternativas" : undefined} tabIndex={sheet ? 0 : undefined} className={sheet ? "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]" : "space-y-3"}>
         {visible.length === 0 ? <p className="py-4 text-sm">No hay recetas con estos filtros. Prueba otro ingrediente o amplía la búsqueda.</p> : null}
