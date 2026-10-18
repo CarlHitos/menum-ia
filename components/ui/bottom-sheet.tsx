@@ -57,7 +57,7 @@ export function BottomSheet({ title, description, onClose, children }: BottomShe
               <h2 id={`${id}-title`} className="text-lg font-semibold leading-snug">{title}</h2>
               {description ? <p id={`${id}-description`} className="mt-1 text-xs leading-5 text-[var(--color-muted)]">{description}</p> : null}
             </div>
-            <button type="button" autoFocus onClick={onClose} className="min-h-11 shrink-0 rounded-full border border-[var(--color-border)] px-3 text-sm text-[var(--color-paper)] hover:border-[var(--color-accent)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent)]">Cancelar</button>
+            <button type="button" autoFocus onClick={onClose} style={{ fontSize: "1.0625rem", fontWeight: 400 }} className="min-h-11 shrink-0 rounded-full border-[1.5px] border-[#C69A58] bg-[#162038] px-3 text-[#D5A45F] shadow-[0_0_8px_rgba(198,154,88,0.07)] transition-colors hover:bg-[#1B2842] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C69A58]">Cancelar</button>
           </header>
           {children}
         </div>
