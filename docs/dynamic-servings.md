@@ -80,7 +80,22 @@ Esta presentación no cambia `totalNeeded`, `purchaseAmount`, las cantidades de
 receta ni el estado persistido. Tampoco supone un tamaño de envase comercial.
 Los productos marcados aparecen tachados al final de su propia categoría y
 pueden desmarcarse allí. Se elimina el bloque global duplicado de completados;
-las categorías conservan su orden y su estado abierto al completar productos.
+las categorías conservan su orden. Al marcar el último producto pendiente de
+una categoría, se pliega y se abre y enfoca la siguiente con productos
+pendientes, saltando categorías vacías o completas y volviendo al principio
+si hace falta. Si no quedan pendientes, se pliega la categoría terminada.
+Al entrar se abre la primera categoría pendiente. Siempre se puede reabrir
+manualmente un grupo completado para desmarcar productos; al desmarcar toda
+la compra se abre de nuevo la primera categoría con productos. El movimiento
+respeta la preferencia de reducir animaciones.
+
+El contador de cada producto muestra «para X comidas», usando los bloques
+planificados (`sourceMealSlotIds`), y el resumen usa «Comidas» con la unión de
+esos bloques. Una receta repetida varios días cuenta en cada comida, pero no
+se duplica el mismo bloque por contener varias veces el ingrediente o por
+aparecer en distintos productos. `sourceRecipeIds` conserva las recetas
+distintas como dato interno; su número no representa las veces que se cocina
+durante la semana. Este cambio no altera cantidades ni checks.
 
 No hace falta migración SQL. Los campos adicionales viven en estructuras JSON
 ya existentes y las cantidades de compra se calculan en memoria.

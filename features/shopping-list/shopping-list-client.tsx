@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { formatShoppingAmount } from "@/features/shopping-list/shopping-quantity";
 import type { ShoppingCategory, ShoppingItem } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
+import { completesShoppingCategory, getNextPendingShoppingCategory } from "@/lib/ui/shopping-navigation";
+import { focusStepStart } from "@/lib/ui/step-navigation";
 
 type ShoppingListClientProps = {
   categories: ShoppingCategory[];
@@ -39,9 +41,38 @@ export function ShoppingListClient({
       }),
     [categories],
   );
-  const [openCategoryKeys, setOpenCategoryKeys] = useState<string[]>(
-    categories[0] ? [categories[0].key] : [],
-  );
+  const [openCategoryKeys, setOpenCategoryKeys] = useState<string[]>(() => {
+    const firstPending = categories.find((category) => category.items.some((item) => !item.checked));
+    return firstPending ? [firstPending.key] : [];
+  });
+  const categoryHeaders = useRef(new Map<string, HTMLButtonElement>());
+  const pendingFocusKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    const key = pendingFocusKey.current;
+    pendingFocusKey.current = null;
+    const header = key ? categoryHeaders.current.get(key) : null;
+    if (header) focusStepStart(header);
+  }, [openCategoryKeys]);
+
+  function handleToggleItem(category: ShoppingCategory, itemId: string) {
+    if (completesShoppingCategory(category, itemId)) {
+      const nextKey = getNextPendingShoppingCategory(categories, category.key);
+      pendingFocusKey.current = nextKey ?? category.key;
+      setOpenCategoryKeys((current) => {
+        const remaining = current.filter((key) => key !== category.key);
+        return nextKey && !remaining.includes(nextKey) ? [...remaining, nextKey] : remaining;
+      });
+    }
+    onToggleItem(itemId);
+  }
+
+  function handleClearMarked() {
+    const firstCategory = categories.find((category) => category.items.length > 0);
+    pendingFocusKey.current = firstCategory?.key ?? null;
+    setOpenCategoryKeys(firstCategory ? [firstCategory.key] : []);
+    onClearMarked();
+  }
 
   function toggleCategory(categoryKey: string) {
     setOpenCategoryKeys((current) =>
@@ -66,11 +97,15 @@ export function ShoppingListClient({
             }
           >
             <button
+              ref={(header) => {
+                if (header) categoryHeaders.current.set(category.key, header);
+                else categoryHeaders.current.delete(category.key);
+              }}
               type="button"
               onClick={() => toggleCategory(category.key)}
               aria-expanded={isOpen}
               aria-controls={`shopping-category-${category.key}`}
-              className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+              className="flex min-h-11 w-full scroll-mt-4 cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
             >
               <div className="flex min-w-0 items-center gap-2">
                 <h2 className="text-base font-semibold text-[var(--color-paper)]">
@@ -111,7 +146,7 @@ export function ShoppingListClient({
                       <input
                         type="checkbox"
                         checked={isChecked}
-                        onChange={() => onToggleItem(item.id)}
+                        onChange={() => handleToggleItem(category, item.id)}
                         className="mt-1 h-4 w-4 accent-[var(--color-accent)]"
                       />
                       <span className={`flex-1 transition-opacity ${isChecked ? "opacity-70" : "opacity-100"}`}>
@@ -125,7 +160,7 @@ export function ShoppingListClient({
                           {item.name}
                         </span>
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                          {formatShoppingAmount(item)} · {item.sourceRecipeIds.length} {item.sourceRecipeIds.length === 1 ? "receta" : "recetas"}
+                          {formatShoppingAmount(item)} · para {item.sourceMealSlotIds.length} {item.sourceMealSlotIds.length === 1 ? "comida" : "comidas"}
                           {item.hasUnquantifiedAmount && item.amountType === "exact" ? " + según necesidad" : ""}
                         </span>
                       </span>
@@ -180,7 +215,7 @@ export function ShoppingListClient({
       <div className="flex justify-center">
         <button
           type="button"
-          onClick={onClearMarked}
+          onClick={handleClearMarked}
           className="rounded-full border border-[var(--color-border)] px-4 py-3 text-sm font-semibold text-[var(--color-paper)] transition hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
         >
           Desmarcar todo

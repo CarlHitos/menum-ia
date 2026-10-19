@@ -72,9 +72,9 @@ export function ShoppingListPageClient({
         count + category.items.filter((item) => item.checked).length,
       0,
     );
-    const recipeRefs = new Set(
+    const mealRefs = new Set(
       merged.categories.flatMap((category) =>
-        category.items.flatMap((item) => item.sourceRecipeIds),
+        category.items.flatMap((item) => item.sourceMealSlotIds),
       ),
     );
 
@@ -82,7 +82,7 @@ export function ShoppingListPageClient({
       totalItems,
       checkedCount,
       pendingCount: totalItems - checkedCount,
-      recipeRefs: recipeRefs.size,
+      mealRefs: mealRefs.size,
     };
   }, [merged.categories]);
 
@@ -156,7 +156,7 @@ export function ShoppingListPageClient({
           {[
             { label: "Productos", value: summary.totalItems },
             { label: "Pendientes", value: summary.pendingCount },
-            { label: "Recetas", value: summary.recipeRefs },
+            { label: "Comidas", value: summary.mealRefs },
           ].map(({ label, value }) => (
             <div key={label} className="min-w-0 px-2">
               <p className="text-[10px] uppercase tracking-[0.08em] text-[var(--color-muted)]">
