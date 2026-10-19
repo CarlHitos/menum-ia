@@ -6,6 +6,7 @@ type PageHeaderProps = {
   description?: string;
   action?: ReactNode;
   compact?: boolean;
+  titleSize?: "default" | "small";
 };
 
 export function PageHeader({
@@ -14,6 +15,7 @@ export function PageHeader({
   description,
   action,
   compact = false,
+  titleSize = "default",
 }: PageHeaderProps) {
   return (
     <header className={`${compact ? "mb-2" : "mb-6"} flex items-start justify-between gap-4`}>
@@ -23,7 +25,7 @@ export function PageHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--color-paper)]">
+        <h1 className={`font-display ${titleSize === "small" ? "text-2xl" : "text-3xl"} font-semibold tracking-tight text-[var(--color-paper)]`}>
           {title}
         </h1>
         {description ? (

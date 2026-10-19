@@ -25,6 +25,7 @@
 ## Fase 4 — Mejoras funcionales
 - Resumen de Hogar implementado en `feat/home-summary`, pendiente de integración: saludo compacto, menú de hoy y accesos con estado del menú y progreso de compra. Ver `docs/home-summary.md`.
 - Edición del hogar y sus comidas del día: activar/desactivar momentos desde ajustes, sincronizando menú y compra sin perder elecciones previas. Alcance y criterios en `TASKS.md`.
+- Acceso con Apple y otros proveedores; hogar compartido mediante invitaciones a cuentas independientes, permisos de edición y sincronización de menú, compra y datos del hogar entre integrantes. Alcance futuro en `TASKS.md`.
 - Repetir semana
 - Historial
 - Favoritos
