@@ -1,4 +1,6 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { Blender, CookingPot, GlassWater, Microwave, RectangleHorizontal, Soup, Utensils, UtensilsCrossed } from "lucide-react";
 import { formatRecipeAmount } from "./ingredient-amount";
 import { RecipeBackLink } from "./recipe-back-link";
 import { SectionCard } from "@/components/ui/section-card";
@@ -57,18 +59,13 @@ export function RecipeDetailClient({
               key={ingredient.id}
               className="flex items-center justify-between gap-3 rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-3 text-sm"
             >
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(252,163,17,0.12)] text-lg">
-                  {getIngredientEmoji(ingredient.name)}
+              <div className="min-w-0 flex-1">
+                <span className="block text-[var(--color-paper)]">
+                  {ingredient.name}
                 </span>
-                <div>
-                  <span className="block text-[var(--color-paper)]">
-                    {ingredient.name}
-                  </span>
-                  <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                    {ingredient.amountType === "exact" ? "Cantidad para esta comida" : "Ajusta al cocinar"}
-                  </span>
-                </div>
+                <span className="mt-1 block text-xs text-[var(--color-muted)]">
+                  {ingredient.amountType === "exact" ? "Cantidad para esta comida" : "Ajusta al cocinar"}
+                </span>
               </div>
               <span className="shrink-0 text-right font-medium text-[var(--color-paper)]">
                 {formatRecipeAmount(ingredient.recipeAmount, ingredient.unit, ingredient.amountType)}
@@ -90,20 +87,18 @@ export function RecipeDetailClient({
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-xl leading-none">
-                    {getStepEmoji(step.title)}
+                  <span
+                    aria-label={`Paso ${index + 1}`}
+                    className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.04)] text-xs font-medium tabular-nums text-[#D5B582]"
+                  >
+                    {index + 1}
                   </span>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-                      Paso {index + 1}
-                    </p>
-                    <h2 className="mt-1 text-sm font-semibold text-[var(--color-paper)]">
-                      {formatStepSummary(step.title)}
-                    </h2>
-                  </div>
+                  <h2 className="text-sm font-semibold text-[var(--color-paper)]">
+                    {formatStepSummary(step.title)}
+                  </h2>
                 </div>
                 {step.timerSeconds ? (
-                  <span className="rounded-full bg-[rgba(252,163,17,0.16)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
+                  <span className="shrink-0 rounded-full bg-[rgba(252,163,17,0.16)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-accent)]">
                     {Math.ceil(step.timerSeconds / 60)} min
                   </span>
                 ) : null}
@@ -121,7 +116,8 @@ export function RecipeDetailClient({
           {recipe.utensils.map((utensil) => (
             <RecipeChip
               key={utensil}
-              label={`${getUtensilEmoji(utensil)} ${utensil}`}
+              label={utensil}
+              icon={getUtensilIcon(utensil)}
               subtle
             />
           ))}
@@ -155,14 +151,16 @@ function RecipeChip({
   label,
   subtle = false,
   compact = false,
+  icon,
 }: {
   label: string;
   subtle?: boolean;
   compact?: boolean;
+  icon?: ReactNode;
 }) {
   return (
     <span
-      className={`rounded-full ${
+      className={`inline-flex items-center gap-2 rounded-full ${
         compact
           ? "inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium uppercase leading-4 tracking-[0.04em]"
           : "px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
@@ -174,6 +172,7 @@ function RecipeChip({
             : "bg-[rgba(252,163,17,0.16)] text-[var(--color-accent-soft)]"
       }`}
     >
+      {icon}
       {label}
     </span>
   );
@@ -220,104 +219,17 @@ function formatStepSummary(title: string) {
   return title;
 }
 
-function getStepEmoji(title: string) {
-  const normalized = title.toLowerCase();
+function getUtensilIcon(utensil: string) {
+  const normalized = utensil.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  let Icon = Utensils;
 
-  if (normalized.includes("base") || normalized.includes("tosta")) {
-    return "🍞";
-  }
+  if (normalized.includes("batidor")) Icon = Blender;
+  else if (normalized.includes("bol")) Icon = Soup;
+  else if (normalized.includes("cuchillo")) Icon = UtensilsCrossed;
+  else if (normalized.includes("tabla") || normalized.includes("bandeja")) Icon = RectangleHorizontal;
+  else if (normalized.includes("sarten") || normalized.includes("olla") || normalized.includes("cazo") || normalized.includes("wok")) Icon = CookingPot;
+  else if (normalized.includes("horno") || normalized.includes("tostador")) Icon = Microwave;
+  else if (normalized.includes("tarro") || normalized.includes("vaso")) Icon = GlassWater;
 
-  if (normalized.includes("mezcla") || normalized.includes("crema")) {
-    return "🥣";
-  }
-
-  if (normalized.includes("huevo")) {
-    return "🍳";
-  }
-
-  if (normalized.includes("horno")) {
-    return "🔥";
-  }
-
-  if (normalized.includes("saltea")) {
-    return "🍲";
-  }
-
-  if (normalized.includes("servir") || normalized.includes("termina")) {
-    return "✨";
-  }
-
-  return "🍽️";
-}
-
-function getUtensilEmoji(utensil: string) {
-  const normalized = utensil.toLowerCase();
-
-  if (normalized.includes("tost")) {
-    return "🍞";
-  }
-
-  if (normalized.includes("bol")) {
-    return "🥣";
-  }
-
-  if (normalized.includes("sarten")) {
-    return "🍳";
-  }
-
-  if (normalized.includes("horno")) {
-    return "🔥";
-  }
-
-  if (normalized.includes("cuch")) {
-    return "🥄";
-  }
-
-  if (normalized.includes("tabla")) {
-    return "🔪";
-  }
-
-  return "🍽️";
-}
-
-function getIngredientEmoji(name: string) {
-  const normalized = name.toLowerCase();
-
-  if (normalized.includes("huevo")) {
-    return "🥚";
-  }
-
-  if (normalized.includes("aguacate")) {
-    return "🥑";
-  }
-
-  if (normalized.includes("tomate")) {
-    return "🍅";
-  }
-
-  if (normalized.includes("pan") || normalized.includes("wrap")) {
-    return "🍞";
-  }
-
-  if (normalized.includes("pollo") || normalized.includes("pavo")) {
-    return "🍗";
-  }
-
-  if (normalized.includes("yogur") || normalized.includes("queso")) {
-    return "🧀";
-  }
-
-  if (normalized.includes("arroz") || normalized.includes("avena")) {
-    return "🌾";
-  }
-
-  if (normalized.includes("fruta") || normalized.includes("platano") || normalized.includes("mango")) {
-    return "🍎";
-  }
-
-  if (normalized.includes("espinaca") || normalized.includes("verdura") || normalized.includes("brocoli")) {
-    return "🥬";
-  }
-
-  return "•";
+  return <Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[#D5B582]" strokeWidth={1.5} />;
 }
