@@ -1,14 +1,14 @@
 # TASKS
 
-## Siguiente tarea — Resumen de Hogar
+## Implementado — Resumen de Hogar
 
-Pendiente de implementar en una rama nueva `feat/home-summary`, después de integrar los ajustes actuales de UX.
+Implementado en `feat/home-summary`; pendiente de revisión e integración. Detalles y validaciones en `docs/home-summary.md`.
 
-- [ ] Sustituir los textos introductorios del hogar configurado por un saludo con el nombre de la cuenta y un resumen compacto de hogar, supermercado y objetivos; indicar objetivos diversos cuando corresponda.
-- [ ] Reutilizar el estilo de HOGAR / COMIDAS y conservar las píldoras de integrantes con un tamaño más pequeño.
-- [ ] Mostrar «Menú de hoy» con recetas reales del plan, tiempo y enlaces al detalle con contexto de comida. No inferir una «próxima comida» mientras no existan horarios o estado de comidas realizadas.
-- [ ] Añadir dos tarjetas en paralelo: «Menú semanal», con estado real y acceso al menú, y «Compra semanal», con progreso de productos marcados y acceso a la lista.
-- [ ] Contemplar hogares sin plan y planes que no incluyen hoy, sin presentar datos de ejemplo; conservar la bienvenida para usuarios sin hogar configurado.
+- [x] Sustituir los textos introductorios del hogar configurado por un saludo con el nombre de la cuenta y un resumen compacto de hogar, supermercado y objetivos; indicar objetivos diversos cuando corresponda.
+- [x] Recuperar la marca y el logo en una barra superior, mostrar saludo y metadatos sobre fondo continuo y conservar los integrantes en una fila horizontal de píldoras compactas.
+- [x] Mostrar «Menú de hoy» con recetas reales del plan, tiempo y enlaces al detalle con contexto de comida. No inferir una «próxima comida» mientras no existan horarios o estado de comidas realizadas.
+- [x] Añadir dos tarjetas en paralelo: «Menú semanal», con estado real y acceso al menú, y «Compra semanal», con progreso de productos marcados y acceso a la lista.
+- [x] Contemplar hogares sin plan y planes que no incluyen hoy, sin presentar datos de ejemplo; conservar la bienvenida para usuarios sin hogar configurado.
 
 Criterio de aceptación: al entrar en Hogar se muestran el resumen, las comidas de hoy cuando existen y los accesos con estados reales. El progreso de compra coincide con la lista y los enlaces de receta conservan las raciones del bloque.
 
@@ -29,6 +29,16 @@ Prioridad: alta. Pendiente de implementar; registrar esta tarea no habilita la e
 Criterio de aceptación inicial: un hogar con cuatro comidas puede activar merienda y pasar a cinco desde sus ajustes, guardar, recargar y ver el nuevo bloque y su compra sin perder sus comidas anteriores. También puede desactivarla y recuperar su elección al reactivarla.
 
 Estado actual: la lógica de momentos de comida y guardado admite cambios, pero el botón «Editar mi hogar» está deshabilitado y `/onboarding` redirige al menú si el hogar ya existe. La primera entrega debe cerrar este acceso y flujo de edición; la edición completa de miembros puede hacerse después.
+
+## Más adelante — Integrantes, objetivos y fotos de perfil
+
+- [ ] Revisar la presentación de Hogar con varios integrantes, nombres largos y distintos objetivos: distribución de píldoras, desplazamiento horizontal y legibilidad en móvil.
+- [ ] Definir cómo presentar varios objetivos, conservando la base común de comidas y evitando una cantidad excesiva de píldoras.
+- [ ] Vincular explícitamente la cuenta autenticada con su integrante del hogar para usar su foto de Google; no asociar personas por coincidencia de nombre ni asignar la foto del propietario a todos.
+- [ ] Permitir cambiar la foto propia y la de integrantes del hogar desde la futura edición de perfiles, con persistencia y permisos adecuados.
+- [ ] Mantener la inicial como alternativa cuando no exista una foto o no se pueda cargar.
+
+Estas mejoras quedan fuera de la entrega actual de `feat/home-summary`.
 
 Las listas generales que siguen contienen tareas históricas pendientes de revisar: algunas funcionalidades ya están implementadas y sus casillas aún no reflejan el estado actual.
 
