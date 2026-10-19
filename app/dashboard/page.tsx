@@ -41,7 +41,7 @@ export default async function DashboardPage() {
     <AppShell currentPath="/dashboard">
       <PageHeader
         eyebrow=""
-        title="Plan semanal"
+        title="Menú semanal"
         compact
       />
       <DashboardClient
