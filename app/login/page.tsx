@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { authOptions } from "@/auth";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/ui/page-header";
-import { SectionCard } from "@/components/ui/section-card";
 import { GoogleSignInButton } from "@/features/auth/google-sign-in-button";
 import { InvalidSessionCleanup } from "@/features/auth/invalid-session-cleanup";
 
@@ -28,24 +28,33 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <AppShell currentPath="/" hideBottomNav>
+      <div className="mb-1 flex items-center justify-between gap-4">
+        <Link
+          href="/"
+          aria-label="Volver al inicio"
+          title="Volver al inicio"
+          className="-ml-2 inline-flex h-11 w-11 items-center justify-center rounded-full transition hover:bg-[rgba(255,255,255,0.06)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+        >
+          <ArrowLeft aria-hidden="true" className="h-4 w-4 text-[var(--color-muted)]" strokeWidth={1.75} />
+        </Link>
+        <Image
+          src="/branding/IconosintransparencyIA.png"
+          alt="Logo de MenumIA"
+          width={52}
+          height={52}
+          className="h-11 w-11 rounded-2xl object-contain"
+          priority
+        />
+      </div>
       <PageHeader
         eyebrow="Acceso"
-        title="Entra en tu hogar"
-        action={
-          <Image
-            src="/branding/IconosintransparencyIA.png"
-            alt="Logo de MenumIA"
-            width={52}
-            height={52}
-            className="h-11 w-11 rounded-2xl object-contain"
-            priority
-          />
-        }
+        title="Conecta tu cuenta"
+        titleSize="small"
       />
 
-      <SectionCard className="bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
+      <div>
         <p className="text-center text-sm leading-6 text-[var(--color-paper)]">
-          Sincroniza tu hogar para acceder a tus menus desde cualquier dispositivo.
+          Accede a tu hogar desde cualquier dispositivo y mantén tus menús siempre a mano.
         </p>
 
         {session?.invalidUserId ? (
@@ -64,15 +73,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p className="mt-3 text-center text-xs leading-5 text-[var(--color-muted)]">
           Prometemos no cotillear tu nevera sin permiso. 😉
         </p>
-      </SectionCard>
-
-      <div className="mt-4 text-center">
-        <Link
-          href="/"
-          className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent-soft)] transition hover:text-[var(--color-accent)]"
-        >
-          Volver al inicio
-        </Link>
       </div>
     </AppShell>
   );

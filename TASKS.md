@@ -30,6 +30,19 @@ Criterio de aceptación inicial: un hogar con cuatro comidas puede activar merie
 
 Estado actual: la lógica de momentos de comida y guardado admite cambios, pero el botón «Editar mi hogar» está deshabilitado y `/onboarding` redirige al menú si el hogar ya existe. La primera entrega debe cerrar este acceso y flujo de edición; la edición completa de miembros puede hacerse después.
 
+## Más adelante — Acceso con otros proveedores y hogar compartido
+
+- [ ] Permitir iniciar sesión con Apple y otros proveedores, manteniendo el acceso con Google y definiendo la vinculación de varios proveedores a una misma cuenta sin duplicar usuarios ni hogares.
+- [ ] Permitir invitar por correo a integrantes de un hogar, con invitaciones que puedan aceptarse, caducar o revocarse.
+- [ ] Al aceptar la invitación e iniciar sesión con su cuenta, incorporar al usuario al hogar compartido y vincularlo con su integrante existente, evitando crear otro hogar o duplicar miembros.
+- [ ] Definir permisos de propietario e integrantes para consultar el plan semanal y editar menús y los campos del hogar que les correspondan.
+- [ ] Compartir y persistir el mismo plan, preferencias y estado de compra entre las cuentas del hogar; reflejar los cambios en los demás usuarios y dispositivos y gestionar ediciones concurrentes sin sobrescribir cambios silenciosamente.
+- [ ] Permitir retirar el acceso de un integrante y verificar que cada cuenta solo pueda consultar o modificar los hogares a los que pertenece.
+
+Criterio de aceptación futuro: dos usuarios con cuentas independientes pertenecen al mismo hogar mediante invitación, consultan el mismo menú y ven los cambios guardados por el otro. Las ediciones respetan sus permisos y retirar el acceso impide seguir consultando o modificando ese hogar.
+
+Estas tareas son futuras; esta entrega solo ajusta la presentación de bienvenida y acceso, sin incorporar proveedores, invitaciones ni sincronización multiusuario.
+
 ## Más adelante — Integrantes, objetivos y fotos de perfil
 
 - [ ] Revisar la presentación de Hogar con varios integrantes, nombres largos y distintos objetivos: distribución de píldoras, desplazamiento horizontal y legibilidad en móvil.

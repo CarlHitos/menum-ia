@@ -47,6 +47,7 @@ export default async function HomePage() {
       <PageHeader
         eyebrow="MenumIA"
         title="Tu hogar en armonIA"
+        titleSize="small"
         action={
           <Image
             src="/branding/IconosintransparencyIA.png"
@@ -59,31 +60,17 @@ export default async function HomePage() {
         }
       />
       <SectionCard>
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-          Bienvenida
-        </p>
-        <p className="mt-3 text-sm leading-6 text-[var(--color-muted)]">
-          MenumIA es el corazon de tu cocina. Organiza quien cocina, que
-          toca hoy y genera la lista de la compra exacta para que nunca falte
-          un ingrediente. Olvida la improvisacion y los gastos de ultima hora
-          en delivery
+        <p className="text-sm leading-6 text-[var(--color-paper)]">
+          MenumIA Organiza los menús de toda la familia, genera tu lista de la compra automática y despídete de la improvisación (y del Delivery😉)
         </p>
       </SectionCard>
 
-      <SectionCard className="mt-4 mb-4 bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
-        <p className="text-base leading-7 text-[var(--color-paper)]">
-          Primero configura tu hogar para que MenumIA pueda preparar un
-          menu y una compra que de verdad encajen contigo.
-        </p>
-        <div className="mt-4 flex justify-center">
-          <Link
-            href={setupHref}
-            className="inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-slate-950"
-          >
-            Configurar mi hogar
-          </Link>
-        </div>
-      </SectionCard>
+      <Link
+        href={setupHref}
+        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-slate-950"
+      >
+        <span className="text-slate-950">Empezar</span>
+      </Link>
     </AppShell>
   );
 }
