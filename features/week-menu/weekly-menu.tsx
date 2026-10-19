@@ -2,7 +2,8 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { useId, useMemo, useState, useSyncExternalStore } from "react";
+import { CalendarDays } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -10,6 +11,7 @@ type WeeklyMenuProps = {
   plan: WeeklyPlanPreviewDay[];
   viewKey?: string;
   headingLabel?: string;
+  rangeLabel?: string;
   onDayChange?: () => void;
   selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
@@ -25,6 +27,9 @@ const mealActionTypography = {
   lineHeight: "1.25rem",
 };
 
+const mealMetaChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] text-[11px] font-semibold leading-none text-[var(--color-accent)]";
+const mealContextChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[#D5A45F] bg-[#343C50] text-[11px] font-light leading-none text-[#F1EDE7]";
+
 const weekdayOrder = [
   "sunday",
   "monday",
@@ -39,14 +44,14 @@ export function WeeklyMenu({
   plan,
   viewKey,
   headingLabel = "Comidas del día",
+  rangeLabel,
   onDayChange,
   selectedSlotId = null,
   onSelectSlot,
   initialDayKey = null,
   onOpenRecipe,
 }: WeeklyMenuProps) {
-  const descriptionIdPrefix = useId();
-  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(() => new Set());
+  const daySelectorRef = useRef<HTMLDivElement>(null);
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
       return initialDayKey;
@@ -66,31 +71,44 @@ export function WeeklyMenu({
   const selectedDay =
     plan.find((day) => day.dayKey === (selectedDayKey ?? restoredDayKey)) ?? plan[0] ?? null;
 
+  useEffect(() => {
+    const selector = daySelectorRef.current;
+    const active = selector?.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
+    if (!selector || !active) return;
+    const bounds = selector.getBoundingClientRect();
+    const button = active.getBoundingClientRect();
+    if (button.left < bounds.left) selector.scrollLeft -= bounds.left - button.left;
+    else if (button.right > bounds.right) selector.scrollLeft += button.right - bounds.right;
+  }, [selectedDay?.dayKey]);
+
   if (!selectedDay) {
     return null;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <SectionCard>
-        <div className="flex items-center justify-between gap-4">
-          <div>
+        <div>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
               {headingLabel}
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
-              {selectedDay.fullDateLabel}
-            </h2>
+            {rangeLabel ? (
+              <p className="-mr-1.5 inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#D5A45F] bg-[#343C50] px-2.5 py-1.5 text-[11px] font-light leading-none text-[#F1EDE7]">
+                <CalendarDays aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-[#D5A45F]" strokeWidth={1.5} />
+                <span>{rangeLabel.replace(" - ", " · ")}</span>
+              </p>
+            ) : null}
           </div>
-          <span className="inline-flex min-w-20 items-center justify-center rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-center text-[11px] font-semibold text-[var(--color-muted)]">
-            {selectedDay.shortLabel} · {selectedDay.dateLabel}
-          </span>
+          <h2 className="mt-2 text-xl font-semibold text-[var(--color-paper)]">
+            {selectedDay.fullDateLabel}
+          </h2>
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-7">
+        <div ref={daySelectorRef} role="group" aria-label="Días del menú" className="mt-3 flex gap-1.5 overflow-x-auto overscroll-x-contain pb-1">
           {plan.map((day) => {
             const isSelected = day.dayKey === selectedDay.dayKey;
-            const [dayNumber, dayMonth] = splitDateLabel(day.dateLabel);
+            const [dayNumber] = splitDateLabel(day.dateLabel);
 
             return (
               <button
@@ -101,8 +119,9 @@ export function WeeklyMenu({
                   if (viewKey) rememberMenuDay(viewKey, day.dayKey);
                   onDayChange?.();
                 }}
+                aria-label={day.fullDateLabel}
                 aria-pressed={isSelected}
-                className={`flex min-h-12 items-center justify-center rounded-2xl px-2 py-3 transition ${
+                className={`flex min-h-12 min-w-9 flex-1 items-center justify-center rounded-xl px-1 py-2 transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                   isSelected
                     ? "bg-[var(--color-accent)] text-slate-950"
                     : "border border-[var(--color-border)] bg-[rgba(255,255,255,0.05)] text-[var(--color-paper)] hover:border-[rgba(252,163,17,0.4)] hover:bg-[rgba(252,163,17,0.12)] active:bg-[var(--color-accent)] active:text-slate-950"
@@ -115,9 +134,6 @@ export function WeeklyMenu({
                   <span className="mt-1 block text-[10px] leading-none opacity-80">
                     {dayNumber}
                   </span>
-                  <span className="mt-1 block text-[10px] leading-none opacity-80">
-                    {dayMonth}
-                  </span>
                 </span>
               </button>
             );
@@ -128,9 +144,6 @@ export function WeeklyMenu({
       <div className="grid gap-3">
         {selectedDay.slots.map((slot) => {
           const isSelected = selectedSlotId === slot.id;
-          const descriptionKey = `${slot.id}:${slot.recipeId ?? ""}:${slot.description ?? ""}`;
-          const descriptionExpanded = expandedDescriptions.has(descriptionKey);
-          const descriptionId = `${descriptionIdPrefix}-description-${slot.id}`;
 
           return (
             <div
@@ -138,7 +151,7 @@ export function WeeklyMenu({
               id={`meal-${slot.id}`}
               tabIndex={-1}
               aria-label={`${slot.mealLabel}: ${slot.title}`}
-              className={`relative isolate rounded-2xl border px-4 py-4 transition-colors ${
+              className={`relative isolate rounded-2xl border px-4 py-3 transition-colors ${
                 slot.status === "planned"
                   ? isSelected
                     ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.1)]"
@@ -146,61 +159,27 @@ export function WeeklyMenu({
                   : "border-dashed border-[var(--color-border)] bg-[rgba(255,255,255,0.03)]"
               }`}
             >
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                        {slot.mealLabel}
-                      </p>
-                      {slot.servings ? (
-                        <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-paper)]/85">
-                          {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
-                        </span>
-                      ) : null}
-                      {slot.description ? (
-                        <button
-                          type="button"
-                          aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
-                          aria-expanded={descriptionExpanded}
-                          aria-controls={descriptionId}
-                          onClick={() => setExpandedDescriptions((current) => {
-                            const next = new Set(current);
-                            if (next.has(descriptionKey)) next.delete(descriptionKey);
-                            else next.add(descriptionKey);
-                            return next;
-                          })}
-                          className={`relative z-10 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
-                        >
-                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
-                            <circle cx="12" cy="12" r="9" />
-                            <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
-                          </svg>
-                        </button>
-                      ) : null}
-                    </div>
-                    <h3 className="mt-3 text-lg font-semibold leading-tight text-[var(--color-paper)]">
-                      {slot.title}
-                    </h3>
+              <div className="flex flex-col gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-display text-base font-semibold leading-snug tracking-tight text-[var(--color-paper)]">
+                    {slot.title}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      {slot.mealLabel}
+                    </p>
+                    {slot.servings ? (
+                      <span className={`${mealMetaChipClassName} px-2`}>
+                        {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
+                      </span>
+                    ) : null}
+                    {slot.minutes ? (
+                      <span className={`${mealContextChipClassName} -mr-1.5 ml-auto px-2`}>
+                        {slot.minutes} min
+                      </span>
+                    ) : null}
                   </div>
-
-                  {slot.minutes ? (
-                    <div className="flex min-w-16 flex-col items-center justify-center rounded-2xl bg-[rgba(252,163,17,0.16)] px-3 py-2 text-center">
-                      <p className="text-lg font-semibold text-[var(--color-accent)]">
-                        {slot.minutes}
-                      </p>
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                        min
-                      </p>
-                    </div>
-                  ) : null}
                 </div>
-
-                {slot.description ? (
-                  <p id={descriptionId} hidden={!descriptionExpanded} className="text-sm leading-6 text-[var(--color-muted)]">
-                    {slot.description}
-                  </p>
-                ) : null}
 
                 <div className="flex items-center gap-3">
                   {slot.status === "planned" && slot.recipeId ? (
