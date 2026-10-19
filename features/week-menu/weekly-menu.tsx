@@ -16,6 +16,7 @@ type WeeklyMenuProps = {
   selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
   initialDayKey?: string | null;
+  restoreDay?: boolean;
   onOpenRecipe?: (href: string) => void;
 };
 
@@ -30,16 +31,6 @@ const mealActionTypography = {
 const mealMetaChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] text-[11px] font-semibold leading-none text-[var(--color-accent)]";
 const mealContextChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[#D5A45F] bg-[#343C50] text-[11px] font-light leading-none text-[#F1EDE7]";
 
-const weekdayOrder = [
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-] as const;
-
 export function WeeklyMenu({
   plan,
   viewKey,
@@ -49,6 +40,7 @@ export function WeeklyMenu({
   selectedSlotId = null,
   onSelectSlot,
   initialDayKey = null,
+  restoreDay = false,
   onOpenRecipe,
 }: WeeklyMenuProps) {
   const daySelectorRef = useRef<HTMLDivElement>(null);
@@ -57,14 +49,13 @@ export function WeeklyMenu({
       return initialDayKey;
     }
 
-    const todayKey = weekdayOrder[new Date().getDay()];
-    return plan.some((day) => day.dayKey === todayKey) ? todayKey : plan[0]?.dayKey ?? "";
+    return plan[0]?.dayKey ?? "";
   }, [initialDayKey, plan]);
 
   const restoredDayKey = useSyncExternalStore(
     subscribeMenuDay,
-    () => viewKey ? readMenuDay(viewKey, plan.map((day) => day.dayKey), defaultDayKey) : defaultDayKey,
-    () => defaultDayKey,
+    () => viewKey ? readMenuDay(viewKey, plan.map((day) => day.dayKey), defaultDayKey, restoreDay) : defaultDayKey,
+    () => plan[0]?.dayKey ?? "",
   );
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
 
@@ -190,6 +181,7 @@ export function WeeklyMenu({
                       href={slot.recipeHref ?? `/recipes/${slot.recipeId}`}
                       onClick={onOpenRecipe ? (event) => {
                         event.preventDefault();
+                        if (viewKey) rememberMenuDay(viewKey, selectedDay.dayKey);
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
                       className="group/recipe inline-flex min-h-11 flex-1 cursor-pointer items-center justify-start gap-2 py-2 text-[#F1EDE7] after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-accent)]"

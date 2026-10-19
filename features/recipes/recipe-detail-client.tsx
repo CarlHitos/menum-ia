@@ -21,7 +21,7 @@ export function RecipeDetailClient({
   return (
     <>
       <div className="mb-4">
-        <RecipeBackLink href={contextQuery ? "/dashboard" : "/recipes"} label={contextQuery ? "Volver al menú" : "Volver a recetas"} />
+        <RecipeBackLink href={contextQuery ? "/dashboard?restoreMenu=1" : "/recipes"} label={contextQuery ? "Volver al menú" : "Volver a recetas"} />
       </div>
       <SectionCard className="mb-4">
         <div className="flex items-start justify-between gap-4">
