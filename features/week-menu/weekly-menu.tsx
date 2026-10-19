@@ -3,7 +3,7 @@
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
 
@@ -28,6 +28,7 @@ const mealActionTypography = {
 };
 
 const mealMetaChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] text-[11px] font-semibold leading-none text-[var(--color-accent)]";
+const mealContextChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[#D5A45F] bg-[#343C50] text-[11px] font-light leading-none text-[#F1EDE7]";
 
 const weekdayOrder = [
   "sunday",
@@ -50,9 +51,7 @@ export function WeeklyMenu({
   initialDayKey = null,
   onOpenRecipe,
 }: WeeklyMenuProps) {
-  const descriptionIdPrefix = useId();
   const daySelectorRef = useRef<HTMLDivElement>(null);
-  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(() => new Set());
   const defaultDayKey = useMemo(() => {
     if (initialDayKey && plan.some((day) => day.dayKey === initialDayKey)) {
       return initialDayKey;
@@ -145,9 +144,6 @@ export function WeeklyMenu({
       <div className="grid gap-3">
         {selectedDay.slots.map((slot) => {
           const isSelected = selectedSlotId === slot.id;
-          const descriptionKey = `${slot.id}:${slot.recipeId ?? ""}:${slot.description ?? ""}`;
-          const descriptionExpanded = expandedDescriptions.has(descriptionKey);
-          const descriptionId = `${descriptionIdPrefix}-description-${slot.id}`;
 
           return (
             <div
@@ -177,39 +173,13 @@ export function WeeklyMenu({
                         {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
                       </span>
                     ) : null}
-                    {slot.description ? (
-                      <button
-                        type="button"
-                        aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
-                        aria-expanded={descriptionExpanded}
-                        aria-controls={descriptionId}
-                        onClick={() => setExpandedDescriptions((current) => {
-                          const next = new Set(current);
-                          if (next.has(descriptionKey)) next.delete(descriptionKey);
-                          else next.add(descriptionKey);
-                          return next;
-                        })}
-                        className={`${mealMetaChipClassName} relative z-10 w-6 cursor-pointer transition-colors after:absolute after:-inset-2.5 after:content-[''] hover:bg-[rgba(252,163,17,0.24)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "ring-1 ring-[var(--color-accent)]" : ""}`}
-                      >
-                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-3.5 w-3.5">
-                          <circle cx="12" cy="12" r="9" />
-                          <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
-                        </svg>
-                      </button>
-                    ) : null}
                     {slot.minutes ? (
-                      <span className={`${mealMetaChipClassName} -mr-1.5 ml-auto px-2`}>
+                      <span className={`${mealContextChipClassName} -mr-1.5 ml-auto px-2`}>
                         {slot.minutes} min
                       </span>
                     ) : null}
                   </div>
                 </div>
-
-                {slot.description ? (
-                  <p id={descriptionId} hidden={!descriptionExpanded} className="text-sm leading-6 text-[var(--color-muted)]">
-                    {slot.description}
-                  </p>
-                ) : null}
 
                 <div className="flex items-center gap-3">
                   {slot.status === "planned" && slot.recipeId ? (
