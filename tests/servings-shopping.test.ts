@@ -333,16 +333,15 @@ test("checked products remain visible once in their category after pending produ
   assert(!markup.includes(">Completados<"));
 });
 
-test("a fully checked category still exposes its checkboxes to undo purchases", () => {
+test("a fully checked category starts collapsed and retains its accessible progress header", () => {
   const catalog = [recipe("a", [ingredient(1, "Cebolla"), ingredient(2, "Aguacate")])];
   const list = buildShoppingListFromPlan(planFor(catalog), catalog);
   list.categories[0].items.forEach((item) => { item.checked = true; });
   const markup = renderToStaticMarkup(createElement(ShoppingListClient, {
     categories: list.categories, onToggleItem: () => {}, onClearMarked: () => {},
   }));
-  assert.equal((markup.match(/type="checkbox"/g) ?? []).length, 2);
-  assert.equal((markup.match(/checked=""/g) ?? []).length, 2);
-  assert(markup.includes('aria-expanded="true"'));
+  assert.equal((markup.match(/type="checkbox"/g) ?? []).length, 0);
+  assert(markup.includes('aria-expanded="false"'));
   assert(markup.includes('aria-label="2 de 2 productos marcados"'));
   assert(!markup.includes(">Completados<"));
 });
