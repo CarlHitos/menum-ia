@@ -27,6 +27,8 @@ const mealActionTypography = {
   lineHeight: "1.25rem",
 };
 
+const mealMetaChipClassName = "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] text-[11px] font-semibold leading-none text-[var(--color-accent)]";
+
 const weekdayOrder = [
   "sunday",
   "monday",
@@ -162,46 +164,44 @@ export function WeeklyMenu({
               }`}
             >
               <div className="flex flex-col gap-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                        {slot.mealLabel}
-                      </p>
-                      {slot.servings ? (
-                        <span className="whitespace-nowrap rounded-full bg-[rgba(255,255,255,0.05)] px-2 py-1 text-[10px] text-[var(--color-paper)]/85">
-                          {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
-                        </span>
-                      ) : null}
-                      {slot.description ? (
-                        <button
-                          type="button"
-                          aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
-                          aria-expanded={descriptionExpanded}
-                          aria-controls={descriptionId}
-                          onClick={() => setExpandedDescriptions((current) => {
-                            const next = new Set(current);
-                            if (next.has(descriptionKey)) next.delete(descriptionKey);
-                            else next.add(descriptionKey);
-                            return next;
-                          })}
-                          className={`relative z-10 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full transition after:absolute after:-inset-2 after:content-[''] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-paper)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`}
-                        >
-                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
-                            <circle cx="12" cy="12" r="9" />
-                            <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
-                          </svg>
-                        </button>
-                      ) : null}
-                      {slot.minutes ? (
-                        <span className="-mr-1.5 ml-auto inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-[rgba(252,163,17,0.16)] px-2 py-1 text-[11px] font-semibold text-[var(--color-accent)]">
-                          {slot.minutes} min
-                        </span>
-                      ) : null}
-                    </div>
-                    <h3 className="mt-1 text-base font-semibold leading-tight text-[var(--color-paper)]">
-                      {slot.title}
-                    </h3>
+                <div className="min-w-0">
+                  <h3 className="font-display text-base font-semibold leading-snug tracking-tight text-[var(--color-paper)]">
+                    {slot.title}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      {slot.mealLabel}
+                    </p>
+                    {slot.servings ? (
+                      <span className={`${mealMetaChipClassName} px-2`}>
+                        {slot.servings} {slot.servings === 1 ? "comensal" : "comensales"}
+                      </span>
+                    ) : null}
+                    {slot.description ? (
+                      <button
+                        type="button"
+                        aria-label={`${descriptionExpanded ? "Ocultar" : "Mostrar"} información de ${slot.title}`}
+                        aria-expanded={descriptionExpanded}
+                        aria-controls={descriptionId}
+                        onClick={() => setExpandedDescriptions((current) => {
+                          const next = new Set(current);
+                          if (next.has(descriptionKey)) next.delete(descriptionKey);
+                          else next.add(descriptionKey);
+                          return next;
+                        })}
+                        className={`${mealMetaChipClassName} relative z-10 w-6 cursor-pointer transition-colors after:absolute after:-inset-2.5 after:content-[''] hover:bg-[rgba(252,163,17,0.24)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${descriptionExpanded ? "ring-1 ring-[var(--color-accent)]" : ""}`}
+                      >
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-3.5 w-3.5">
+                          <circle cx="12" cy="12" r="9" />
+                          <path strokeLinecap="round" d="M12 11v6m0-10v.01" />
+                        </svg>
+                      </button>
+                    ) : null}
+                    {slot.minutes ? (
+                      <span className={`${mealMetaChipClassName} -mr-1.5 ml-auto px-2`}>
+                        {slot.minutes} min
+                      </span>
+                    ) : null}
                   </div>
                 </div>
 
