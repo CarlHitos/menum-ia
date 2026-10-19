@@ -1,8 +1,8 @@
 "use client";
 
-import { menuViewKey, rememberMenuPosition, takeMenuPosition } from "@/lib/ui/menu-navigation";
+import { getDefaultMenuDay, menuViewKey, rememberMenuPosition, takeMenuPosition } from "@/lib/ui/menu-navigation";
 import { focusStepStart } from "@/lib/ui/step-navigation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { resolvePlanServings, updateSlotServings } from "@/lib/domain/plan-servings";
 import { useEffect, useRef, useState } from "react";
 import { MealEditorSheet } from "@/features/week-menu/meal-editor-sheet";
@@ -41,6 +41,8 @@ export function DashboardClient({
   recipes,
 }: DashboardClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const restoreMenuView = searchParams.get("restoreMenu") === "1";
   const [plan, setPlan] = useState<WeeklyPlan | null>(initialPlan);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const saveErrorRef = useRef<HTMLDivElement | null>(null);
@@ -63,9 +65,10 @@ export function DashboardClient({
   const selectedDayLabel = weeklyPlanPreview.find((day) => day.slots.some((slot) => slot.id === selectedSlotId))?.fullDateLabel ?? "";
 
   const returnPosition = useRef<{ key: string; position: number | null } | null>(null);
+  const leavingForRecipe = useRef(false);
   const viewKey = plan ? menuViewKey(household.id, plan.id) : undefined;
   useEffect(() => {
-    if (!viewKey) return;
+    if (!viewKey || !restoreMenuView || leavingForRecipe.current) return;
     if (returnPosition.current?.key !== viewKey) {
       returnPosition.current = { key: viewKey, position: takeMenuPosition(viewKey) };
     }
@@ -82,7 +85,7 @@ export function DashboardClient({
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(secondFrame);
     };
-  }, [viewKey]);
+  }, [viewKey, restoreMenuView]);
 
   useEffect(() => {
     if (saveError && saveErrorRef.current) focusStepStart(saveErrorRef.current);
@@ -135,7 +138,12 @@ export function DashboardClient({
         pending = saveQueue.current;
         await pending;
       } while (pending !== saveQueue.current);
-      if (viewKey && href.startsWith("/recipes/")) rememberMenuPosition(viewKey);
+      if (viewKey && href.startsWith("/recipes/")) {
+        leavingForRecipe.current = true;
+        rememberMenuPosition(viewKey);
+        // Mark this history entry so browser Back also restores the menu context.
+        window.history.replaceState(null, "", "/dashboard?restoreMenu=1");
+      }
       router.push(href);
     } catch {
       // Keep the current plan and display the retry action.
@@ -226,13 +234,14 @@ export function DashboardClient({
         <>
 
       <WeeklyMenu
-        key={plan.id}
+        key={`${plan.id}:${restoreMenuView}`}
         viewKey={viewKey}
+        restoreDay={restoreMenuView}
         headingLabel={plan.status === "confirmed" ? "Menú confirmado" : "Comidas del día"}
         rangeLabel={rangeLabel}
         onDayChange={() => setSelectedSlotId(null)}
         plan={weeklyPlanPreview}
-        initialDayKey={plan.days[0]?.dayKey ?? null}
+        initialDayKey={getDefaultMenuDay(plan)}
         selectedSlotId={selectedSlotId}
         onSelectSlot={handleSelectSlot}
         onOpenRecipe={(href) => void navigateAfterSave(href)}

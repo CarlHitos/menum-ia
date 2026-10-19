@@ -314,7 +314,7 @@ test("a fully checked category still exposes its checkboxes to undo purchases", 
   assert.equal((markup.match(/type="checkbox"/g) ?? []).length, 2);
   assert.equal((markup.match(/checked=""/g) ?? []).length, 2);
   assert(markup.includes('aria-expanded="true"'));
-  assert(markup.includes("2/2 marcados"));
+  assert(markup.includes('aria-label="2 de 2 productos marcados"'));
   assert(!markup.includes(">Completados<"));
 });
 

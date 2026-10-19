@@ -1,6 +1,18 @@
 # TASKS
 
-## Próxima mejora — Edición del hogar y comidas del día
+## Siguiente tarea — Resumen de Hogar
+
+Pendiente de implementar en una rama nueva `feat/home-summary`, después de integrar los ajustes actuales de UX.
+
+- [ ] Sustituir los textos introductorios del hogar configurado por un saludo con el nombre de la cuenta y un resumen compacto de hogar, supermercado y objetivos; indicar objetivos diversos cuando corresponda.
+- [ ] Reutilizar el estilo de HOGAR / COMIDAS y conservar las píldoras de integrantes con un tamaño más pequeño.
+- [ ] Mostrar «Menú de hoy» con recetas reales del plan, tiempo y enlaces al detalle con contexto de comida. No inferir una «próxima comida» mientras no existan horarios o estado de comidas realizadas.
+- [ ] Añadir dos tarjetas en paralelo: «Menú semanal», con estado real y acceso al menú, y «Compra semanal», con progreso de productos marcados y acceso a la lista.
+- [ ] Contemplar hogares sin plan y planes que no incluyen hoy, sin presentar datos de ejemplo; conservar la bienvenida para usuarios sin hogar configurado.
+
+Criterio de aceptación: al entrar en Hogar se muestran el resumen, las comidas de hoy cuando existen y los accesos con estados reales. El progreso de compra coincide con la lista y los enlaces de receta conservan las raciones del bloque.
+
+## Pendiente — Edición del hogar y comidas del día
 
 Prioridad: alta. Pendiente de implementar; registrar esta tarea no habilita la edición actual.
 

@@ -23,7 +23,8 @@
 - Guardado de recetas y preferencias
 
 ## Fase 4 — Mejoras funcionales
-- Edición del hogar y sus comidas del día: activar/desactivar momentos desde ajustes, sincronizando menú y compra sin perder elecciones previas. Primera prioridad de esta fase; alcance y criterios en `TASKS.md`.
+- Resumen de Hogar: siguiente tarea tras los ajustes actuales de UX, en `feat/home-summary`; saludo compacto, menú de hoy y accesos con estado del menú y progreso de compra. Alcance en `TASKS.md`.
+- Edición del hogar y sus comidas del día: activar/desactivar momentos desde ajustes, sincronizando menú y compra sin perder elecciones previas. Alcance y criterios en `TASKS.md`.
 - Repetir semana
 - Historial
 - Favoritos

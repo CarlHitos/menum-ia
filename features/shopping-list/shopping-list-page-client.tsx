@@ -5,7 +5,9 @@ import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { SectionCard } from "@/components/ui/section-card";
 import { ShoppingListClient } from "@/features/shopping-list/shopping-list-client";
+import { RecipeBackLink } from "@/features/recipes/recipe-back-link";
 import { buildShoppingListFromPlan } from "@/lib/domain/shopping-list";
+import { getPlanRangeLabel } from "@/lib/domain/weekly-plan-runtime";
 import {
   buildNextShoppingListState,
   flattenShoppingItems,
@@ -58,15 +60,6 @@ export function ShoppingListPageClient({
         : [],
     [shoppingList, shoppingState],
   );
-  const recipeCount = useMemo(() => {
-    if (!plan) {
-      return 0;
-    }
-
-    return new Set(
-      plan.days.flatMap((day) => day.slots.map((slot) => slot.recipeId)),
-    ).size;
-  }, [plan]);
   const hasChangesAfterConfirmation =
     plan?.status === "draft" && Boolean(plan.confirmedAt);
   const summary = useMemo(() => {
@@ -124,7 +117,7 @@ export function ShoppingListPageClient({
       <>
         <PageHeader
           eyebrow=""
-          title="Lista inteligente"
+          title="Compra semanal"
           description="Primero elige cuando empieza tu planificacion para generar la compra."
         />
 
@@ -149,103 +142,31 @@ export function ShoppingListPageClient({
   return (
     <>
       <PageHeader
+        compact
         eyebrow=""
-        title="Lista inteligente"
-        description={`${recipeCount} recetas de tu menú semanal.`}
+        title="Compra semanal"
+        description={`${plan.status === "confirmed" ? "Semana activa" : hasChangesAfterConfirmation ? "Semana en edición · Cambios recientes" : "Semana en edición"} (${getPlanRangeLabel(plan)})`}
+        action={
+          <RecipeBackLink href="/dashboard" label="Editar menú" />
+        }
       />
 
-      <SectionCard className="mb-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-accent-soft)]">
-          {plan.status === "confirmed"
-            ? "Compra vinculada a la semana activa"
-            : hasChangesAfterConfirmation
-              ? "Compra actualizada con cambios recientes"
-              : "Compra vinculada a la semana en edicion"}
-        </p>
-        <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-          {plan.status === "confirmed"
-            ? "Esta lista refleja la semana que ya has dejado lista para comprar y cocinar."
-            : hasChangesAfterConfirmation
-              ? "Has cambiado una semana que ya estaba cerrada. Esta compra ya usa la version actual del menu."
-              : "Esta lista se ira ajustando mientras cambies recetas antes de cerrar la semana."}
-        </p>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span
-            className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${
-              plan.status === "confirmed"
-                ? "bg-[rgba(135,214,141,0.18)] text-[var(--color-success)]"
-                : "bg-[rgba(252,163,17,0.16)] text-[var(--color-accent-soft)]"
-            }`}
-          >
-            {plan.status === "confirmed" ? "Semana confirmada" : "Semana en edicion"}
-          </span>
-          {plan.status === "draft" ? (
-            <Link
-              href="/dashboard"
-              className="text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-paper)]"
-            >
-              Confirmar semana desde el menu
-            </Link>
-          ) : null}
-        </div>
-      </SectionCard>
-
-      <SectionCard className="mb-4 bg-[linear-gradient(145deg,rgba(255,255,255,0.14),rgba(252,163,17,0.12))]">
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-end">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-slate-950"
-            >
-              Editar menu
-            </Link>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Cobertura semanal
-            </p>
-            <h2 className="mt-2 text-lg font-semibold text-[var(--color-paper)]">
-              Compra de las comidas incluidas en tu plan
-            </h2>
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-2 py-3 text-center">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                  Productos
-                </p>
-                <p className="mt-1 text-lg font-semibold leading-none text-[var(--color-paper)]">
-                  {summary.totalItems}
-                </p>
-              </div>
-              <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-2 py-3 text-center">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                  Pendientes
-                </p>
-                <p className="mt-1 text-lg font-semibold leading-none text-[var(--color-paper)]">
-                  {summary.pendingCount}
-                </p>
-              </div>
-              <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] px-2 py-3 text-center">
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--color-muted)]">
-                  Recetas
-                </p>
-                <p className="mt-1 text-lg font-semibold leading-none text-[var(--color-paper)]">
-                  {summary.recipeRefs}
-                </p>
-              </div>
+      <SectionCard className="mb-3 !p-3">
+        <div className="grid grid-cols-3 divide-x divide-[var(--color-border)] text-center">
+          {[
+            { label: "Productos", value: summary.totalItems },
+            { label: "Pendientes", value: summary.pendingCount },
+            { label: "Recetas", value: summary.recipeRefs },
+          ].map(({ label, value }) => (
+            <div key={label} className="min-w-0 px-2">
+              <p className="text-[10px] uppercase tracking-[0.08em] text-[var(--color-muted)]">
+                {label}
+              </p>
+              <p className="mt-0.5 text-base font-semibold leading-tight text-[var(--color-paper)]">
+                {value}
+              </p>
             </div>
-            <div className="mt-4 h-2 rounded-full bg-[rgba(255,255,255,0.08)]">
-              <div
-                className="h-full rounded-full bg-[var(--color-accent)] transition-all"
-                style={{
-                  width:
-                    summary.totalItems === 0
-                      ? "0%"
-                      : `${(summary.checkedCount / summary.totalItems) * 100}%`,
-                }}
-              />
-            </div>
-          </div>
+          ))}
         </div>
       </SectionCard>
 

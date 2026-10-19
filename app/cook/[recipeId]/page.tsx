@@ -2,6 +2,7 @@ import { RecipeBackLink } from "@/features/recipes/recipe-back-link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/ui/section-card";
+import { StatPill } from "@/components/ui/stat-pill";
 import { CookingMode } from "@/features/cooking/cooking-mode";
 import { requireAuth } from "@/lib/auth/require-auth";
 import { getHouseholdWithMembersByOwnerUserId } from "@/lib/dal/households";
@@ -53,22 +54,12 @@ export default async function CookPage({ params, searchParams }: CookPageProps) 
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] p-3">
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Duracion
-            </p>
-            <p className="mt-1 text-base font-semibold text-[var(--color-paper)]">
-              {recipe.durationMinutes} min
-            </p>
-          </div>
-          <div className="rounded-2xl bg-[rgba(255,255,255,0.06)] p-3">
-            <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Raciones
-            </p>
-            <p className="mt-1 text-base font-semibold text-[var(--color-paper)]">
-              {context.requestedServings} {context.requestedServings === 1 ? "persona" : "personas"}
-            </p>
-          </div>
+          <StatPill label="Duración" value={String(recipe.durationMinutes)} suffix="min" />
+          <StatPill
+            label="Raciones"
+            value={String(context.requestedServings)}
+            suffix={context.requestedServings === 1 ? "persona" : "personas"}
+          />
         </div>
       </SectionCard>
 

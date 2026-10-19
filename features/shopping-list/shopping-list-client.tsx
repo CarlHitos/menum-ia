@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { formatShoppingAmount } from "@/features/shopping-list/shopping-quantity";
 import type { ShoppingCategory, ShoppingItem } from "@/lib/domain/types";
 import { SectionCard } from "@/components/ui/section-card";
@@ -69,30 +70,28 @@ export function ShoppingListClient({
               onClick={() => toggleCategory(category.key)}
               aria-expanded={isOpen}
               aria-controls={`shopping-category-${category.key}`}
-              className="flex w-full items-center justify-between gap-4 text-left"
+              className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
             >
-              <div className="flex items-center gap-3">
-                <span className="inline-flex min-w-16 items-center justify-center rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-accent-soft)]">
-                  {isOpen ? "Ocultar" : "Ver"}
+              <div className="flex min-w-0 items-center gap-2">
+                <h2 className="text-base font-semibold text-[var(--color-paper)]">
+                  {category.label}
+                </h2>
+                <span
+                  aria-label={`${category.checkedCount} de ${category.items.length} productos marcados`}
+                  className={`shrink-0 rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[11px] tabular-nums ${
+                    category.isComplete
+                      ? "text-[var(--color-success)]"
+                      : "text-[var(--color-muted)]"
+                  }`}
+                >
+                  {category.checkedCount}/{category.items.length}
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold text-[var(--color-paper)]">
-                    {category.label}
-                  </h2>
-                  <p
-                    className={`mt-1 text-xs uppercase tracking-[0.18em] ${
-                      category.isComplete
-                        ? "text-[var(--color-success)]"
-                        : "text-[var(--color-muted)]"
-                    }`}
-                  >
-                    {category.checkedCount}/{category.items.length} marcados
-                  </p>
-                </div>
               </div>
-              <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                {category.items.length} productos
-              </span>
+              <ChevronRight
+                aria-hidden="true"
+                className={`h-4 w-4 shrink-0 text-[var(--color-muted)] transition-transform ${isOpen ? "rotate-90" : ""}`}
+                strokeWidth={1.75}
+              />
             </button>
 
             {isOpen ? (
@@ -103,7 +102,11 @@ export function ShoppingListClient({
                   return (
                     <label
                       key={item.id}
-                      className="flex cursor-pointer items-start gap-3 rounded-2xl bg-[rgba(255,255,255,0.06)] px-3 py-3"
+                      className={`flex cursor-pointer items-start gap-3 rounded-2xl px-3 py-3 transition-colors ${
+                        isChecked
+                          ? "bg-[rgba(255,255,255,0.025)]"
+                          : "bg-[rgba(255,255,255,0.06)]"
+                      }`}
                     >
                       <input
                         type="checkbox"
@@ -111,7 +114,7 @@ export function ShoppingListClient({
                         onChange={() => onToggleItem(item.id)}
                         className="mt-1 h-4 w-4 accent-[var(--color-accent)]"
                       />
-                      <span className="flex-1">
+                      <span className={`flex-1 transition-opacity ${isChecked ? "opacity-70" : "opacity-100"}`}>
                         <span
                           className={`block text-sm font-medium ${
                             isChecked

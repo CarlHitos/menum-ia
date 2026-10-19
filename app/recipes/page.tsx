@@ -11,7 +11,7 @@ export default async function RecipesPage() {
   if (!await getHouseholdWithMembersByOwnerUserId(session.user.id)) redirect("/onboarding");
   const recipes = await getCatalogRecipes();
   return <AppShell currentPath="/recipes">
-    <PageHeader eyebrow="" title="Biblioteca de recetas" description="Ideas para tus comidas, desayunos y preparaciones. Encuentra recetas por sus ingredientes y temporada." />
+    <PageHeader compact eyebrow="" title="Biblioteca de recetas" />
     <RecipeBrowser recipes={recipes} />
   </AppShell>;
 }
