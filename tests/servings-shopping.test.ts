@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { RecipeDetailClient } from "../features/recipes/recipe-detail-client";
 import { CookingMode } from "../features/cooking/cooking-mode";
 import { ShoppingListClient } from "../features/shopping-list/shopping-list-client";
+import { ShoppingListPageClient } from "../features/shopping-list/shopping-list-page-client";
 import { formatShoppingAmount } from "../features/shopping-list/shopping-quantity";
 import { recipes } from "../lib/data/recipe-catalog";
 import { buildDefaultWeekTemplate } from "../lib/domain/default-week-template";
@@ -71,6 +72,34 @@ test("weekly sum retains thirds instead of rounding each recipe to 0.33", () => 
   assert.equal(items[0].purchaseAmount, 1);
   assert.equal(items[0].sourceMealSlotIds.length, 3);
   assert.equal(items[0].sourceRecipeIds.length, 1);
+});
+
+test("shopping counts planned meals rather than distinct recipes, including repeated fruit recipes", () => {
+  const breakfast = recipe("breakfast", [ingredient(3, "Platano")], 3);
+  const snack = recipe("snack", [ingredient(2, "Platano"), ingredient(3, "Manzana")], 3);
+  const catalog = [breakfast, breakfast, breakfast, breakfast, snack, snack, snack, snack, snack, snack];
+  const list = buildShoppingListFromPlan(planFor(catalog, 3), [breakfast, snack]);
+  const banana = flattenShoppingItems(list.categories).find((item) => item.name === "Platano")!;
+  assert.equal(banana.totalNeeded, 24);
+  assert.equal(banana.purchaseAmount, 24);
+  assert.equal(banana.sourceRecipeIds.length, 2);
+  assert.equal(banana.sourceMealSlotIds.length, 10);
+  const markup = renderToStaticMarkup(createElement(ShoppingListClient, {
+    categories: list.categories, onToggleItem: () => {}, onClearMarked: () => {},
+  }));
+  assert(markup.includes("24 unidades"));
+  assert(markup.includes("para 10 comidas"));
+  assert(!markup.includes("2 recetas"));
+  const pageMarkup = renderToStaticMarkup(createElement(ShoppingListPageClient, {
+    initialPlan: planFor(catalog, 3), initialShoppingState: null, recipes: [breakfast, snack],
+  }));
+  assert.match(pageMarkup, />Comidas<\/p><p[^>]*>10<\/p>/);
+
+  const single = buildShoppingListFromPlan(planFor([breakfast], 3), [breakfast]);
+  const singleMarkup = renderToStaticMarkup(createElement(ShoppingListClient, {
+    categories: single.categories, onToggleItem: () => {}, onClearMarked: () => {},
+  }));
+  assert(singleMarkup.includes("para 1 comida"));
 });
 
 test("540 g + 450 g of the same chicken cut is one 990 g purchase", () => {

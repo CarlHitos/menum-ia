@@ -125,7 +125,7 @@ export function ShoppingListClient({
                           {item.name}
                         </span>
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                          {formatShoppingAmount(item)} · {item.sourceRecipeIds.length} {item.sourceRecipeIds.length === 1 ? "receta" : "recetas"}
+                          {formatShoppingAmount(item)} · para {item.sourceMealSlotIds.length} {item.sourceMealSlotIds.length === 1 ? "comida" : "comidas"}
                           {item.hasUnquantifiedAmount && item.amountType === "exact" ? " + según necesidad" : ""}
                         </span>
                       </span>
