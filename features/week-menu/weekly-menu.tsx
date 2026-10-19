@@ -2,7 +2,7 @@
 
 import { readMenuDay, rememberMenuDay, subscribeMenuDay } from "@/lib/ui/menu-navigation";
 import Link from "next/link";
-import { CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { WeeklyPlanPreviewDay } from "@/lib/domain/weekly-plan-preview";
 import { SectionCard } from "@/components/ui/section-card";
@@ -174,8 +174,9 @@ export function WeeklyMenu({
                       </span>
                     ) : null}
                     {slot.minutes ? (
-                      <span className={`${mealContextChipClassName} -mr-1.5 ml-auto px-2`}>
-                        {slot.minutes} min
+                      <span className={`${mealContextChipClassName} -mr-1.5 ml-auto gap-1.5 px-2`}>
+                        <Clock aria-hidden="true" className="h-3 w-3 shrink-0 text-[#D5A45F]" strokeWidth={1.5} />
+                        <span>{slot.minutes} min</span>
                       </span>
                     ) : null}
                   </div>
@@ -191,9 +192,10 @@ export function WeeklyMenu({
                         event.preventDefault();
                         onOpenRecipe(slot.recipeHref ?? `/recipes/${slot.recipeId}`);
                       } : undefined}
-                      className="inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.08)] px-4 py-2.5 text-[var(--color-paper)] transition-colors duration-150 after:absolute after:inset-0 after:rounded-2xl after:content-[''] hover:border-[var(--color-accent)] hover:bg-[rgba(252,163,17,0.12)] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-accent)] active:bg-[rgba(252,163,17,0.18)]"
+                      className="group/recipe inline-flex min-h-11 flex-1 cursor-pointer items-center justify-start gap-2 py-2 text-[#F1EDE7] after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--color-accent)]"
                     >
-                      Ver receta
+                      <span className="text-[#F1EDE7] transition-colors group-hover/recipe:text-[var(--color-accent-soft)]">Ver receta</span>
+                      <ArrowRight aria-hidden="true" className="h-4 w-4 text-[#F1EDE7] transition-transform group-hover/recipe:translate-x-0.5" strokeWidth={1.75} />
                     </Link>
                   ) : null}
 
@@ -204,15 +206,17 @@ export function WeeklyMenu({
                       aria-pressed={isSelected}
                       title={isSelected ? "Editando comida" : "Cambiar comida"}
                       onClick={() => onSelectSlot(slot.id)}
-                      className={`relative z-10 inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+                      className="group/edit relative z-10 inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+                    >
+                      <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${
                         isSelected
                           ? "border-[rgba(252,163,17,0.55)] bg-[rgba(252,163,17,0.08)] text-[var(--color-accent-soft)]"
-                          : "border-[var(--color-border)] text-[var(--color-paper)] hover:bg-[rgba(255,255,255,0.06)] active:bg-[rgba(255,255,255,0.1)]"
-                      }`}
-                    >
-                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 3a2.83 2.83 0 0 1 4 4L7 20l-4 1 1-4Z M14 5l4 4" />
-                      </svg>
+                          : "border-[rgba(255,255,255,0.1)] text-[var(--color-muted)] group-hover/edit:bg-[rgba(255,255,255,0.04)] group-hover/edit:text-[var(--color-paper)]"
+                      }`}>
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 3a2.83 2.83 0 0 1 4 4L7 20l-4 1 1-4Z M14 5l4 4" />
+                        </svg>
+                      </span>
                     </button>
                   ) : null}
                 </div>

@@ -38,12 +38,12 @@ export function RecipeDetailClient({
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <RecipeChip label={`${requestedServings} ${requestedServings === 1 ? "comensal" : "comensales"}`} />
-          <RecipeChip label={recipeKindLabels[getRecipeMetadata(recipe).kind]} />
-          <RecipeChip label={recipeSeasonLabels[getRecipeMetadata(recipe).season]} />
-          <RecipeChip label={`${recipe.durationMinutes} min`} />
-          <RecipeChip label={formatDifficulty(recipe.difficulty)} />
+        <div className="mt-3 flex flex-wrap gap-1">
+          <RecipeChip compact label={`${requestedServings} ${requestedServings === 1 ? "comensal" : "comensales"}`} />
+          <RecipeChip compact label={recipeKindLabels[getRecipeMetadata(recipe).kind]} />
+          <RecipeChip compact label={recipeSeasonLabels[getRecipeMetadata(recipe).season]} />
+          <RecipeChip compact label={`${recipe.durationMinutes} min`} />
+          <RecipeChip compact label={formatDifficulty(recipe.difficulty)} />
         </div>
       </SectionCard>
 
@@ -154,16 +154,24 @@ export function RecipeDetailClient({
 function RecipeChip({
   label,
   subtle = false,
+  compact = false,
 }: {
   label: string;
   subtle?: boolean;
+  compact?: boolean;
 }) {
   return (
     <span
-      className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] ${
+      className={`rounded-full ${
+        compact
+          ? "inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium uppercase leading-4 tracking-[0.04em]"
+          : "px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
+      } ${
         subtle
           ? "bg-[rgba(255,255,255,0.08)] text-[var(--color-muted)]"
-          : "bg-[rgba(252,163,17,0.16)] text-[var(--color-accent-soft)]"
+          : compact
+            ? "bg-[rgba(252,163,17,0.10)] text-[#D5B582]"
+            : "bg-[rgba(252,163,17,0.16)] text-[var(--color-accent-soft)]"
       }`}
     >
       {label}
